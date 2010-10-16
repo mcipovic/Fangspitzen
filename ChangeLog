@@ -4,6 +4,7 @@ v0.9.8 - Modularized the core (see ./includes)
        - Added ftp-backup script
        - Added add-user script for adding users to the system and rutorrent
        - Simplified installation of base packages
+       - Added launchpad-update.sh script
 
 v0.9.7 - Better debugging methods
        - run cleanup() if process quits unexpectly (ctrl-c)

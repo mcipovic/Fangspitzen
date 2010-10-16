@@ -1,0 +1,16 @@
+Finish Cherokee Config
+Finish ShroudBNC install
+Test Transission
+Test Deluge
+Configure fail2ban
+
+--- phpsysinfo
+--- uTorrent Server
+--- add request: irssi
+--- add request: ajaxplorer https://ajaxplorer.svn.sourceforge.net/svnroot/ajaxplorer/trunk/core/src
+--- add request: headless virtualbox
+--- add request: virtualbox webui http://code.google.com/p/phpvirtualbox
+--- implement dialog
+
+*** MultiUser (priority)
+*** User Add|Edit|Del functions (priority)

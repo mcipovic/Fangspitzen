@@ -1,0 +1,13 @@
+## htdigest authentication
+	AuthType Digest
+	AuthName "ruTorrent"
+	AuthDigestProvider file
+	AuthUserFile /etc/apache2/.htpasswd
+	Require valid-user
+
+## ip control list example
+#	order deny,allow
+#	allow from 123.45.6.7
+#	allow from 012.34.5.3
+#	deny from all
+

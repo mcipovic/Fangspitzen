@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 trap ctrl_c SIGINT
 #
 # 	Copyright (c) <2009>, <OMNi>
@@ -30,8 +30,8 @@ trap ctrl_c SIGINT
 ##################################################################
 ## DESCRiPTiON: Auto System Installer Script                     #
 ## See TODO and CHANGELOG                                        #
-VERSION='0.9.8-svn'                                              #
-DATE='Oct 12 2010'                                               #
+VERSION='0.9.8~svn'                                              #
+DATE='Oct 21 2010'                                               #
 ##################################################################
 source includes/functions.sh  # Source in our functions
 
@@ -43,14 +43,12 @@ while [ $# -gt 0 ]; do
 			else error "Specify Length --pass x "
 			fi
 			mkpass ;;
-		-h|--help)    # Output usage information
-			usage ;;
 		-v|--version) # Output version information
-			echo " OMNi's AutoScript v${VERSION} - ${DATE}"
+			echo -e "\n v$VERSION  $DATE \n"
 			exit 0 ;;
 		*)
 			echo " Invalid Option"
-			usage ;;
+			usage ;;  # Output usage information
 	esac
 done
 
@@ -283,38 +281,6 @@ elif [[ ${sql} = 'postgre' ]]; then
 	debug_wait "postgresql.installed"
 fi
 
-##[ XCache ]##
-if [[ ${cache} = 'xcache' ]]; then
-	notice "iNSTALLiNG X-CACHE"
-	${INSTALL} php5-xcache 2>> ${eLOG}
-		E_=$? && debug_error "X-Cache failed to install"
-
-	echo -e "\n${bldylw} Generate a User Name and Password for XCache-Admin"
-	echo -e " You can use www.trilug.org/~jeremy/md5.php to generate the password ${rst}\n"
-	read -p "   Login Name: " xUser  # Get UserName and Password
-	read -p " MD5 Password: " xPass  # For XCache-Admin
-
-	PATH_xcache="/etc/php5/conf.d/xcache.ini"
-	sed -i "s:; xcache.admin.user .*:xcache.admin.user = ${xUser}:" ${PATH_xcache}
-	sed -i "s:; xcache.admin.pass .*:xcache.admin.pass = ${xPass}:" ${PATH_xcache}
-	sed -i 's:xcache.size  .*:xcache.size  = 48M:'                  ${PATH_xcache}  # Increase cache size
-	sed -i "s:xcache.count .*:xcache.count = ${CORES}:" 	        ${PATH_xcache}  # Specify CPU Core count
-	sed -i 's:xcache.var_size  .*:xcache.var_size  = 8M:'           ${PATH_xcache}
-	sed -i 's:xcache.optimizer .*:xcache.optimizer = On:'           ${PATH_xcache}
-	cp -a /usr/share/xcache/admin ${WEB}/xcache-admin/  # Copy Admin folder to webroot
-
-	log "XCache Installation | Completed"
-	debug_wait "xcache.installed"
-
-##[ APC ]##
-elif [[ ${cache} = 'apc' ]]; then
-	notice "iNSTALLiNG APC"
-	${INSTALL} php-apc 2>> ${eLOG}
-	E_=$? && debug_error "PHP-APC failed to install"
-	log "APC Installation | Completed"
-	debug_wait "apc.installed"
-fi
-
 ##[ Bouncers ]##
 cd ${BASE}
 if [[ ${bnc} = 'znc' || ${bnc} = 'sbnc' || ${bnc} = 'psybnc' ]]; then
@@ -410,6 +376,7 @@ fi
 cd ${BASE}/tmp
 if [[ ${vnstat} = 'y' ]]; then
 	notice "iNSTALLiNG VNSTAT"
+	${INSTALL} libgd2-xpm libgd2-xpm-dev 2>> ${eLOG}
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
 	tar xzf vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
@@ -470,7 +437,7 @@ fi
 echo -e "\n*******************************"
 echo -e   "**${bldred} TORRENT CLiENT iNSTALLiNG ${rst}**"
 echo -e   "*******************************\n"
-cd tmp
+cd ${BASE}/tmp
 
 if [[ ${buildtorrent} = 'b' ]]; then
 #-->##[ BuildTorrent ]##

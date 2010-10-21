@@ -3,26 +3,28 @@ while [ ${skip} = false ]; do
 clear
 echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<---------------${rst}"
 
-read -p " [HTTP SERVER]     [apache|lighttp|cherokee|none]: "  http
-read -p " [SQL SERVER]         [mysql|sqlite|postgre|none]: "  sql
-
-read -p " [FTP SERVER]         [vsftp|proftp|pureftp|none]: "  ftpd
-read -p " [Torrent App]      [rtorrent|tranny|deluge|none]: "  torrent
+read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: "  http
+read -p "[ SQL SERVER  ]        [mysql|sqlite|postgre|none]: "  sql
+read -p "[ FTP SERVER  ]        [vsftp|proftp|pureftp|none]: "  ftpd
+read -p "[ Torrent App ]      [rtorrent|tranny|deluge|none]: "  torrent
 
 if [[ ${torrent} = 'rtorrent' ]]; then
-read -p " [Compile with Pre-Allocation?]             [y|n]: "  alloc ;fi
-if [[ ${torrent} != 'tranny' || ${torrent} != 'deluge' ]]; then
-read -p " [ruTorrent WebUi]                          [y|n]: "  webui ;fi
-if [[ ${torrent} != 'rtorrent' || ${torrent} != 'tranny' || ${torrent} != 'deluge' ]]; then
-read -p " [MkTorrent or BuildTorrent]                  [b]: "  buildtorrent ;fi
+read -p "[ Enable preallocation   ]             [y|n]: "  alloc
+	if [[ ${alloc} = 'y' ]]; then
+	echo -e "\n See http://libtorrent.rakshasa.no/ticket/460 for more info and potential dangers :Do not use on ext3 \n"
+fi;fi
+
+if [[ ${torrent} = 'rtorrent' || ${torrent} = 'tranny' || ${torrent} = 'deluge' ]]; then
+read -p "[ MkTorrent or BuildTorrent ]                  [b]: "  buildtorrent ;fi
+read -p "[ ruTorrent WebUi ]                          [y|n]: "  webui
 
 echo -e "\n       **** [ Extra Options ] ****"
 read -p " [iRC Bouncer]             [znc|psybnc|sbnc|none]: "  bnc
-read -p " [PHP Cache]                    [xcache|apc|none]: "  cache
 read -p " [WebMiN]                                   [y|n]: "  webmin
 read -p " [VnStat WebUi]                             [y|n]: "  vnstat
 
-#!========================>> CHECKS <<==========================!#
+
+#!=====================>> CONFIRMATION <<=======================!#
 echo -e "\n*******************************"
 echo -e   "**********${bldred} CONFiRM ${rst}************"
 echo -e   "*******************************\n"
@@ -84,6 +86,9 @@ fi
 ##[ Check for Torent Client ]##
 if [[ ${torrent} = 'rtorrent' ]]; then
 	echo -e "${bldblu} Package: libtorrent|rtorrent : Version: 0.12.6|0.8.6 ${rst}"
+	if [[ ${alloc} = 'y' ]]; then
+		echo -e "${bldylw} Compiling --with-posix-fallocate !${rst}"
+	fi
 elif [[ ${torrent} = 'tranny' ]]; then
 	if [[ ${NAME} = 'lenny' ]]; then
 		echo -e "${bldred} Not currently working with lenny ${rst}"
@@ -114,7 +119,7 @@ else
 	echo -e "${bldblu} Package: mktorrent : Version: 1.0~git ${rst}"
 fi;fi
 
-##[ Check for Webui ]##
+##[ Check for ruTorrent ]##
 if [[ ${torrent} = 'rtorrent' ]]; then
 	if [[ ${webui} = 'y' ]]; then
 		echo -e "${bldblu} Package: ruTorrent : Version: 3.1~svn${rst}"
@@ -134,20 +139,6 @@ elif [[ ${bnc} = 'sbnc' ]]; then
 elif [[ ${bnc} = 'none' ]]; then
 	echo -e "${bldylw} BOUNCER NOT BEiNG iNSTALLED${rst}"
 else echo -e "${bldred}--> ERROR iN iRC BOUNCER iNPUT!${rst}" ; bnc='none'
-fi
-
-##[ Check for PHP Cache ]##
-if [[ ${cache} = 'xcache' ]]; then
-	v1=$(aptitude show php5-xcache | grep Version)
-	v2=$(aptitude show php5-xcache | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
-elif [[ ${cache} = 'apc' ]]; then
-	v1=$(aptitude show php-apc | grep Version)
-	v2=$(aptitude show php-apc | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
-elif [[ ${cache} = 'none' ]]; then
-	echo -e "${bldylw} PHP CACHE NOT BEiNG iNSTALLED${rst}"
-else echo -e "${bldred}--> ERROR iN PHP CACHE iNPUT!${rst}" ; cache='none'
 fi
 
 ##[ Check for WEBMiN ]##

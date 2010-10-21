@@ -4,7 +4,7 @@ base_install() {  #[TODO] find a better way to do this
 STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl fail2ban file g++ gcc git-core gzip htop iptables libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools screen ssl-cert subversion unrar unzip zip"
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libexpat1 libncurses5 libncurses5-dev libsigc++-2.0-dev libxml2"
 if [[ $http != 'none' ]]; then
-PHP="php5 php5-cgi php5-cli php5-common php5-curl php5-gd php5-dev php5-mcrypt php5-mhash php5-mysql php5-suhosin php5-xmlrpc libgd2-xpm libgd2-xpm-dev"
+PHP="php5 php5-cgi php5-cli php5-common php5-curl php5-gd php5-dev php5-mcrypt php5-mhash php5-mysql php5-suhosin php5-xmlrpc"
 fi
 
 	if [[ $DISTRO = 'Ubuntu' ]]; then
@@ -158,9 +158,8 @@ update() {  # Apt-get update|upgrade
 usage() {  # help screen
 	echo -e "\n${bldpur} Usage:${bldred} $0 ${bldpur}[${bldred}option${bldpur}]"
 	echo -e " Options:"
-	echo -e " ${bldred}  -h  --help   ${bldylw}          Show this screen"
-	echo -e " ${bldred}  -p  --pass ${bldpur}[${bldred}length${bldpur}] ${bldylw}   Generate a strong password"
-	echo -e " ${bldred}  -v  --version ${bldylw}         Show version number\n ${rst}"
+	echo -e " ${bldred}  -p,  --pass ${bldpur}[${bldred}length${bldpur}] ${bldylw}   Generate a strong password"
+	echo -e " ${bldred}  -v,  --version ${bldylw}         Show version number\n ${rst}"
 	exit 1
 }
 

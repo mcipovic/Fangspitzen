@@ -90,7 +90,7 @@ if [[ ${torrent} = 'rtorrent' ]]; then
 	fi
 elif [[ ${torrent} = 'tranny' ]]; then
 	if [[ ${NAME} = 'lenny' ]]; then
-		echo -e "${bldred} Not currently working with lenny ${rst}"
+		echo -e "${bldred} TODO! ${rst}"
 		torrent='none'
 	else
 		v1=$(aptitude show transmission-daemon | grep Version)
@@ -99,7 +99,7 @@ elif [[ ${torrent} = 'tranny' ]]; then
 	fi
 elif [[ ${torrent} = 'deluge' ]]; then
 	if [[ ${NAME} = 'lenny' ]]; then
-		echo -e "${bldred} Not currently working with lenny ${rst}"
+		echo -e "${bldred} TODO! ${rst}"
 		torrent='none'
 	else
 		v1=$(aptitude show deluge | grep Version)

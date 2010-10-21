@@ -8,7 +8,7 @@ PHP="php5 php5-cgi php5-cli php5-common php5-curl php5-gd php5-dev php5-mcrypt p
 fi
 
 	if [[ $DISTRO = 'Ubuntu' ]]; then
-		if [[ $NAME = 'karmic' || $NAME = 'lucid' ]]; then
+		if [[ $NAME = 'karmic' || $NAME = 'lucid' || $NAME='maverick' ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $eLOG && E_=$?
 		elif [[ $NAME = 'jaunty' ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar2 2>> $eLOG && E_=$?

@@ -9,10 +9,8 @@ read -p "[ FTP SERVER  ]        [vsftp|proftp|pureftp|none]: "  ftpd
 read -p "[ Torrent App ]      [rtorrent|tranny|deluge|none]: "  torrent
 
 if [[ ${torrent} = 'rtorrent' ]]; then
-read -p "[ Enable preallocation   ]             [y|n]: "  alloc
-	if [[ ${alloc} = 'y' ]]; then
-	echo -e "\n See http://libtorrent.rakshasa.no/ticket/460 for more info and potential dangers :Do not use on ext3 \n"
-fi;fi
+read -p "[ --with-posix-fallocate ? ]                 [y|n]: "  alloc
+fi
 
 if [[ ${torrent} = 'rtorrent' || ${torrent} = 'tranny' || ${torrent} = 'deluge' ]]; then
 read -p "[ MkTorrent or BuildTorrent ]                  [b]: "  buildtorrent ;fi
@@ -87,7 +85,8 @@ fi
 if [[ ${torrent} = 'rtorrent' ]]; then
 	echo -e "${bldblu} Package: libtorrent|rtorrent : Version: 0.12.6|0.8.6 ${rst}"
 	if [[ ${alloc} = 'y' ]]; then
-		echo -e "${bldylw} Compiling --with-posix-fallocate !${rst}"
+		echo -e "${bldylw} Compiling --with-posix-fallocate! ${rst}"
+		echo -e "${bldylw} See http://libtorrent.rakshasa.no/ticket/460 for more info and potential dangers. Do not use on ext3 ${rst}"
 	fi
 elif [[ ${torrent} = 'tranny' ]]; then
 	if [[ ${NAME} = 'lenny' ]]; then

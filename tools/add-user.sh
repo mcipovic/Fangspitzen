@@ -80,7 +80,7 @@ do_add()
 make_rtorrent_rc()
 {
 	cd /home/$user_name
-	sudo -u $user_name mkdir downloads; mkdir watch; mkdir .session
+	sudo -u $user_name mkdir downloads; mkdir .session
 	sudo -u $user_name cat > .rtorrent.rc << "EOF"
 max_peers = 50
 max_peers_seed = 50
@@ -116,16 +116,11 @@ EOF
 
 make_rtorrent_init()
 {
-	if [[ -f ../modules/rtorrent/rtorrent-init ]]; then
 		sudo -u $user_name echo "user=$user_name"                              > .rtorrent.init.conf
 		sudo -u $user_name echo "base=/home/$user_name"                       >> .rtorrent.init.conf
 		sudo -u $user_name echo "config=(\"\$base/.rtorrent.rc\")"            >> .rtorrent.init.conf
 		sudo -u $user_name echo "logfile=/home/$user_name/.rtorrent.init.log" >> .rtorrent.init.conf
-
-		cp ../modules/rtorrent/rtorrent-init /etc/init.d/rtorrent-$user_name
-		chmod a+x /etc/init.d/rtorrent-$user_name
-	else
-		echo "Cant locate \"modules/rtorrent/rtorrent-init\", skipping..."
+		echo -e "${bldred}-${rst} rTorrent Init Script.[${bldpur} CREATED ${rst}]\n"
 	fi
 }
 

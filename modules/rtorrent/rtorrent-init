@@ -35,10 +35,10 @@ checkcnfg() {
 d_start() {
   [ -d "${base}" ] && cd "${base}"
   stty stop undef && stty start undef
-  sudo -u $user screen -dmS ${srnname} rtorrent ${options} 2>&1 1>/dev/null | tee -a "$logfile" >&2
+  su -c "screen -dmS ${srnname} ${options}" ${user} | tee -a "$logfile" >&2
   for (( i=0 ; i < ${#options[@]} ; i++ )) ;  do
     sleep 3
-    sudo -u $user screen -dmS ${srnname} rtorrent ${options[i]} 2>&1 1>/dev/null | tee -a "$logfile" >&2
+	su -c "screen -dmS ${srnname} ${options}" ${user} | tee -a "$logfile" >&2
   done
 }
 

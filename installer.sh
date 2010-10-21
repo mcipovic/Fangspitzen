@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 trap ctrl_c SIGINT
 #
 # 	Copyright (c) <2009>, <OMNi>

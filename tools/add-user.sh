@@ -116,11 +116,14 @@ EOF
 
 make_rtorrent_init()
 {
+	if [[ -f /etc/init.d/rtorrent ]]; then
 		sudo -u $user_name echo "user=$user_name"                              > .rtorrent.init.conf
 		sudo -u $user_name echo "base=/home/$user_name"                       >> .rtorrent.init.conf
 		sudo -u $user_name echo "config=(\"\$base/.rtorrent.rc\")"            >> .rtorrent.init.conf
 		sudo -u $user_name echo "logfile=/home/$user_name/.rtorrent.init.log" >> .rtorrent.init.conf
 		echo -e "${bldred}-${rst} rTorrent Init Script.[${bldpur} CREATED ${rst}]\n"
+	else
+		echo -e "${bldred}-${rst} rTorrent Init Script.[${bldpur} SKIPPED ${rst}]\n"
 	fi
 }
 

@@ -65,22 +65,22 @@ checkcnfg
 
 case "$1" in
   start)
+    d_start
     echo -n "Starting $NAME..."
-    d_start && sleep 0.5
-    echo " done"
+    sleep 0.5 && echo " done"
     ;;
   stop)
+    d_stop
     echo -n "Stopping $NAME..."
-    d_stop && sleep 0.5
-    echo " done"
+    sleep 0.5 && echo " done"
     ;;
   restart|force-reload|reload)
     echo -n "Stopping $NAME..."
     d_stop && sleep 0.5
     echo " done"
+    d_start
     echo -n "Starting $NAME..."
-    d_start && sleep 0.5
-    echo " done"
+    sleep 0.5 && echo " done"
     ;;
   *)
     echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2

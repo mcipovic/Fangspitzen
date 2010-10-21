@@ -1,5 +1,5 @@
 ##!=======================>> QUESTiONS <<========================!##
-while [ ${skip} = false ]; do
+while [[ ${skip} = false ]]; do
 clear
 echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<---------------${rst}"
 

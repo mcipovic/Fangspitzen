@@ -1,5 +1,18 @@
 cd ${BASE}/tmp
-notice "iNSTALLiNG rTorrent"
+compile_rtorrent=false
+
+if [[ -f /usr/bin/rtorrent ]]; then  # Only if rtorrent doesnt exist or we allow it, will rtorrent compile again
+	echo -en "rTorrent Found.... re-compile and overwrite? [y/n]: "
+	if  yesno  # if user says yes
+		then compile_rtorrent=true
+		break
+	fi
+else
+	compile_rtorrent=true
+fi
+
+while [[ $compile_rtorrent = true ]]; do
+	notice "iNSTALLiNG rTorrent"
 	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc  # Checkout 'advanced' xmlrpc
 		E_=$? && debug_error "XMLRPC Download Failed"
 	download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz  # Grab rtorrent
@@ -53,6 +66,7 @@ notice "iNSTALLiNG rTorrent"
 		log "rTorrent Compile | Completed"
 	make install
 		log "rTorrent Installation | Completed"
+done
 
 	notice "iNSTALLiNG rTorrent CONFiG FiLE"
 	cd $HOME

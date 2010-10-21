@@ -16,12 +16,6 @@ base=
 config=
 
 
-# set of options to run with each instance, separated by a new line
-# must keep parentheses around the entire statement
-#if no special options, specify with: ""
-options=("")
-
-
 # name of screen session
 srnname="rtorrent-$user"
 

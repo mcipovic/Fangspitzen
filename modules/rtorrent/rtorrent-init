@@ -10,45 +10,46 @@ SCRIPTNAME=/etc/init.d/$NAME
 checkcnfg() {
   exists=0
   for i in `echo "$PATH" | tr ':' '\n'` ; do
-    if [ -f $i/$NAME ] ; then
+    if [[ -f $i/$NAME ]] ; then
       exists=1
       break
     fi
   done
-  if [ $exists -eq 0 ] ; then
+  if [[ $exists -eq 0 ]] ; then
     echo "cannot find $NAME binary in PATH: $PATH" | tee -a "$logfile" >&2
     exit 3
   fi
-  for (( i=0 ; i < ${#config[@]} ;  i++ )) ; do
-    if ! [ -r "${config[i]}" ] ; then
-        echo "cannot find readable config ${config[i]}. check that it is there and permissions are appropriate"  | tee -a "$logfile" >&2
-        exit 3
-    fi
-    session=$(getsession "${config[i]}")
-    if ! [ -d "${session}" ] ; then
-        echo "cannot find readable session directory ${session} from config ${config[i]}. check permissions" | tee -a "$logfile" >&2
-        exit 3
-    fi
-  done
+  if ! [[ -r ${config} ]] ; then
+      echo "cannot find readable config ${config}. check that it is there and permissions are appropriate"  | tee -a "$logfile" >&2
+      exit 3
+  fi
+  session=$(getsession ${config})
+  if ! [[ -d ${session} ]] ; then
+      echo "cannot find readable session directory ${session} from config ${config}. check permissions" | tee -a "$logfile" >&2
+      exit 3
+  fi
+
 }
 
 d_start() {
-  [ -d "${base}" ] && cd "${base}"
+  [[ -d ${base} ]] && cd ${base}
   stty stop undef && stty start undef
-  su -c "screen -dmS ${srnname} ${options}" ${user} | tee -a "$logfile" >&2
+  su $user -c "mkdir -p /home/$USER/.dtach"
+  su $user -c "rm -f /home/$USER/.dtach/rtorrent"
+  su $user -c "dtach -n /home/$USER/.dtach/rtorrent"
+  sleep 1
 }
 
 d_stop() {
-  for (( i=0 ; i < ${#config[@]} ; i++ )) ; do
-    session=$(getsession "${config[i]}")
-    if ! [ -s ${session}/rtorrent.lock ] ; then
+    session=$(getsession ${config})
+    if ! [[ -s ${session}/rtorrent.lock ]] ; then
         return
     fi
     pid=$(cat ${session}/rtorrent.lock | awk -F: '{print($2)}' | sed "s/[^0-9]//g")
     if ps -A | grep -sq ${pid}.*rtorrent ; then
         kill -s INT ${pid}
     fi
-  done
+	sleep 1
 }
 
 getsession() { 
@@ -61,22 +62,22 @@ checkcnfg
 
 case "$1" in
   start)
-    d_start
     echo -n "Starting $NAME..."
-    sleep 0.5 && echo " done"
+    d_start
+    echo " done"
     ;;
   stop)
-    d_stop
     echo -n "Stopping $NAME..."
-    sleep 0.5 && echo " done"
+    d_stop
+    echo " done"
     ;;
   restart|force-reload|reload)
     echo -n "Stopping $NAME..."
-    d_stop && sleep 0.5
+    d_stop
     echo " done"
-    d_start
     echo -n "Starting $NAME..."
-    sleep 0.5 && echo " done"
+    d_start
+    echo " done"
     ;;
   *)
     echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2

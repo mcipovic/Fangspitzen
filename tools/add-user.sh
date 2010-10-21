@@ -115,7 +115,6 @@ make_rtorrent_init()
 		sudo -u $user_name echo "user=$user_name"                              > .rtorrent.init.conf
 		sudo -u $user_name echo "base=/home/$user_name"                       >> .rtorrent.init.conf
 		sudo -u $user_name echo "config=(\"\$base/.rtorrent.rc\")"            >> .rtorrent.init.conf
-		sudo -u $user_name echo "options=(\"\")"                              >> .rtorrent.init.conf
 		sudo -u $user_name echo "srnname=\"rtorrent-$user_name\""             >> .rtorrent.init.conf
 		sudo -u $user_name echo "logfile=/home/$user_name/.rtorrent.init.log" >> .rtorrent.init.conf
 		echo -e "${bldred}-${rst} rTorrent Init Script.[${bldpur} CREATED ${rst}]\n"

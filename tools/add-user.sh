@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # Assumptions:
 #	Apache - mod_auth_digest

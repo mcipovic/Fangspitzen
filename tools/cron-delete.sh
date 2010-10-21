@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 DEL_PATH=/path/to/files  # Path to folder where you want to delete from
 DAYS=5                   # Files older than this will be deleted

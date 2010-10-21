@@ -1,0 +1,32 @@
+##[ Start Configuration ]##
+
+# Do not put a space on either side of the equal signs e.g.
+# system user to run as (can only use one)
+user=
+
+
+# default directory for screen, needs to be an absolute path
+base=
+
+
+# system user to run as # not implemented, see d_start for beginning implementation
+# group=$(id -ng "$user")
+# the full path to the filename where you store your rtorrent configuration
+# must keep parentheses around the entire statement, quotations around each config file
+config=
+
+
+# set of options to run with each instance, separated by a new line
+# must keep parentheses around the entire statement
+#if no special options, specify with: ""
+options=("")
+
+
+# name of screen session
+srnname="rtorrent"
+
+
+# file to log to (makes for easier debugging if something goes wrong)
+logfile=
+
+##[ End Configuration ]##

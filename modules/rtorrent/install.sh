@@ -1,14 +1,14 @@
 cd ${BASE}/tmp
 notice "iNSTALLiNG rTorrent"
-	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc # Checkout 'advanced' xmlrpc
+	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc  # Checkout 'advanced' xmlrpc
 		E_=$? && debug_error "XMLRPC Download Failed"
-	download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz        # Grab rtorrent
+	download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz  # Grab rtorrent
 		E_=$? && debug_error "rTorrent Download Failed"
-	download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz     # Grab libtorrent
+	download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
 		E_=$? && debug_error "LibTorrent Download Failed"
 	echo -e "XMLRPC | Downloaded \nLibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}
 
-	tar xzf rtorrent-0.8.6.tar.gz && tar xzf libtorrent-0.12.6.tar.gz             # Unpack
+	tar xzf rtorrent-0.8.6.tar.gz && tar xzf libtorrent-0.12.6.tar.gz  # Unpack
 	log -e "LibTorrent | Unpacked \nrTorrent | Unpacked"
 
 	notice "COMPiLiNG... Go Grab a Coffee"
@@ -30,9 +30,8 @@ notice "iNSTALLiNG rTorrent"
 	fi
 		sh autogen.sh
 	if [[ ${alloc} = 'y' ]]; then
-		sh configure --prefix=/usr --with-posix-fallocate  # Compile with pre-allocate
-	else
-		sh configure --prefix=/usr
+		 sh configure --prefix=/usr --with-posix-fallocate  # Use posix_fallocate
+	else sh configure --prefix=/usr
 	fi
 	compile && E_=$?
 		debug_error "LibTorrent Build Failed"
@@ -66,6 +65,9 @@ notice "iNSTALLiNG rTorrent"
 		PATH_rt=${HOME}/.rtorrent.rc
 		cp modules/rtorrent/rtorrent.rc ${PATH_rt}
 
+		echo "directory = /home/$USER/downloads" >> ${PATH_rt}
+		echo "session = /home/$USER/.session"    >> ${PATH_rt}
+
 		if [[ ${alloc} = 'y' ]]; then
 			echo "system.file_allocate.set=yes" >> ${PATH_rt}  # Enable file pre-allocation
 		fi
@@ -81,9 +83,16 @@ notice "iNSTALLiNG rTorrent"
 	else log "Previous rTorrent.rc Config Found, skipping..."
 	fi
 
-	if [[ ! -f /etc/init.d/rtorrent ]]; then #TODO# This is broken
-		cp modules/rtorrent/rtorrent-init /etc/init.d/rtorrent           # Copy init script
-		sed -i "s:user=\"\":user=\"${USER}\":" /etc/init.d/rtorrent      # Put UserName in script
+	if [[ ! -f /etc/init.d/rtorrent ]]; then  # Copy init script
+		cp modules/rtorrent/rtorrent-init /etc/init.d/rtorrent
+		cp modules/rtorrent/rtorrent-init-conf $HOME/.rtorrent.init.conf
+
+		# Write init configuration
+		sed -i "s:user=:user=\"${USER}\":"                  $HOME/.rtorrent.init.conf
+		sed -i "s:base=:base=$HOME:"                        $HOME/.rtorrent.init.conf
+		sed -i 's:config=:config=("$base/.rtorrent.rc"):'   $HOME/.rtorrent.init.conf
+		sed -i "s:logfile=:logfile=$HOME/rtorrentInit.log:" $HOME/.rtorrent.init.conf
+
 		chmod a+x /etc/init.d/rtorrent && update-rc.d rtorrent defaults  # Start at boot
 		log "rTorrent Config | Installed \nrTorrent Init Script | Created"
 	else

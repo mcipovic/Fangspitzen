@@ -15,6 +15,7 @@ hash_interval = 10
 hash_max_tries = 5
 
 schedule = low_diskspace,5,60,close_low_diskspace=100M
+#schedule = watch_directory,5,5,load_start=/absolute/path/to/watch/*.torrent
 
 use_udp_trackers = yes
 dht = off
@@ -25,10 +26,6 @@ encryption = allow_incoming,try_outgoing,enable_retry
 
 max_open_files = 256
 max_memory_usage = 800M
-
-directory = ~/downloads
-session = ~/.session
-schedule = watch_directory,5,5,load_start=~/watch/*.torrent
 
 ##- Below Generated From Auto Script -##
 

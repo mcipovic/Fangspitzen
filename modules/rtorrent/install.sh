@@ -56,11 +56,10 @@ notice "iNSTALLiNG rTorrent"
 
 	notice "iNSTALLiNG rTorrent CONFiG FiLE"
 	cd $HOME
-	if [[ ! -d .session ]] ; then sudo -u $USER mkdir .session  ;fi
-	if [[ ! -d downloads ]]; then sudo -u $USER mkdir downloads ;fi
-	if [[ ! -d watch ]]    ; then sudo -u $USER mkdir watch     ;fi
+	sudo -u $USER mkdir -p .session
+	sudo -u $USER mkdir -p downloads
+	#sudo -u $USER mkdir -p watch
 
-	
 	if [[ -f .rtorrent.rc ]]; then
 		log "Previous rTorrent.rc config found, creating backup..."
 		mv .rtorrent.rc .rtorrent.rc.bak
@@ -70,14 +69,14 @@ notice "iNSTALLiNG rTorrent"
 	PATH_rt=${HOME}/.rtorrent.rc
 	cp modules/rtorrent/rtorrent.rc ${PATH_rt}
 
-	echo "directory = /home/$USER/downloads" >> ${PATH_rt}
-	echo "session = /home/$USER/.session"    >> ${PATH_rt}
+	echo "directory = /home/$USER/downloads"  >> ${PATH_rt}
+	echo "session = /home/$USER/.session"     >> ${PATH_rt}
 
 	if [[ ${alloc} = 'y' ]]; then
-		echo "system.file_allocate.set=yes" >> ${PATH_rt}  # Enable file pre-allocation
+		echo "system.file_allocate.set = yes" >> ${PATH_rt}  # Enable file pre-allocation
 	fi
 	if [[ -d /etc/apache2 ]]; then
-		echo 'scgi_port = localhost:5000'   >> ${PATH_rt}  # Create scgi port on localhost:5000
+		echo 'scgi_port = localhost:5000'     >> ${PATH_rt}  # Create scgi port on localhost:5000
 	elif [[ -d /etc/lighttpd || -d /etc/cherokee ]]; then
 		echo "scgi_local = /tmp/rpc.socket"                             >> ${PATH_rt}  # Create sgci socket
 		echo 'schedule = chmod,0,0,"execute=chmod,777,/tmp/rpc.socket"' >> ${PATH_rt}  # Make socket readable
@@ -85,7 +84,6 @@ notice "iNSTALLiNG rTorrent"
 		debug_wait "No httpd found: Make sure to add sgci mounts to .rtorrent.rc"
 	fi
 	log "rTorrent Config | Created"
-
 
 	if [[ ! -f /etc/init.d/rtorrent ]]; then  # Copy init script
 		cp modules/rtorrent/rtorrent-init /etc/init.d/rtorrent

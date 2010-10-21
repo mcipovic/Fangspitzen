@@ -64,6 +64,7 @@ do_add()
 	fi
 
 	make_rtorrent_rc
+	make_rtorrent_init
 
 	htdigest $htpasswd "ruTorrent" $user_name
 	if [[ $? = 0 ]]; then
@@ -80,7 +81,7 @@ make_rtorrent_rc()
 {
 	cd /home/$user_name
 	sudo -u $user_name mkdir downloads; mkdir watch; mkdir .session
-	sudo -u $user_name cat >> .rtorrent.rc << "EOF"
+	sudo -u $user_name cat > .rtorrent.rc << "EOF"
 max_peers = 50
 max_peers_seed = 50
 max_uploads = 250
@@ -99,10 +100,10 @@ encoding_list = UTF-8
 encryption = allow_incoming,try_outgoing,enable_retry
 max_open_files = 256
 max_memory_usage = 800M
-directory = ~/downloads
-session = ~/.session
-schedule = watch_directory,5,5,load_start=~/watch/*.torrent
+#schedule = watch_directory,5,5,load_start=/absolute/path/to/watch/*.torrent
 EOF
+	echo "directory = /home/$user_name/downloads" >> .rtorrent.rc
+	echo "session = /home/$user_name/.session"    >> .rtorrent.rc
 
 	if [[ $webserver = 'apache' ]]; then
 		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
@@ -111,6 +112,21 @@ EOF
 #		sudo -u $user_name echo "scgi_local = /tmp/rpc.$user_name.socket"                             >> /home/$user_name/.rtorrent.rc
 	fi
 	echo -e "${bldred}-${rst} rTorrent Config .....[${bldpur} CREATED ${rst}]\n"
+}
+
+make_rtorrent_init()
+{
+	if [[ -f ../modules/rtorrent/rtorrent-init ]]; then
+		sudo -u $user_name echo "user=$user_name"                              > .rtorrent.init.conf
+		sudo -u $user_name echo "base=/home/$user_name"                       >> .rtorrent.init.conf
+		sudo -u $user_name echo "config=(\"\$base/.rtorrent.rc\")"            >> .rtorrent.init.conf
+		sudo -u $user_name echo "logfile=/home/$user_name/.rtorrent.init.log" >> .rtorrent.init.conf
+
+		cp ../modules/rtorrent/rtorrent-init /etc/init.d/rtorrent-$user_name
+		chmod a+x /etc/init.d/rtorrent-$user_name
+	else
+		echo "Cant locate \"modules/rtorrent/rtorrent-init\", skipping..."
+	fi
 }
 
 make_rutorrent_conf()

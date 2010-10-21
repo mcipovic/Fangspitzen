@@ -34,9 +34,7 @@ checkcnfg() {
 d_start() {
   [[ -d ${base} ]] && cd ${base}
   stty stop undef && stty start undef
-  su $user -c "mkdir -p /home/$USER/.dtach"
-  su $user -c "rm -f /home/$USER/.dtach/rtorrent"
-  su $user -c "dtach -n /home/$USER/.dtach/rtorrent"
+  su $user -c "mkdir -p /home/$USER/.dtach && rm -f /home/$USER/.dtach/rtorrent && dtach -n /home/$USER/.dtach/rtorrent rtorrent"
   sleep 1
 }
 

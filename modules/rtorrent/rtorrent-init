@@ -35,10 +35,10 @@ checkcnfg() {
 d_start() {
   [ -d "${base}" ] && cd "${base}"
   stty stop undef && stty start undef
-  sudo -u $user "screen -dmS ${srnname} rtorrent ${options} 2>&1 1>/dev/null" | tee -a "$logfile" >&2
+  sudo -u $user screen -dmS ${srnname} rtorrent ${options} 2>&1 1>/dev/null | tee -a "$logfile" >&2
   for (( i=0 ; i < ${#options[@]} ; i++ )) ;  do
     sleep 3
-    sudo -u $user "screen -dmS ${srnname} rtorrent ${options[i]} 2>&1 1>/dev/null" | tee -a "$logfile" >&2
+    sudo -u $user screen -dmS ${srnname} rtorrent ${options[i]} 2>&1 1>/dev/null | tee -a "$logfile" >&2
   done
 }
 
@@ -66,20 +66,20 @@ checkcnfg
 case "$1" in
   start)
     echo -n "Starting $NAME..."
-    d_start && sleep 1
+    d_start && sleep 0.5
     echo " done"
     ;;
   stop)
     echo -n "Stopping $NAME..."
-    d_stop && sleep 1
+    d_stop && sleep 0.5
     echo " done"
     ;;
   restart|force-reload|reload)
     echo -n "Stopping $NAME..."
-    d_stop && sleep 1
+    d_stop && sleep 0.5
     echo " done"
     echo -n "Starting $NAME..."
-    d_start && sleep 1
+    d_start && sleep 0.5
     echo " done"
     ;;
   *)

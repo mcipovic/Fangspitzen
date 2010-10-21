@@ -95,16 +95,6 @@ error() {  # call this when you know there will be an error
 	exit
 }
 
-get_sysinfo() {  # get hostname; net interface; ip
-	echo -en ">>> Finding IP........[${bldylw} "
-	readonly HOST=$(hostname) iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
-	readonly iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
-	if [[ ${iP} = *.*.* ]]
-		then echo -e "$iP ${rst}]"
-		else echo -e "${bldred}FAiLED ${rst}]"
-	fi
-}
-
 get_varinfo() {  # get distro; name; version; architecture
 	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(uname -m)
 	# Distributor -i  > Ubuntu  > Debian  > Debian  > LinuxMint  (DISTRO)
@@ -224,7 +214,15 @@ init() {
 		apt-get install -yqq lsb-release
 		echo -e "[${bldylw} done ${rst}]"
 	fi
-	get_sysinfo
+
+	# Get hostname, net interface, ip
+	HOST=$(hostname)
+	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
+	iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
+	readonly IP iFACE iP
+	if ! [[ ${iP} = *.*.* ]]; then
+		error "Unable to find ip from outside"
+	fi
 }
 
 #!=====================>> COLOR CONTROL <<=====================!#

@@ -105,12 +105,6 @@ EOF
 	echo "directory = /home/$user_name/downloads" >> .rtorrent.rc
 	echo "session = /home/$user_name/.session"    >> .rtorrent.rc
 
-	if [[ $webserver = 'apache' ]]; then
-		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
-#	elif [[ $webserver = 'lighttp' ]]; then
-#		sudo -u $user_name echo 'schedule = chmod,0,0,"execute=chmod,777,/tmp/rpc.$user_name.socket"' >> /home/$user_name/.rtorrent.rc
-#		sudo -u $user_name echo "scgi_local = /tmp/rpc.$user_name.socket"                             >> /home/$user_name/.rtorrent.rc
-	fi
 	echo -e "${bldred}-${rst} rTorrent Config .....[${bldpur} CREATED ${rst}]\n"
 }
 
@@ -165,8 +159,11 @@ httpd_scgi()
 
 	if [[ $webserver = 'apache' ]]; then
 		echo "SCGIMount $scgi_mount 127.0.0.1:$scgi_port" >> /etc/apache2/mods-available/scgi.conf
+		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
 		echo -e "${bldred}-${rst} Apache SCGi Mount ...[${bldpur} CREATED ${rst}]\n"
 #	elif [[ $webserver = 'lighttp' ]]; then
+#		sudo -u $user_name echo 'schedule = chmod,0,0,"execute=chmod,777,/tmp/rpc.$user_name.socket"' >> /home/$user_name/.rtorrent.rc
+#		sudo -u $user_name echo "scgi_local = /tmp/rpc.$user_name.socket"                             >> /home/$user_name/.rtorrent.rc
 	fi
 }
 

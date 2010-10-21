@@ -23,7 +23,7 @@ options=("")
 
 
 # name of screen session
-srnname="rtorrent"
+srnname="rtorrent-$user"
 
 
 # file to log to (makes for easier debugging if something goes wrong)

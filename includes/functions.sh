@@ -82,7 +82,6 @@ debug_wait() {  # prints a message and wait for user before continuing
 		echo -en "${bldpur} Press Enter...${rst}"
 		read ENTER
 	fi
-	echo
 }
 
 download() {  # uses either wget or axel

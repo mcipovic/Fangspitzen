@@ -85,8 +85,8 @@ fi
 if [[ ${torrent} = 'rtorrent' ]]; then
 	echo -e "${bldblu} Package: libtorrent|rtorrent : Version: 0.12.6|0.8.6 ${rst}"
 	if [[ ${alloc} = 'y' ]]; then
-		echo -e "${bldylw} Compiling --with-posix-fallocate! ${rst}"
-		echo -e "${bldylw} See http://libtorrent.rakshasa.no/ticket/460 for more info and potential dangers. Do not use on ext3 ${rst}"
+		echo -e "${bldpur} Compiling --with-posix-fallocate! ${rst}"
+		echo -e "${bldpur} See http://libtorrent.rakshasa.no/ticket/460 for more info and potential dangers. Do not use on ext3 ${rst}\n"
 	fi
 elif [[ ${torrent} = 'tranny' ]]; then
 	if [[ ${NAME} = 'lenny' ]]; then

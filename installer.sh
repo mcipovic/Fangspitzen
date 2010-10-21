@@ -145,7 +145,8 @@ base_install
 	echo -e "${bldylw} done ${rst}"
 debug_wait "base.packages.installed"
 
-sed -i 's:default_bits .*:default_bits = 2048:' /usr/share/ssl-cert/ssleay.cnf
+SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
+sed -i 's:default_bits .*:default_bits = 2048:' $SSLEAYCNF  # Bump 1024=>2048 bit certs
 
 cd ${BASE}
 ##[ APACHE ]##
@@ -155,7 +156,7 @@ if [[ ${http} = 'apache' ]]; then
 	E_=$? && debug_error "Apache2 failed to install"
 
 	if [[ ! -f /etc/apache2/ssl/private.key ]]; then  # Create SSL Certificate
-		mkdir -p /etc/apache2/ssl && make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/apache2/ssl/private.key
+		mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLEAYCNF /etc/apache2/ssl/private.key
 		chmod 600 /etc/apache2/ssl/private.key  # Read write permission for owner only
 	fi
 	if [[ ! -f /etc/apache2/mods-available/scgi.conf ]]; then  # Add RPC Mountpoint
@@ -175,7 +176,7 @@ elif [[ ${http} = 'lighttp' ]]; then
 
 	lighty-enable-mod fastcgi ssl auth access accesslog compress # Enable Modules
 	if [[ ! -f /etc/lighttpd/ssl/server.pem ]]; then  # Create SSL Certificate
-		mkdir -p /etc/apache2/ssl && make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/lighttpd/ssl/server.pem
+		mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLEAYCNF /etc/lighttpd/ssl/server.pem
 		chmod 600 /etc/lighttpd/ssl/server.pem  # Read write permission for owner only
 	fi
 	if [[ ! -f /etc/lighttpd/conf-available/99-scgi.conf ]]; then  # Add RPC Mountpoint
@@ -241,7 +242,7 @@ elif [[ ${ftpd} = 'pureftp' ]]; then
 	debug_wait "Creating PureFTP SSL Key"
 	echo 1 > /etc/pure-ftpd/conf/TLS  # Enable TLS+FTP (2 will allow TLS only, 0 disables it)
 	if [[ ! -f /etc/ssl/private/pure-ftpd.pem ]]; then  # Create SSL Certificate
-		mkdir -p /etc/ssl/private && make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/ssl/private/pure-ftpd.pem
+		mkdir -p /etc/ssl/private && make-ssl-cert $SSLEAYCNF /etc/ssl/private/pure-ftpd.pem
 		chmod 600 /etc/ssl/private/pure-ftpd.pem  # Read write permission for owner only
 		log "PureFTP SSL Key created"
 	fi

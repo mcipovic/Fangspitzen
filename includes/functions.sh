@@ -1,4 +1,4 @@
-#!=======================>> FUNCTiONS <<=======================!#
+##!=======================>> FUNCTiONS <<=======================!##
 base_install() {  #[TODO] find a better way to do this
 
 STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl fail2ban file g++ gcc git-core gzip htop iptables libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools screen ssl-cert subversion unrar unzip zip"

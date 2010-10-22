@@ -34,7 +34,7 @@ checkout() {  # increase verbosity
 
 checkroot() {  # check if user is root
 	if [[ $UID = 0 ]]; then echo -e ">>> RooT USeR ChecK...[${bldylw} done ${rst}]"
-	if [[ $DEBUG = 1 ]]; then echo -e ">>> Debug Mode........[${bldylw} ON ${rst}]"
+	if [[ $DEBUG = 1 ]]; then echo -e ">>> Debug Mode ON.....[${bldylw} done ${rst}]"
 	fi
 	else error "PLEASE RUN WITH SUDO"
 	fi

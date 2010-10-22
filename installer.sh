@@ -30,8 +30,8 @@ trap ctrl_c SIGINT
 ##################################################################
 ## DESCRiPTiON: Auto System Installer Script                     #
 ## See TODO and CHANGELOG                                        #
-VERSION='0.9.8~svn'                                              #
-DATE='Oct 21 2010'                                               #
+VERSION='0.9.9~svn'                                              #
+DATE='Oct 22 2010'                                               #
 ##################################################################
 source includes/functions.sh  # Source in our functions
 
@@ -105,17 +105,16 @@ cat << "EOF"
   The installation is quite stable and functional when run on a freshly
   installed supported Operating System, but upgrades from systems that 
   have already had these programs installed and/or removed will likely
-  run into problems.
+  run into problems (not so much the case anymore).
 
-  This script is not intended to update your system!  It should only be
-  used on a supported and clean OS.
+  You can update your system along with installing those "must have"
+  programs by running this script with no options selected.
 
   The systems currently supported are:
-     Ubuntu ->  9.04 Jaunty   |   Debian -> 5 Lenny
-            ->  9.10 Karmic   |          -> 6 Squeeze
-            -> 10.04 Lucid    |
+     Ubuntu >> 9 Jaunty,Karmic >> 10 Lucid,Maverick
+     Debian >> 5 Lenny >> 6 Squeeze
 
-  If your OS is not listed, this script will most likey do something bad.
+  If your OS is not listed, this script will most likey explode.
 EOF
 
 get_varinfo

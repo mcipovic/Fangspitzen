@@ -441,7 +441,7 @@ cd ${BASE}/tmp
 
 if [[ ${buildtorrent} = 'b' ]]; then
 #-->##[ BuildTorrent ]##
-if [[ ! -f /usr/bin/buildtorrent ]]; then
+if [[ ! -f /usr/local/bin/buildtorrent ]]; then
 	notice "iNSTALLiNG BuildTorrent"
 	if [[ ! -d buildtorrent ]]; then  # Checkout latest BuildTorrent source
 		git clone -q git://gitorious.org/buildtorrent/buildtorrent.git
@@ -455,16 +455,14 @@ if [[ ! -f /usr/bin/buildtorrent ]]; then
 	autoheader
 	automake -a -c
 	sh configure
-	make
-	E=$?
-	make install
+	make install && E=$?
 
 	debug_error "BuildTorrent Build Failed" && debug_wait "buildtorrent.installed"
 	log "BuildTorrent Installation | Completed"
 fi
 else
 #-->##[ mkTorrent ]##
-if [[ ! -f /usr/bin/mktorrent ]]; then
+if [[ ! -f /usr/local/bin/mktorrent ]]; then
 	notice "iNSTALLiNG MkTorrent"
 	if [[ ! -d mktorrent ]]; then  # Checkout latest mktorrent source
 		git clone -q git://github.com/esmil/mktorrent.git
@@ -473,23 +471,14 @@ if [[ ! -f /usr/bin/mktorrent ]]; then
 	fi
 
 	cd mktorrent
-	if [[ ${ARCH} = 'i686' ]]; then  # Compile with multi-threads|ssl|long-options|no-redundant-hash-checks|more-open-files
-		compile PREFIX=/usr USE_PTHREADS=1 USE_OPENSSL=1 USE_LONG_OPTIONS=1 USE_LARGE_FILES=1 NO_HASH_CHECK=1 MAX_OPENFD=500
-		make
-		E_=$?
-		make install
-	else
-		compile PREFIX=/usr USE_PTHREADS=1 USE_OPENSSL=1 USE_LONG_OPTIONS=1 NO_HASH_CHECK=1 MAX_OPENFD=500
-		make
-		E_=$?
-		make install
-	fi
+	make install && E_=$?
+
 	debug_error "MkTorrent Build Failed" && debug_wait "mktorrent.installed"
 	log "MkTorrent Installation | Completed"
 fi
 fi
-cd ${BASE}
 
+cd ${BASE}
 ##[ rTorrent ]##
 if [[ ${torrent} = 'rtorrent' ]]; then
 	source modules/rtorrent/install.sh

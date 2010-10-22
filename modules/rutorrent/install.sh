@@ -24,12 +24,12 @@ cd ${BASE}/tmp
 		cp ../modules/rutorrent/config.php.lighttp rutorrent/conf/config.php
 	fi
 
-	if [[ -f /usr/bin/buildtorrent ]]; then
-		sed -i "s:	\$useExternal .*;:	\$useExternal = \"buildtorrent\";:"                        rutorrent/plugins/create/conf.php
-		sed -i "s:	\$pathToCreatetorrent .*;:	\$pathToCreatetorrent = '/usr/bin/buildtorrent';:" rutorrent/plugins/create/conf.php
-	elif [[ -f /usr/bin/mktorrent ]]; then
-		sed -i "s:	\$useExternal .*;:	\$useExternal = \"mktorrent\";:"                        rutorrent/plugins/create/conf.php
-		sed -i "s:	\$pathToCreatetorrent .*;:	\$pathToCreatetorrent = '/usr/bin/mktorrent';:" rutorrent/plugins/create/conf.php
+	if [[ -f /usr/local/bin/buildtorrent ]]; then
+		sed -i "s:	\$useExternal .*;:	\$useExternal = \"buildtorrent\";:"                              rutorrent/plugins/create/conf.php
+		sed -i "s:	\$pathToCreatetorrent .*;:	\$pathToCreatetorrent = '/usr/local/bin/buildtorrent';:" rutorrent/plugins/create/conf.php
+	elif [[ -f /usr/local/bin/mktorrent ]]; then
+		sed -i "s:	\$useExternal .*;:	\$useExternal = \"mktorrent\";:"                                 rutorrent/plugins/create/conf.php
+		sed -i "s:	\$pathToCreatetorrent .*;:	\$pathToCreatetorrent = '/usr/local/bin/mktorrent';:"    rutorrent/plugins/create/conf.php
 	fi
 	log "ruTorrent Config | Created"
 

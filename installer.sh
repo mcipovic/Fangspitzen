@@ -152,7 +152,7 @@ cd ${BASE}
 ##[ APACHE ]##
 if [[ ${http} = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
-	${INSTALL} apache2 apache2-mpm-prefork apache2-utils libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-fcgid libapache2-mod-suphp apachetop 2>> ${eLOG}
+	${INSTALL} apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-fcgid libapache2-mod-suphp suphp-common apachetop 2>> ${eLOG}
 	E_=$? && debug_error "Apache2 failed to install"
 
 	if [[ ! -f /etc/apache2/ssl/private.key ]]; then  # Create SSL Certificate

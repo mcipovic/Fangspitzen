@@ -8,7 +8,6 @@ if [[ -f /etc/ssh/sshd_config ]]; then
 	sed -i 's:LoginGraceTime 120:LoginGraceTime 30:'   /etc/ssh/sshd_config
 	sed -i 's:X11Forwarding yes:X11Forwarding no:'     /etc/ssh/sshd_config
 /etc/init.d/ssh force-reload
-debug_wait "sshd"
 fi
 if [[ ${http} = 'apache' ]]; then
 	sed -i 's:AllowOverride None:AllowOverride All:'   /etc/apache2/sites-available/default
@@ -18,12 +17,10 @@ if [[ ${http} = 'apache' ]]; then
 	sed -i 's:ServerTokens Full:ServerTokens Prod:'    /etc/apache2/apache2.conf
 	echo   "ServerName ${HOSTNAME}" >>                 /etc/apache2/apache2.conf
 /etc/init.d/apache2 force-reload
-debug_wait "apache.reloaded"
 fi
 if [[ ${sql} = 'mysql' ]]; then
 	sed -ie 's:query_cache_limit .*:query_cache_limit = 2M\nquery_cache_type = 1:' /etc/mysql/my.cnf
 /etc/init.d/mysql force-reload
-debug_wait "mysqld.reloaded"
 fi
 if [[ ${sql} = 'postgre' ]]; then  # This needs to change per version
 	post_ver=8.4
@@ -34,7 +31,6 @@ if [[ ${sql} = 'postgre' ]]; then  # This needs to change per version
 	sed -i "s:#autovacuum .*:autovacuum = on:"     ${post_conf}
 	sed -i "s:#track_counts .*:track_counts = on:" ${post_conf}
 /etc/init.d/postgresql-${post_ver} restart
-debug_wait "postgresql.restarted"
 fi
 
 #[ Add Some Useful Command Alias' ]#

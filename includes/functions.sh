@@ -172,12 +172,9 @@ init() {
 
 	##[ Use Axel and Apt-Fast ]##
 	if ! which apt-fast >/dev/null; then
+		apt-get install -yqq axel lsb-release
 		axel --quiet http://www.mattparnell.com/linux/apt-fast/apt-fast.sh
 		mv apt-fast.sh /usr/bin/apt-fast && chmod +x /usr/bin/apt-fast
-	fi
-
-	if ! [[ which axel >/dev/null || which lsb_release >/dev/null ]]; then
-		apt-fast install -yqq axel lsb-release
 	fi
 
 	##[ Be more verbose if DEBUG is enabled and keep quiet if not ]##

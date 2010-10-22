@@ -25,9 +25,11 @@ cd ${BASE}/tmp
 	fi
 
 	if [[ -f /usr/bin/buildtorrent ]]; then
-		 sed -i "s:\$useExternal = .*;:\$useExternal = buildtorrent;:" rutorrent/plugins/create/conf.php
+		sed -i "s:	\$useExternal .*;:	\$useExternal = \"buildtorrent\";:"                        rutorrent/plugins/create/conf.php
+		sed -i "s:	\$pathToCreatetorrent .*;:	\$pathToCreatetorrent = '/usr/bin/buildtorrent';:" rutorrent/plugins/create/conf.php
 	elif [[ -f /usr/bin/mktorrent ]]; then
-		sed -i "s:\$useExternal = .*;:\$useExternal = mktorrent;:"    rutorrent/plugins/create/conf.php
+		sed -i "s:	\$useExternal .*;:	\$useExternal = \"mktorrent\";:"                        rutorrent/plugins/create/conf.php
+		sed -i "s:	\$pathToCreatetorrent .*;:	\$pathToCreatetorrent = '/usr/bin/mktorrent';:" rutorrent/plugins/create/conf.php
 	fi
 	log "ruTorrent Config | Created"
 

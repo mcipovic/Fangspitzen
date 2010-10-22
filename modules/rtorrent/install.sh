@@ -18,7 +18,7 @@ while [[ $compile_rtorrent = true ]]; do
 	#download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz  # Grab rtorrent
 	#	E_=$? && debug_error "rTorrent Download Failed"
 	#download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
-	svn checkout -r 1130 svn://rakshasa.no/libtorrent/trunk && E_=$?
+	svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
 	mv trunk/libtorrent libtorrent-0.12.6 && mv trunk/rtorrent rtorrent-0.8.6 && rm -r trunk
 		debug_error "LibTorrent Download Failed"
 	echo -e "XMLRPC | Downloaded \nLibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}

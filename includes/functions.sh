@@ -170,51 +170,29 @@ init() {
 	clear_logfile  # Start with a fresh logfile
 	mkdir --parents tmp/  # Create tmp folder
 
-	##[ Check for download app ]##
-	if which axel >/dev/null; then
-		if [[ ! -f /usr/bin/apt-fast ]]; then
-			download http://www.mattparnell.com/linux/apt-fast/apt-fast.sh
-			mv apt-fast.sh /usr/bin/apt-fast
-			chmod +x apt-fast
-		fi
+	##[ Use Axel and Apt-Fast ]##
+	if ! which apt-fast >/dev/null; then
+		axel --quiet http://www.mattparnell.com/linux/apt-fast/apt-fast.sh
+		mv apt-fast.sh /usr/bin/apt-fast && chmod +x /usr/bin/apt-fast
+	fi
+
+	if ! [[ which axel >/dev/null || which lsb_release >/dev/null ]]; then
+		apt-fast install -yqq axel lsb-release
+	fi
+
 	##[ Be more verbose if DEBUG is enabled and keep quiet if not ]##
-		if [[ $DEBUG = 1 ]]; then
+	if [[ $DEBUG = 1 ]]; then
 		DL='axel --num-connections=4 --alternate'
 		UPDATE='apt-fast update'
 		UPGRADE='apt-fast upgrade --yes'
-		INSTALL='apt-fast install --yes'
-		else
-		DL='axel --num-connections=4 --quiet'
+		INSTALL='apt-get install --yes'
+	else
+		DL='axel --num-connections=4 '
 		UPDATE='apt-fast update -qq'
 		UPGRADE='apt-fast upgrade --yes -qq'
-		INSTALL='apt-fast install --yes -qq'
-		fi
-
-	elif which wget >/dev/null; then
-		if [[ $DEBUG = 1 ]]; then
-		DL='wget --no-verbose --timeout=30'
-		UPDATE='apt-get update'
-		UPGRADE='apt-get upgrade --yes'
-		INSTALL='apt-get install --yes'
-		else
-		DL='wget --quiet --timeout=30'
-		UPDATE='apt-get update -qq'
-		UPGRADE='apt-get upgrade --yes -qq'
-		INSTALL='apt-get install --yes -qq'
-		fi
-
-	else E_=$?
-		debug_error "${txtred}No download program available: Please install${bldred} axel${txtred},${bldred} wget${txtred}, or${bldred} curl"
-	fi
-	echo -e "[${bldylw} done ${rst}]"
-
-	if ! which lsb_release >/dev/null; then  # Check for lsb-release package
-		echo -n ">>> Installing LSB Module..."
-		apt-get install -yqq lsb-release
-		echo -e "[${bldylw} done ${rst}]"
+		INSTALL='apt-get install --yes '
 	fi
 
-	# Get hostname, net interface, ip
 	HOST=$(hostname)
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
 	iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
@@ -222,6 +200,7 @@ init() {
 	if ! [[ ${iP} = *.*.* ]]; then
 		error "Unable to find ip from outside"
 	fi
+	echo -e "[${bldylw} done ${rst}]"
 }
 
 #!=====================>> COLOR CONTROL <<=====================!#

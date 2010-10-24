@@ -98,8 +98,6 @@ cat << "EOF"
         )_/        \          /
        (@           '--------'
 
-            Welcome to 0MNi's Auto Installer
-
   WARNING:
 
   The installation is quite stable and functional when run on a freshly
@@ -116,7 +114,6 @@ cat << "EOF"
 
   If your OS is not listed, this script will most likey explode.
 EOF
-# END
 
 get_varinfo
 

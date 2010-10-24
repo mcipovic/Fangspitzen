@@ -116,6 +116,7 @@ cat << "EOF"
 
   If your OS is not listed, this script will most likey explode.
 EOF
+# END
 
 get_varinfo
 

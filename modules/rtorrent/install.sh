@@ -13,20 +13,23 @@ fi
 
 while [[ $compile_rtorrent = true ]]; do
 	notice "iNSTALLiNG rTorrent"
-	#checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc  # Checkout 'advanced' xmlrpc
-	#	E_=$? && debug_error "XMLRPC Download Failed"
-	#download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz  # Grab rtorrent
-	#	E_=$? && debug_error "rTorrent Download Failed"
-	#download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
-	svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
-	mv trunk/libtorrent libtorrent-0.12.6 && mv trunk/rtorrent rtorrent-0.8.6 && rm -r trunk
-		debug_error "LibTorrent Download Failed"
+	if [[ $rtorrent_svn = 'y' ]]; then
+		svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
+			debug_error "LibTorrent Download Failed"
+		mv trunk/libtorrent libtorrent && mv trunk/rtorrent rtorrent && rm -r trunk
+	else
+		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz  # Grab rtorrent
+			E_=$? && debug_error "rTorrent Download Failed"
+		download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
+		tar xzf rtorrent-0.8.6.tar.gz && tar xzf libtorrent-0.12.6.tar.gz  # Unpack
+		mv libtorrent-0.8.6 libtorrent && mv rtorrent-0.12.6 rtorrent
+	fi
+	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc  # Checkout 'advanced' xmlrpc
+		E_=$? && debug_error "XMLRPC Download Failed"
 	echo -e "XMLRPC | Downloaded \nLibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}
-
-	tar xzf rtorrent-0.8.6.tar.gz && tar xzf libtorrent-0.12.6.tar.gz  # Unpack
 	log -e "LibTorrent | Unpacked \nrTorrent | Unpacked"
 
-	notice "COMPiLiNG... Go Grab a Coffee"
+	notice "COMPiLiNG... XMLRPC"
 #-->[ Compile xmlrpc ]
 	cd xmlrpc
 	sh configure --prefix=/usr
@@ -37,7 +40,7 @@ while [[ $compile_rtorrent = true ]]; do
 		log "XMLRPC Installation | Completed"
 		debug_wait "xmlrpc.installed"
 
-	notice "STiLL COMPiLiNG! How About A Donut"
+	notice "COMPiLiNG... LiBTORRENT"
 #-->[ Compile libtorrent ]
 	cd ../libtorrent-0.12.6
 	if [[ ${NAME} = 'lenny' ]]; then
@@ -55,7 +58,7 @@ while [[ $compile_rtorrent = true ]]; do
 		log "LibTorrent Installation | Completed"
 		debug_wait "libtorrent.installed"
 
-	notice "ALMOST DONE! I SWEAR!"
+	notice "COMPiLiNG... rTORRENT"
 #-->[ Compile rtorrent ]
 	cd ../rtorrent-0.8.6
 	if [[ ${NAME} = 'lenny' ]]; then
@@ -70,7 +73,7 @@ while [[ $compile_rtorrent = true ]]; do
 		log "rTorrent Installation | Completed"
 done
 
-	notice "iNSTALLiNG rTorrent CONFiG FiLE"
+	notice "CREATiNG NEW rTORRENT.RC CONFiG"
 	cd $HOME
 	sudo -u $USER mkdir -p .session
 	sudo -u $USER mkdir -p downloads
@@ -79,6 +82,7 @@ done
 	if [[ -f .rtorrent.rc ]]; then
 		log "Previous rTorrent.rc config found, creating backup..."
 		mv .rtorrent.rc .rtorrent.rc.bak
+		notice "BACKED UP PREVIOUS rTORRENT.RC"
 	fi
 
 	cd $BASE

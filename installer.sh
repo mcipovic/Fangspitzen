@@ -434,7 +434,7 @@ fi
 
 echo -e "\n*******************************"
 echo -e   "**${bldred} TORRENT CLiENT iNSTALLiNG ${rst}**"
-echo -e   "*******************************\n"
+echo      "*******************************"
 cd ${BASE}/tmp
 
 if [[ ${buildtorrent} = 'b' ]]; then

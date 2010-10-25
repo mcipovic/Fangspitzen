@@ -3,23 +3,25 @@ while [[ ${skip} = false ]]; do
 clear
 echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<---------------${rst}"
 
-read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: "  http
-read -p "[ SQL SERVER  ]        [mysql|sqlite|postgre|none]: "  sql
-read -p "[ FTP SERVER  ]        [vsftp|proftp|pureftp|none]: "  ftpd
-read -p "[ Torrent App ]      [rtorrent|tranny|deluge|none]: "  torrent
+read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: " http
+read -p "[ SQL SERVER  ]        [mysql|sqlite|postgre|none]: " sql
+read -p "[ FTP SERVER  ]        [vsftp|proftp|pureftp|none]: " ftpd
+read -p "[ Torrent App ]      [rtorrent|tranny|deluge|none]: " torrent
 
 if [[ ${torrent} = 'rtorrent' ]]; then
-read -p "[ --with-posix-fallocate ? ]                 [y|n]: "  alloc
+read -p "[ compile from svn ? ]                       [y|n]: " rtorrent_svn
+read -p "[ --with-posix-fallocate ? ]                 [y|n]: " alloc
 fi
 
-if [[ ${torrent} = 'rtorrent' || ${torrent} = 'tranny' || ${torrent} = 'deluge' ]]; then
-read -p "[ MkTorrent or BuildTorrent ]                  [b]: "  buildtorrent ;fi
-read -p "[ ruTorrent WebUi ]                          [y|n]: "  webui
+if [[ -f /usr/local/bin/mktorrent || -f /usr/local/bin/buildtorrent ]]; then
+read -p "[ MkTorrent or BuildTorrent ]                  [b]: " buildtorrent ;fi
+read -p "[ ruTorrent WebUi ]                          [y|n]: " webui
 
 echo -e "\n       **** [ Extra Options ] ****"
-read -p " [iRC Bouncer]             [znc|psybnc|sbnc|none]: "  bnc
-read -p " [WebMiN]                                   [y|n]: "  webmin
-read -p " [VnStat WebUi]                             [y|n]: "  vnstat
+read -p " [iRC Bouncer]              [znc|psybnc|sbnc|none]: " bnc
+if [[ -d /usr/share/webmin ]]; then
+read -p " [WebMiN]                                    [y|n]: " webmin ;fi
+read -p " [VnStat WebUi]                              [y|n]: " vnstat
 
 
 #!=====================>> CONFIRMATION <<=======================!#
@@ -83,7 +85,11 @@ fi
 
 ##[ Check for Torent Client ]##
 if [[ ${torrent} = 'rtorrent' ]]; then
-	echo -e "${bldblu} Package: libtorrent|rtorrent : Version: 0.12.7|0.8.7 ~svn r1180 ${rst}"
+	if [[ ${rtorrent_svn} = 'y' ]]; then
+		echo -e "${bldblu} Package: libtorrent|rtorrent : Version: 0.12.7|0.8.7 ~svn r1180 ${rst}"
+	else
+		echo -e "${bldblu} Package: libtorrent|rtorrent : Version: 0.12.6|0.8.6 ${rst}"
+	fi
 	if [[ ${alloc} = 'y' ]]; then
 		echo -e "${bldpur} Compiling --with-posix-fallocate! ${rst}"
 		echo -e "${bldpur} See http://libtorrent.rakshasa.no/ticket/460 for more info and potential dangers. Do not use on ext3 ${rst}\n"

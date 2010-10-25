@@ -1,24 +1,22 @@
-#!/bin/sh
+#!/bin/bash
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
-SERVICE='rtorrent'
-HOMEDIR="/home/${USER}"
-SESSION="${HOMEDIR}/.session"
-FILE="${SESSION}/rtorrent.lock"
-SIZE=95 #total %age
+SERVICE=rtorrent
+FILE=/home/$USER/.session/rtorrent.lock
 
-df ${HOMEDIR}| tail -1 | while read fs size used avail pcnt mount;
+df /home/$USER | tail -1 | while read fs size used avail pcnt mount
 do
-  pcnt=$(echo ${pcnt} | cut -d'%' -f1 )
-  if [ ${pcnt} -ge ${SIZE} ]; then
-    echo "Running out of space \"${fs} (${pcnt}%)\" on ${HOSTNAME} as on $(date)"
-    exit 1
-  fi
+	pcnt=$(echo $pcnt | cut -d'%' -f1 )
+	if [[ $pcnt -ge 95 ]]; then
+		echo "Running out of space \"$fs ($pcnt%)\" on $HOSTNAME as on $(date)"
+		exit 1
+	fi
 
-if pgrep -u ${USER} ${SERVICE} > /dev/null
-then
-    echo "${SERVICE} service running, everything is fine"
-else
-    rm -f ${FILE}
-    echo "${SERVICE} is not running, starting ${SERVICE}" && screen -dmS seedbox ${SERVICE}
-fi
+	if pgrep -u $USER $SERVICE >/dev/null; then
+		echo "$SERVICE service running, everything is fine"
+	else
+		rm -f /home/$USER/.dtach/rtorrent
+		mkdir -p /home/$USER/.dtach && mkdir -p /home/$USER/.dtach/rtorrent
+		rm -f $FILE
+		echo "$SERVICE is not running, starting $SERVICE" && dtach -n /home/$USER/.dtach/rtorrent $SERVICE
+	fi
 done

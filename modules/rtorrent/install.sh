@@ -42,7 +42,7 @@ while [[ $compile_rtorrent = true ]]; do
 
 	notice "COMPiLiNG... LiBTORRENT"
 #-->[ Compile libtorrent ]
-	cd ../libtorrent-0.12.6
+	cd ../libtorrent
 	if [[ ${NAME} = 'lenny' ]]; then
 		rm -f scripts/{libtool,lt*}.m4
 	fi
@@ -60,7 +60,7 @@ while [[ $compile_rtorrent = true ]]; do
 
 	notice "COMPiLiNG... rTORRENT"
 #-->[ Compile rtorrent ]
-	cd ../rtorrent-0.8.6
+	cd ../rtorrent
 	if [[ ${NAME} = 'lenny' ]]; then
 		rm -f scripts/{libtool,lt*}.m4
 	fi

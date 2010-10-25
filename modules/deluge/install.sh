@@ -1,6 +1,6 @@
 cd ${BASE}/tmp
 	notice "iNSTALLiNG DELUGE"
-	${INSTALL} deluge-common deluge-console deluge-daemon deluge-web 2>> ${eLOG}
+	${INSTALL} deluge-common deluge-console deluge-web deluged 2>> ${eLOG}
 		E_=$? && debug_error "Deluge failed to install"
 
 	deluged && killall deluged
@@ -8,7 +8,7 @@ cd ${BASE}/tmp
 
 	if [[ ! -f /etc/init.d/deluge-daemon ]]; then
 		cp ../modules/deluge/deluge-daemon.defaults /etc/default/deluge-daemon            # Copy init config
-		cp ../modules/deluge/deluge-daemon.init /etc/init.d/deluge-daemon                 # Copy init script
+		cp ../modules/deluge/deluge-daemon.init     /etc/init.d/deluge-daemon             # Copy init script
 		sed -i "s:DELUGED_USER=.*:DELUGED_USER=\"${dUser}\":" /etc/default/deluge-daemon  # Put UserName in script
 		chmod a+x /etc/init.d/deluge-daemon && update-rc.d deluge-daemon defaults         # Start at boot
 

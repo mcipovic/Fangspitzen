@@ -15,23 +15,26 @@ done
 
 if [[ $compile_rtorrent = 'true' ]]; then
 cd ${BASE}/tmp
+
+	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc && E_=$?  # Checkout xmlrpc ~advanced
+	debug_error "XMLRPC Download Failed"
+	log "XMLRPC | Downloaded \nLibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}
+
 	if [[ $rtorrent_svn = 'y' ]]; then
 		notice "iNSTALLiNG rTorrent-SVN"
 		svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
-			debug_error "LibTorrent Download Failed"
+		debug_error "LibTorrent Download Failed"
 		mv trunk/libtorrent libtorrent && mv trunk/rtorrent rtorrent && rm -r trunk
+		log "XMLRPC | Downloaded \nLibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}
 	else
 		notice "iNSTALLiNG rTorrent-STABLE"
-		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz     # Grab rtorrent
-			E_=$? && debug_error "rTorrent Download Failed"
 		download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
-		tar xzf rtorrent-0.8.6.tar.gz && tar xzf libtorrent-0.12.6.tar.gz          # Unpack
-		mv rtorrent-0.8.6 libtorrent && mv libtorrent-0.12.6 rtorrent
+		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz     # Grab rtorrent
+		log "LibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}
+		tar xzf libtorrent-0.12.6.tar.gz && tar xzf rtorrent-0.8.6.tar.gz          # Unpack
+		mv libtorrent-0.12.6 libtorrent && mv rtorrent-0.8.6 rtorrent
+		log "LibTorrent | Unpacked \nrTorrent | Unpacked"
 	fi
-	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc  # Checkout 'advanced' xmlrpc
-		E_=$? && debug_error "XMLRPC Download Failed"
-	echo -e "XMLRPC | Downloaded \nLibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}
-	log -e "LibTorrent | Unpacked \nrTorrent | Unpacked"
 
 	notice "COMPiLiNG... XMLRPC"
 #-->[ Compile xmlrpc ]

@@ -42,7 +42,7 @@ checkroot() {  # check if user is root
 
 cleanup() {  # remove tmp folder and restore permissions
 	cd $BASE ; rm --recursive --force tmp/
-	log "Cleaning up"
+	log "Cleaning up \n<--------------------------------->"
 	chown -R ${USER}:${USER} $BASE
 	chmod -R 755 $BASE
 }
@@ -59,8 +59,7 @@ compile() {  # increase verbosity
 
 ctrl_c() {  # interrupt trap
 	log "CTRL-C : abnormal exit detected..."
-	echo
-	echo -n " Cleaning up and exiting..."
+	echo -en "\n Cleaning up and exiting..."
 	cleanup
 	echo -e " done \n"
 	exit 0

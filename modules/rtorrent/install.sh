@@ -15,12 +15,13 @@ done
 
 if [[ $compile_rtorrent = 'true' ]]; then
 cd ${BASE}/tmp
-	notice "iNSTALLiNG rTorrent"
 	if [[ $rtorrent_svn = 'y' ]]; then
+		notice "iNSTALLiNG rTorrent-SVN"
 		svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
 			debug_error "LibTorrent Download Failed"
 		mv trunk/libtorrent libtorrent && mv trunk/rtorrent rtorrent && rm -r trunk
 	else
+		notice "iNSTALLiNG rTorrent-STABLE"
 		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz     # Grab rtorrent
 			E_=$? && debug_error "rTorrent Download Failed"
 		download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
@@ -98,6 +99,7 @@ echo "session = /home/$USER/.session"     >> ${PATH_rt}
 if [[ ${rtorrent_svn} != 'y' ]]; then
 	echo "max_open_files = 256"    >> ${PATH_rt}
 	echo "max_memory_usage = 800M" >> ${PATH_rt}
+	echo "preload_type = 1"        >> ${PATH_rt}
 fi
 
 if [[ ${alloc} = 'y' ]]; then
@@ -137,6 +139,6 @@ if [[ $start_rt = 'y' ]]; then
 	mkdir -p $HOME/.dtach $HOME/.dtach/rtorrent
 	chmod -R 755 $HOME/.dtach
 	chown -R $USER:$USER $HOME/.dtach
-	sudo -u $USER detach -n /home/$USER/.dtach/rtorrent rtorrent
+	sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
 	echo "rTorrent has been started with dtach in ~/.dtach/rtorrent"
 fi

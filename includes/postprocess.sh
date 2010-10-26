@@ -48,11 +48,9 @@ ldconfig
 	log "Linking Shared Libaries | Completed"
 	debug_wait "linked.shared.libs"
 
-if [[ ${DEBUG} = 0 ]]; then update; fi
+echo -en "${bldred} Cleaning up...${rst}"
 apt-get -qq autoremove # remove uneeded and 
 apt-get -qq autoclean  #+cached deb packages
-
-echo -en "${bldred} Cleaning up...${rst}"
 cleanup
 echo -e "${bldylw} done${rst}"
 
@@ -61,4 +59,4 @@ echo -e "\n*******************************"
 echo -e   "******${bldred} SCRiPT COMPLETED! ${rst}******"
 echo -e   "****${bldred} FiNiSHED iN ${bldylw}$SECONDS ${bldred}SECONDS ${rst}**"
 echo -e   "*******************************\n"
-log "SCRiPT | COMPLETED @ $(date) \n<-------------------------------------------------> \n"
+log "SCRiPT | COMPLETED @ $(date) \n<---------------------------------> \n"

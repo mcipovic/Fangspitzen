@@ -47,8 +47,8 @@ cd ${BASE}/tmp
 	log "ruTorrent Config | Created"
 
 	cp -R rutorrent ${WEB}  # Move rutorrent to webroot
-	chown -R www-data:www-data ${WEB}
 	chmod -R 755 ${WEB}
+	chown -R www-data:www-data ${WEB}
 	log "ruTorrent Installation | Completed"
 	debug_wait "rutorrent.installed"
 fi

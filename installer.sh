@@ -140,7 +140,7 @@ echo -e   "********************************\n"
 notice "iNSTALLiNG BASE PACKAGES... this may take a while"
 base_install
 	echo -e "${bldylw} done ${rst}"
-debug_wait "base.packages.installed"
+	debug_wait "base.packages.installed"
 
 SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
 sed -i 's:default_bits .*:default_bits = 2048:' $SSLEAYCNF  # Bump 1024=>2048 bit certs
@@ -334,7 +334,7 @@ elif [[ ${bnc} = 'psybnc' ]]; then
 	cd ${HOME}
 	notice "iNSTALLiNG PsyBNC"
 	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz
-		E_=$? && debug_error "PsyBNC Download Failed" && debug_wait
+		E_=$? && debug_error "PsyBNC Download Failed"
 	tar -xzf psyBNC-2.3.2-10.tar.gz && cd psybnc  # Unpack
 		log "PsyBNC | Downloaded + Unpacked"
 	make menuconfig
@@ -379,8 +379,9 @@ if [[ ${vnstat} = 'y' ]]; then
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
 	tar xzf vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
 	compile
-		E_=$? && debug_error "VnStat Build Failed" && debug_wait "vnstat.compiled"
+		E_=$? && debug_error "VnStat Build Failed"
 		log "VnStat Compile | Completed"
+		debug_wait "vnstat.compiled"
 	make install                                                          # Install
 		log "VnStat Installation | Completed"
 	cd ..
@@ -455,8 +456,9 @@ if [[ ! -f /usr/local/bin/buildtorrent ]]; then
 	sh configure
 	make install && E=$?
 
-	debug_error "BuildTorrent Build Failed" && debug_wait "buildtorrent.installed"
+	debug_error "BuildTorrent Build Failed"
 	log "BuildTorrent Installation | Completed"
+	debug_wait "buildtorrent.installed"
 fi
 else
 #-->##[ mkTorrent ]##
@@ -471,8 +473,9 @@ if [[ ! -f /usr/local/bin/mktorrent ]]; then
 	cd mktorrent
 	make install && E_=$?
 
-	debug_error "MkTorrent Build Failed" && debug_wait "mktorrent.installed"
+	debug_error "MkTorrent Build Failed"
 	log "MkTorrent Installation | Completed"
+	debug_wait "mktorrent.installed"
 fi
 fi
 

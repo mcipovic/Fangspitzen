@@ -95,9 +95,15 @@ cp modules/rtorrent/rtorrent.rc ${PATH_rt}
 echo "directory = /home/$USER/downloads"  >> ${PATH_rt}
 echo "session = /home/$USER/.session"     >> ${PATH_rt}
 
+if [[ ${rtorrent_svn} != 'y' ]]; then
+	echo "max_open_files = 256"    >> ${PATH_rt}
+	echo "max_memory_usage = 800M" >> ${PATH_rt}
+fi
+
 if [[ ${alloc} = 'y' ]]; then
 	echo "system.file_allocate.set = yes" >> ${PATH_rt}  # Enable file pre-allocation
 fi
+
 if [[ -d /etc/apache2 ]]; then
 	echo 'scgi_port = localhost:5000'     >> ${PATH_rt}  # Create scgi port on localhost:5000
 elif [[ -d /etc/lighttpd || -d /etc/cherokee ]]; then
@@ -129,7 +135,8 @@ echo
 read -p "Start rtorrent now? [y|n]: " start_rt
 if [[ $start_rt = 'y' ]]; then
 	mkdir -p $HOME/.dtach $HOME/.dtach/rtorrent
-	chmod -R $USER:$USER $HOME/.dtach
+	chmod -R 755 $HOME/.dtach
+	chown -R $USER:$USER $HOME/.dtach
 	sudo -u $USER detach -n /home/$USER/.dtach/rtorrent rtorrent
 	echo "rTorrent has been started with dtach in ~/.dtach/rtorrent"
 fi

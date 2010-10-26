@@ -24,8 +24,5 @@ encoding_list = UTF-8
 
 encryption = allow_incoming,try_outgoing,enable_retry
 
-max_open_files = 256
-max_memory_usage = 800M
-
 ##- Below Generated From Auto Script -##
 

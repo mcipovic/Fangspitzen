@@ -9,16 +9,16 @@ fi
 
 	if [[ $DISTRO = 'Ubuntu' ]]; then
 		if [[ $NAME = 'karmic' || $NAME = 'lucid' || $NAME='maverick' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $eLOG && E_=$?
+			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG && E_=$?
 		elif [[ $NAME = 'jaunty' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar2 2>> $eLOG && E_=$?
+			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar2 2>> $LOG && E_=$?
 		fi
 
 	elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
 		if [[ $NAME = 'squeeze' || $NAME = 'debian' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $eLOG && E_=$?
+			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG && E_=$?
 		elif [[ $NAME = 'lenny' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar0 2>> $eLOG && E_=$?
+			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar0 2>> $LOG && E_=$?
 		fi
 	fi
 
@@ -49,7 +49,6 @@ cleanup() {  # remove tmp folder and restore permissions
 
 clear_logfile() {  # clear the logfile
 	if [[ -f $LOG ]]; then rm --force $LOG ;fi
-	if [[ -f $eLOG ]]; then rm --force $eLOG ;fi
 }
 
 compile() {  # increase verbosity

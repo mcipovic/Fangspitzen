@@ -40,7 +40,7 @@ checkroot() {  # check if user is root
 	fi
 }
 
-cleanup() {  # remove uneeded and cached deb packages
+cleanup() {  # remove tmp folder and restore permissions
 	cd $BASE ; rm --recursive --force tmp/
 	log "Cleaning up"
 	chown -R ${USER}:${USER} $BASE

@@ -1,17 +1,21 @@
 cd ${BASE}/tmp
 compile_rtorrent=false
 
-if [[ -f /usr/bin/rtorrent ]]; then  # Only if rtorrent doesnt exist or we allow it, will rtorrent compile again
-	echo -en "rTorrent Found.... re-compile and overwrite? [y/n]: "
-	if  yesno  # if user says yes
-		then compile_rtorrent=true
-		break
+while [[ $compile_rtorrent = false ]]; do
+	if [[ ! -f /usr/bin/rtorrent ]]; then  # Compile rtorrent
+		compile_rtorrent='true'
+	else  # Ask to re-compile if rtorrent is already installed
+		echo -en "rTorrent Found.... re-compile and overwrite? [y/n]: "
+		if  yesno; then  # if user says yes
+			compile_rtorrent='true'
+			break
+		else
+			$compile_rtorrent='break_loop'
+		fi
 	fi
-else
-	compile_rtorrent=true
-fi
+done
 
-while [[ $compile_rtorrent = true ]]; do
+while [[ $compile_rtorrent = 'true' ]]; do
 	notice "iNSTALLiNG rTorrent"
 	if [[ $rtorrent_svn = 'y' ]]; then
 		svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?

@@ -49,8 +49,8 @@ ldconfig
 	debug_wait "linked.shared.libs"
 
 if [[ ${DEBUG} = 0 ]]; then update; fi
-apt-get -qq autoremove
-apt-get -qq autoclean
+apt-get -qq autoremove # remove uneeded and 
+apt-get -qq autoclean  #+cached deb packages
 
 echo -en "${bldred} Cleaning up...${rst}"
 cleanup

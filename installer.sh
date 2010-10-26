@@ -118,9 +118,9 @@ EOF
 get_varinfo
 
 echo -en "\n Continue? [y/n]: "
-if ! yesno ;then  # Continue if yes
-	rm -rf tmp/
-	exit 0  # Die if no
+if ! yesno; then  # Cleanup and die if no
+	cleanup
+	exit 0 
 fi
 
 readonly REPO_PATH=/etc/apt/sources.list.d/

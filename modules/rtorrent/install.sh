@@ -3,7 +3,7 @@ while [[ $compile_rtorrent = false ]]; do
 	if [[ ! -f /usr/bin/rtorrent ]]; then  # Compile rtorrent
 		compile_rtorrent='true'
 	else  # Ask to re-compile if rtorrent is already installed
-		echo -en "rTorrent Found.... re-compile and overwrite? [y/n]: "
+		echo -en "rTorrent Found.... re-compile? [y/n]: "
 		if  yesno; then  # if user says yes
 			compile_rtorrent='true'
 			break
@@ -18,22 +18,22 @@ cd ${BASE}/tmp
 
 	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc && E_=$?  # Checkout xmlrpc ~advanced
 	debug_error "XMLRPC Download Failed"
-	log "XMLRPC | Downloaded \nLibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}
+	log "XMLRPC | Downloaded" >> ${LOG}
 
 	if [[ $rtorrent_svn = 'y' ]]; then
 		notice "iNSTALLiNG rTorrent-SVN"
 		svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
 		debug_error "LibTorrent Download Failed"
 		mv trunk/libtorrent libtorrent && mv trunk/rtorrent rtorrent && rm -r trunk
-		log "XMLRPC | Downloaded \nLibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}
+		log "Lib|rTorrent | Downloaded" >> ${LOG}
 	else
 		notice "iNSTALLiNG rTorrent-STABLE"
 		download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
 		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz     # Grab rtorrent
-		log "LibTorrent | Downloaded \nrTorrent | Downloaded" >> ${LOG}
+		log "Lib|rTorrent | Downloaded" >> ${LOG}
 		tar xzf libtorrent-0.12.6.tar.gz && tar xzf rtorrent-0.8.6.tar.gz          # Unpack
 		mv libtorrent-0.12.6 libtorrent && mv rtorrent-0.8.6 rtorrent
-		log "LibTorrent | Unpacked \nrTorrent | Unpacked"
+		log "Lib|rTorrent | Unpacked"
 	fi
 
 	notice "COMPiLiNG... XMLRPC"
@@ -139,7 +139,7 @@ debug_wait "rtorrent.installed"
 echo
 read -p "Start rtorrent now? [y|n]: " start_rt
 if [[ $start_rt = 'y' ]]; then
-	mkdir -p $HOME/.dtach $HOME/.dtach/rtorrent
+	mkdir -p $HOME/.dtach && rm -rf $HOME/.dtach/rtorrent
 	chmod -R 755 $HOME/.dtach
 	chown -R $USER:$USER $HOME/.dtach
 	sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent

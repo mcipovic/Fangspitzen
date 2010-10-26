@@ -121,7 +121,7 @@ fi
 if [[ ${torrent} != 'none' ]]; then
 if [[ ${buildtorrent} = 'b' ]]; then
 	echo -e "${bldblu} Package: buildtorrent : Version: 0.9~git ${rst}"
-elif [[ ${buildtorrent} = 'm'
+elif [[ ${buildtorrent} = 'm' ]]; then
 	echo -e "${bldblu} Package: mktorrent : Version: 1.0~git ${rst}"
 fi;fi
 

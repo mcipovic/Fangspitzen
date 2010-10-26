@@ -48,7 +48,6 @@ cleanup() {  # remove tmp folder and restore permissions
 }
 
 clear_logfile() {  # clear the logfile
-	eLOG=${LOG}.error
 	if [[ -f $LOG ]]; then rm --force $LOG ;fi
 	if [[ -f $eLOG ]]; then rm --force $eLOG ;fi
 }
@@ -105,7 +104,7 @@ get_varinfo() {  # get distro; name; version; architecture
 }
 
 log() {  # send to the logfile
-	echo "$1" >> $LOG
+	echo -e "$1" >> $LOG
 }
 
 mkpass() {  # generate a random password of user defined length
@@ -167,7 +166,8 @@ yesno() {  # user input for yes|no
 
 init() {
 	echo -n ">>> iNiTiALiZiNG......"
-	clear_logfile  # Start with a fresh logfile
+	eLOG=${LOG}.error
+	#clear_logfile  # Start with a fresh logfile
 	mkdir --parents tmp/  # Create tmp folder
 
 	##[ Use Axel and Apt-Fast ]##

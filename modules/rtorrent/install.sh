@@ -15,7 +15,7 @@ while [[ $compile_rtorrent = false ]]; do
 	fi
 done
 
-while [[ $compile_rtorrent = 'true' ]]; do
+if [[ $compile_rtorrent = 'true' ]]; then
 	notice "iNSTALLiNG rTorrent"
 	if [[ $rtorrent_svn = 'y' ]]; then
 		svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
@@ -75,7 +75,7 @@ while [[ $compile_rtorrent = 'true' ]]; do
 		log "rTorrent Compile | Completed"
 	make install
 		log "rTorrent Installation | Completed"
-done
+fi
 
 	notice "CREATiNG NEW rTORRENT.RC CONFiG"
 	cd $HOME

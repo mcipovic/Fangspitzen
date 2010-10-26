@@ -15,7 +15,8 @@ read -p "  [ compile with falloc() ? ]                [y|n]: " alloc ;fi
 read -p "[ ruTorrent WebUi ]                          [y|n]: " webui
 
 if [[ ! -f /usr/local/bin/mktorrent && ! -f /usr/local/bin/buildtorrent ]]; then
-read -p "[ MkTorrent or BuildTorrent ]                  [b]: " buildtorrent ;fi
+read -p "[ MkTorrent or BuildTorrent ]                  [b]: " buildtorrent
+else buildtorrent='n' ;fi
 
 echo -e "\n       **** [ Extra Options ] ****"
 read -p " [iRC Bouncer]              [znc|psybnc|sbnc|none]: " bnc
@@ -120,7 +121,7 @@ fi
 if [[ ${torrent} != 'none' ]]; then
 if [[ ${buildtorrent} = 'b' ]]; then
 	echo -e "${bldblu} Package: buildtorrent : Version: 0.9~git ${rst}"
-else
+elif [[ ${buildtorrent} = 'm'
 	echo -e "${bldblu} Package: mktorrent : Version: 1.0~git ${rst}"
 fi;fi
 

@@ -1,7 +1,7 @@
 ##[ XCache ]##
 if [[ ${cache} = 'xcache' ]]; then
 	notice "iNSTALLiNG X-CACHE"
-	${INSTALL} php5-xcache 2>> ${eLOG}
+	${INSTALL} php5-xcache 2>> ${LOG}
 		E_=$? && debug_error "X-Cache failed to install"
 
 	echo -e "\n${bldylw} Generate a User Name and Password for XCache-Admin"
@@ -24,7 +24,7 @@ if [[ ${cache} = 'xcache' ]]; then
 ##[ APC ]##
 elif [[ ${cache} = 'apc' ]]; then
 	notice "iNSTALLiNG APC"
-	${INSTALL} php-apc 2>> ${eLOG}
+	${INSTALL} php-apc 2>> ${LOG}
 	E_=$? && debug_error "PHP-APC failed to install"
 	log "APC Installation | Completed"
 	debug_wait "apc.installed"

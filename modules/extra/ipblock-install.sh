@@ -12,9 +12,9 @@ fi
 if [[ ${ipblock} = 'y' ]]; then
 	notice "iNSTALLiNG iPBlock"
 	if [[ $NAME = 'lenny' ]]; then
-		apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1  # Install updated libraries for lenny support
+		apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1 2>> ${LOG}  # Install updated libraries for lenny support
 	fi
-	${INSTALL} iplist 2>> ${eLOG}
+	${INSTALL} iplist 2>> ${LOG}
 		E_=$? && debug_error "IPlist failed to install"
 
 	PATH_iplist=/etc/ipblock.conf

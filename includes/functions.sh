@@ -69,8 +69,8 @@ ctrl_c() {  # interrupt trap
 
 debug_error() {  # call this to catch a bad return code and log the error
 	if [[ $E_ != 0 ]]; then
-		echo -e " Error:${bldred} $1 ${rst}"
-		log "Error: $1"
+		echo -e " Error:${bldred} $1 ${rst} ($E)"
+		log "Error: $1 ($E)"
 		cleanup
 	fi
 }
@@ -166,7 +166,6 @@ yesno() {  # user input for yes|no
 
 init() {
 	echo -n ">>> iNiTiALiZiNG......"
-	eLOG=${LOG}.error
 	#clear_logfile  # Start with a fresh logfile
 	mkdir --parents tmp/  # Create tmp folder
 

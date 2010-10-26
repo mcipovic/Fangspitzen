@@ -11,7 +11,7 @@ fi
 #TODO#[ SABnzbd ]##
 if [[ ${sabnzbd} = 'y' ]]; then
 	notice "iNSTALLiNG SABnzbd"
-	${INSTALL} sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl 2>> ${eLOG}
+	${INSTALL} sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl 2>> ${LOG}
 		E_=$? && debug_error "Sabnzbd failed to install"
 
 	#if [[ $NAME = 'lenny' ]]; then

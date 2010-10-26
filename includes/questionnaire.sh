@@ -10,16 +10,16 @@ read -p "[ Torrent App ]      [rtorrent|tranny|deluge|none]: " torrent
 
 if [[ ${torrent} = 'rtorrent' ]]; then
 read -p "  [      compile from svn ? ]                [y|n]: " rtorrent_svn
-read -p "  [ compile with falloc() ? ]                [y|n]: " alloc
-fi
+read -p "  [ compile with falloc() ? ]                [y|n]: " alloc ;fi
 
-if [[ -f /usr/local/bin/mktorrent || -f /usr/local/bin/buildtorrent ]]; then
-read -p "[ MkTorrent or BuildTorrent ]                  [b]: " buildtorrent ;fi
 read -p "[ ruTorrent WebUi ]                          [y|n]: " webui
+
+if [[ ! -f /usr/local/bin/mktorrent && ! -f /usr/local/bin/buildtorrent ]]; then
+read -p "[ MkTorrent or BuildTorrent ]                  [b]: " buildtorrent ;fi
 
 echo -e "\n       **** [ Extra Options ] ****"
 read -p " [iRC Bouncer]              [znc|psybnc|sbnc|none]: " bnc
-if [[ -d /usr/share/webmin ]]; then
+if [[ ! -d /usr/share/webmin ]]; then
 read -p " [WebMiN]                                    [y|n]: " webmin ;fi
 read -p " [VnStat WebUi]                              [y|n]: " vnstat
 
@@ -125,13 +125,11 @@ else
 fi;fi
 
 ##[ Check for ruTorrent ]##
-if [[ ${torrent} = 'rtorrent' ]]; then
-	if [[ ${webui} = 'y' ]]; then
-		echo -e "${bldblu} Package: ruTorrent : Version: 3.1~svn${rst}"
-	elif [[ ${webui} = 'n' ]]; then
-		echo -e "${bldylw} WEBUi NOT BEiNG iNSTALLED${rst}"
-	else echo -e "${bldred}--> ERROR iN WEBUi iNPUT!${rst}" ; webui='n'
-	fi
+if [[ ${webui} = 'y' ]]; then
+	echo -e "${bldblu} Package: ruTorrent : Version: 3.1~svn${rst}"
+elif [[ ${webui} = 'n' ]]; then
+	echo -e "${bldylw} WEBUi NOT BEiNG iNSTALLED${rst}"
+else echo -e "${bldred}--> ERROR iN WEBUi iNPUT!${rst}" ; webui='n'
 fi
 
 ##[ Check for BNC ]##
@@ -148,8 +146,8 @@ fi
 
 ##[ Check for WEBMiN ]##
 if [[ ${webmin} = 'y' ]]; then
-	v1=$(aptitude show php-apc | grep Version)
-	v2=$(aptitude show php-apc | grep Package)
+	v1=$(aptitude show webmin | grep Version)
+	v2=$(aptitude show webmin | grep Package)
 	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
 elif [[ ${webmin} = 'n' ]]; then
 	echo -e "${bldylw} WEBMiN NOT BEiNG iNSTALLED${rst}"

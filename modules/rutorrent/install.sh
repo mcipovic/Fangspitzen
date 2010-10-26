@@ -14,9 +14,10 @@ cd ${BASE}/tmp
 	cp ../modules/rutorrent/favicon.ico rutorrent/favicon.ico
 	log "ruTorrent plugins | Downloaded"
 
+	echo
 	if [[ -d /etc/apache2 ]]; then  # Apache
 		htdigest -c /etc/apache2/.htpasswd "ruTorrent" ${USER}  # Create user authentication
-		cp ../modules/apache/htaccess trunk/rutorrent/.htaccess
+		cp ../modules/apache/htaccess rutorrent/.htaccess
 		cp ../modules/rutorrent/config.php.apache rutorrent/conf/config.php
 	elif [[ -d /etc/lighttpd ]]; then  # Lighttp
 		htdigest -c /etc/lighttpd/.htpasswd "ruTorrent" ${USER}  # Create user authentication

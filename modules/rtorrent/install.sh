@@ -26,7 +26,7 @@ if [[ $compile_rtorrent = 'true' ]]; then
 			E_=$? && debug_error "rTorrent Download Failed"
 		download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
 		tar xzf rtorrent-0.8.6.tar.gz && tar xzf libtorrent-0.12.6.tar.gz  # Unpack
-		mv libtorrent-0.8.6 libtorrent && mv rtorrent-0.12.6 rtorrent
+		mv rtorrent-0.8.6 libtorrent && mv libtorrent-0.12.6 rtorrent
 	fi
 	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc  # Checkout 'advanced' xmlrpc
 		E_=$? && debug_error "XMLRPC Download Failed"

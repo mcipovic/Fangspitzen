@@ -1,6 +1,4 @@
-cd ${BASE}/tmp
 compile_rtorrent=false
-
 while [[ $compile_rtorrent = false ]]; do
 	if [[ ! -f /usr/bin/rtorrent ]]; then  # Compile rtorrent
 		compile_rtorrent='true'
@@ -10,12 +8,13 @@ while [[ $compile_rtorrent = false ]]; do
 			compile_rtorrent='true'
 			break
 		else
-			$compile_rtorrent='break_loop'
+			compile_rtorrent='break_loop'
 		fi
 	fi
 done
 
 if [[ $compile_rtorrent = 'true' ]]; then
+cd ${BASE}/tmp
 	notice "iNSTALLiNG rTorrent"
 	if [[ $rtorrent_svn = 'y' ]]; then
 		svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?

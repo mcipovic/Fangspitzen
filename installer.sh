@@ -65,7 +65,7 @@ if [[ -f config.ini ]]; then  # Die if no config..
 		echo -e "--> ${bldred}Does not match ${BASE}${rst}"
 		exit 1
 	fi
-	checkroot
+	clear && checkroot
 	readonly USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG  # Make sure these aren't overwritten
 	init  # If user is root lets begin
 else

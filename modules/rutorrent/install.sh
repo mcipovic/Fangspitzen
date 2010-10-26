@@ -1,3 +1,15 @@
+install_rutorrent=false
+while [[ $install_rutorrent = false ]]; do
+	if [[ ! -d $WEB/rutorrent ]]; then  # Compile rtorrent
+		install_rutorrent='true'
+	else  # Ask to re-compile if rtorrent is already installed
+		echo -en "ruTorrent Found.... Updating"
+		cd $WEB/rutorrent && svn up
+		break
+	fi
+done
+
+if [[ $install_rutorrent = 'true' ]]; then
 cd ${BASE}/tmp
 	notice "iNSTALLiNG ruTorrent"
 	checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent  # Checkout ruTorrent
@@ -39,3 +51,4 @@ cd ${BASE}/tmp
 	chmod -R 755 ${WEB}
 	log "ruTorrent Installation | Completed"
 	debug_wait "rutorrent.installed"
+fi

@@ -38,17 +38,19 @@ source includes/functions.sh  # Source in our functions
 ##[ Check command line switches ]##
 while [ $# -gt 0 ]; do
   	case $1 in
-		-p|--pass)    # Generate strong random 'user defined length' passwords
+		--force-extra)  # Run alternate script
+			force_mod_extra=1
+		-p|--pass)  # Generate strong random 'user defined length' passwords
 			if [[ $2 ]]; then opt=$2
 			else error "Specify Length --pass x "
 			fi
 			mkpass ;;
-		-v|--version) # Output version information
+		-v|--version)  # Output version and date
 			echo -e "\n v$VERSION  $DATE \n"
 			exit 0 ;;
-		*)
+		*)  # Output usage information
 			echo " Invalid Option"
-			usage ;;  # Output usage information
+			usage ;;
 	esac
 done
 
@@ -64,12 +66,18 @@ if [[ -f config.ini ]]; then  # Die if no config..
 		echo -e "--> ${bldred}Fatal Error: Wrong Directory Detected.${rst}"
 		echo -e "--> ${bldred}Does not match ${BASE}${rst}"
 		exit 1
-	fi
-	clear && checkroot
+	fi ;clear
+	checkroot
 	readonly USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG  # Make sure these aren't overwritten
 	init  # If user is root lets begin
 else
 	error "config.ini not found!"
+fi
+
+if [[ $force_mod_extra=1 ]]
+	log "\nForcing extras installer scripts to run!"
+	source modules/extra/_main.sh
+	exit
 fi
 
 #[TODO] Reserved for future ##
@@ -142,7 +150,6 @@ base_install
 	echo -e "${bldylw} done ${rst}"
 	debug_wait "base.packages.installed"
 
-SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
 sed -i 's:default_bits .*:default_bits = 2048:' $SSLEAYCNF  # Bump 1024=>2048 bit certs
 
 cd ${BASE}
@@ -421,22 +428,11 @@ if [[ ${vnstat} = 'y' ]]; then
 	fi
 	debug_wait "vnstat-web.installed"
 fi
-cd ${BASE}
 
-#!===================>> TORRENT CLiENTS <<======================!#
-if [[ ${torrent} = 'none' ]]; then  # Check for 'none' first to not waste time
-	##[ ruTorrent ]##
-	if [[ ${webui} = 'y' ]]; then
-		source modules/rutorrent/install.sh
-	fi
-	source ${BASE}/includes/postprocess.sh
-	exit 0  # We can exit if so
-fi
-
+cd ${BASE}/tmp
 echo -e "\n*******************************"
 echo -e   "**${bldred} TORRENT CLiENT iNSTALLiNG ${rst}**"
 echo      "*******************************"
-cd ${BASE}/tmp
 
 if [[ ${buildtorrent} = 'b' ]]; then
 #-->##[ BuildTorrent ]##
@@ -502,6 +498,11 @@ fi
 #if [[ ${utorrent} = 'y' ]]; then
 #	source modules/utorrent/install.sh
 #fi
+
+if $mod_extra ;then
+	log "\nForcing extras installer scripts to run!"
+	source modules/extra/_main.sh
+fi
 
 source ${BASE}/includes/postprocess.sh
 exit 0  # Completed

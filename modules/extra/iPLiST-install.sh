@@ -1,21 +1,21 @@
-##[ Check for iPBLOCK ]##
+##[ Check for iPLiST ]##
 if [[ ${ipblock} = 'y' ]]; then
 	v1=$(aptitude show iplist | grep Version)
 	v2=$(aptitude show iplist | grep Package)
 	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
 elif [[ ${ipblock} = 'n' ]]; then
-	echo -e "${bldylw} iPBLOCK NOT BEiNG iNSTALLED${rst}"
-else echo -e "${bldred}---> ERROR iN iPBLOCK iNPUT!${rst}" ;ipblock='n'
+	echo -e "${bldylw} iPLiST NOT BEiNG iNSTALLED${rst}"
+else echo -e "${bldred}---> ERROR iN iPLiST iNPUT!${rst}" ;ipblock='n'
 fi
 
-#TODO#[ iPBlock ]##
+#TODO#[ iPLiST ]##
 if [[ ${ipblock} = 'y' ]]; then
-	notice "iNSTALLiNG iPBlock"
+	notice "iNSTALLiNG iPLiST"
 	if [[ $NAME = 'lenny' ]]; then
 		apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1 2>> ${LOG}  # Install updated libraries for lenny support
 	fi
 	${INSTALL} iplist 2>> ${LOG}
-		E_=$? && debug_error "IPlist failed to install"
+		E_=$? && debug_error "iPLiST failed to install"
 
 	PATH_iplist=/etc/ipblock.conf
 	filters='index.html?list=bt_level1'
@@ -27,7 +27,8 @@ if [[ ${ipblock} = 'y' ]]; then
 	ipblock -u
 		log "Block Lists Updated"
 	echo -e "${bldylw} done ${rst}"
-	echo -en "${bldred} Starting iPBlock....${rst}"
+	echo -en "${bldred} Starting iPLiST....${rst}"
 	ipblock -r  # Start ipblock
+	iplist -b   # daemonize
 		debug_wait "iplist.installed.started"
 fi

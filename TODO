@@ -2,6 +2,7 @@ Finish Cherokee Config
 Finish ShroudBNC install
 Test Transission
 Test Deluge
+Test iplist
 Configure fail2ban
 
 --- phpsysinfo
@@ -10,6 +11,7 @@ Configure fail2ban
 --- add request: ajaxplorer https://ajaxplorer.svn.sourceforge.net/svnroot/ajaxplorer/trunk/core/src
 --- add request: headless virtualbox
 --- add request: virtualbox webui http://code.google.com/p/phpvirtualbox
+--- setup a reverse proxy frontend for our webserver
 --- implement dialog
 
 *** MultiUser (priority)

@@ -156,7 +156,7 @@ yesno() {  # user input for yes|no
 			;;
 			n|N|No|NO|no|nO) return 1
 			;;
-			*) echo -n " Please enter y or n: "
+			*) echo -n " Please enter ${undrln}y${rst} or ${undrln}y${rst}: "
 			;;
 		esac
 	done
@@ -197,6 +197,10 @@ init() {
 	echo -e "[${bldylw} done ${rst}]"
 }
 
+##[ VARiABLE iNiT ]##
+force_mod_extra=0
+SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
+
 #!=====================>> COLOR CONTROL <<=====================!#
 ##[ echo -e "${txtblu}test ${rst}" ]##
 txtblk='\e[0;30m'  # Black ---Regular
@@ -231,4 +235,5 @@ bakblu='\e[44m'    # Blue
 bakpur='\e[45m'    # Purple
 bakcyn='\e[46m'    # Cyan
 bakwht='\e[47m'    # White
+undrln='\e[4m'     # Underline
 rst='\e[0m'        # --------Reset

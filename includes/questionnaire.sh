@@ -165,7 +165,7 @@ fi
 
 ##[ CONFiRMATiON ]##
 echo -en "\n Is this correct? [y/n]: "
-	if  yesno
+	if yesno
 		then skip=true
 		break
 	fi

@@ -200,6 +200,7 @@ init() {
 ##[ VARiABLE iNiT ]##
 force_mod_extra=0
 SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
+CORES=$(grep -c ^processor /proc/cpuinfo)
 
 #!=====================>> COLOR CONTROL <<=====================!#
 ##[ echo -e "${txtblu}test ${rst}" ]##

@@ -87,12 +87,12 @@ download() {  # uses either wget or axel
 
 error() {  # call this when you know there will be an error
 	echo -e " Error:${bldred} $1 ${rst} \n"
-	log "Error: $1"
+	#log "Error: $1"
 	exit
 }
 
 get_varinfo() {  # get distro; name; version; architecture
-	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(uname -m)
+	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(arch)
 	# Distributor -i  > Ubuntu  > Debian  > Debian  > LinuxMint  (DISTRO)
 	# Release     -r  > 10.04   > 5.0.6   > testing > 1          (RELASE)
 	# Codename    -c  > lucid   > lenny   > squeeze > debian     (NAME)

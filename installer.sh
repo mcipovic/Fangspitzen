@@ -39,7 +39,7 @@ source includes/functions.sh  # Source in our functions
 while [ $# -gt 0 ]; do
   	case $1 in
 		--force-extra)  # Run alternate script
-			force_mod_extra=1
+			force_mod_extra=1  ;;
 		-p|--pass)  # Generate strong random 'user defined length' passwords
 			if [[ $2 ]]; then opt=$2
 			else error "Specify Length --pass x "

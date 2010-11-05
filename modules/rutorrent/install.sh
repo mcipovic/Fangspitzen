@@ -22,6 +22,7 @@ cd ${BASE}/tmp
 	E_=$? && debug_error "Plugins Download Failed"
 	cd ..
 
+	cp -R ../modules/rutorrent/pausewebui-0.8 rutorrent/plugins/pausewebui
 	cp ../modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini
 	cp ../modules/rutorrent/favicon.ico rutorrent/favicon.ico
 	log "ruTorrent plugins | Downloaded"

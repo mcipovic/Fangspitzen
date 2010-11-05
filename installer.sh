@@ -499,7 +499,7 @@ fi
 #	source modules/utorrent/install.sh
 #fi
 
-if $mod_extra ;then
+if [[ $mod_extra = 1 ]]; then
 	log "\nForcing extras installer scripts to run!"
 	source modules/extra/_main.sh
 fi

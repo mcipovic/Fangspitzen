@@ -84,7 +84,7 @@ fi
 #
 # if ! which dialog >/dev/null; then
 # 	 echo -n ">>> Installing Dialog Module..."
-# 	 ${INSTALL} dialog 2>> ${LOG}
+# 	 $INSTALL dialog 2>> ${LOG}
 #	 echo -e "[${bldylw} done ${rst}]"
 # elif which dialog >/dev/null; then
 #	 echo -e "[${bldylw} done ${rst}]"
@@ -152,11 +152,11 @@ base_install
 
 sed -i 's:default_bits .*:default_bits = 2048:' $SSLEAYCNF  # Bump 1024=>2048 bit certs
 
-cd ${BASE}
+cd $BASE
 ##[ APACHE ]##
 if [[ ${http} = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
-	${INSTALL} apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-fcgid libapache2-mod-suphp suphp-common apachetop 2>> ${LOG}
+	$INSTALL apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> ${LOG}
 	E_=$? && debug_error "Apache2 failed to install"
 
 	if [[ ! -f /etc/apache2/ssl/private.key ]]; then  # Create SSL Certificate
@@ -175,7 +175,7 @@ if [[ ${http} = 'apache' ]]; then
 ##[ LiGHTTPd ]##
 elif [[ ${http} = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
-	${INSTALL} lighttpd apache2-utils 2>> ${LOG}
+	$INSTALL lighttpd apache2-utils 2>> ${LOG}
 	E_=$? && debug_error "Lighttpd failed to install"
 
 	lighty-enable-mod fastcgi ssl auth access accesslog compress # Enable Modules
@@ -194,9 +194,9 @@ elif [[ ${http} = 'lighttp' ]]; then
 elif [[ ${http} = 'cherokee' ]]; then
 	notice "iNSTALLiNG CHEROKEE"
 	#if [[ $NAME = 'lenny' ]]; then
-	#	${INSTALL} cherokee spawn-fcgi 2>> ${LOG} && E_=$?
+	#	$INSTALL cherokee spawn-fcgi 2>> ${LOG} && E_=$?
 	#else
-		${INSTALL} cherokee libcherokee-mod-libssl libcherokee-mod-mysql libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> ${LOG}
+		$INSTALL cherokee libcherokee-mod-libssl libcherokee-mod-mysql libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> ${LOG}
 		E_=$? && debug_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini
@@ -215,7 +215,7 @@ fi
 ##[ vsFTP ]##
 if [[ ${ftpd} = 'vsftp' ]]; then
 	notice "iNSTALLiNG vsFTPd"
-	${INSTALL} vsftpd 2>> ${LOG}
+	$INSTALL vsftpd 2>> ${LOG}
 		E_=$? && debug_error "vsFTPd failed to install"
 	sed -i 's:anonymous_enable=YES:anonymous_enable=NO:' /etc/vsftpd.conf
 	sed -i 's:#local_enable .*:local_enable=YES:'        /etc/vsftpd.conf
@@ -231,7 +231,7 @@ if [[ ${ftpd} = 'vsftp' ]]; then
 ##[ proFTP ]##
 elif [[ ${ftpd} = 'proftp' ]]; then
 	notice "iNSTALLiNG proFTPd"
-	${INSTALL} proftpd-basic 2>> ${LOG}
+	$INSTALL proftpd-basic 2>> ${LOG}
 	E_=$? && debug_error "ProFTPd failed to install"
 
 	log "ProFTP Installation | Completed"
@@ -240,7 +240,7 @@ elif [[ ${ftpd} = 'proftp' ]]; then
 ##[ pureFTP ]##
 elif [[ ${ftpd} = 'pureftp' ]]; then
 	notice "iNSTALLiNG Pure-FTPd"
-	${INSTALL} pure-ftpd pure-ftpd-common 2>> ${LOG}
+	$INSTALL pure-ftpd pure-ftpd-common 2>> ${LOG}
 	E_=$? && debug_error "PureFTP failed to install"
 
 	debug_wait "Creating PureFTP SSL Key"
@@ -261,9 +261,9 @@ fi
 if [[ ${sql} = 'mysql' ]]; then
 	notice "iNSTALLiNG MySQL"
 	if [[ ${DISTRO} = 'Ubuntu' ]]; then
-		${INSTALL} mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> ${LOG} && E_=$?
+		$INSTALL mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> ${LOG} && E_=$?
 	elif [[ ${DISTRO} = 'Debian' ]]; then
-		${INSTALL} mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> ${LOG} && E_=$?
+		$INSTALL mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> ${LOG} && E_=$?
 	fi
 	debug_error "MySQL failed to install"
 	log "MySQL Installation | Completed"
@@ -272,7 +272,7 @@ if [[ ${sql} = 'mysql' ]]; then
 ##[ SQLiTE ]##
 elif [[ ${sql} = 'sqlite' ]]; then
 	notice "iNSTALLiNG SQLite"
-	${INSTALL} sqlite3 php5-sqlite 2>> ${LOG}
+	$INSTALL sqlite3 php5-sqlite 2>> ${LOG}
 	E_=$? && debug_error "SQLite failed to install"
 	log "SQLite Installation | Completed"
 	debug_wait "sqlite.installed"
@@ -280,16 +280,16 @@ elif [[ ${sql} = 'sqlite' ]]; then
 ##[ PostGreSQL ]##
 elif [[ ${sql} = 'postgre' ]]; then
 	notice "iNSTALLiNG PostgreSQL"
-	${INSTALL} postgresql postgresql-client-common postgresql-common 2>> ${LOG}
+	$INSTALL postgresql postgresql-client-common postgresql-common 2>> ${LOG}
 	E_=$? && debug_error "PostgreSQL failed to install"
 	log "PostgreSQL Installation | Completed"
 	debug_wait "postgresql.installed"
 fi
 
 ##[ Bouncers ]##
-cd ${BASE}
+cd $BASE
 if [[ ${bnc} = 'znc' || ${bnc} = 'sbnc' || ${bnc} = 'psybnc' ]]; then
-	${INSTALL} libc-ares-dev tcl tcl-dev 2>> ${LOG}
+	$INSTALL libc-ares-dev tcl tcl-dev 2>> ${LOG}
 		E_=$? && debug_error "Required packages failed to install"
 fi
 
@@ -368,20 +368,20 @@ elif [[ ${bnc} = 'psybnc' ]]; then
 fi
 
 ##[ WebMiN ]##
-cd ${BASE}
+cd $BASE
 if [[ ${webmin} = 'y' ]]; then
 	notice "iNSTALLiNG WEBMiN"
-	${INSTALL} webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> ${LOG}
+	$INSTALL webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> ${LOG}
 	E_=$? && debug_error "Webmin failed to install" && sleep 3
 		log "WebMin Installation | Completed"
 		debug_wait "webmin.installed"
 fi
 
 ##[ vnStat ]##
-cd ${BASE}/tmp
+cd $BASE/tmp
 if [[ ${vnstat} = 'y' ]]; then
 	notice "iNSTALLiNG VNSTAT"
-	${INSTALL} libgd2-xpm libgd2-xpm-dev 2>> ${LOG}
+	$INSTALL libgd2-xpm libgd2-xpm-dev 2>> ${LOG}
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
 	tar xzf vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
@@ -429,7 +429,7 @@ if [[ ${vnstat} = 'y' ]]; then
 	debug_wait "vnstat-web.installed"
 fi
 
-cd ${BASE}/tmp
+cd $BASE/tmp
 echo -e "\n*******************************"
 echo -e   "**${bldred} TORRENT CLiENT iNSTALLiNG ${rst}**"
 echo      "*******************************"
@@ -475,7 +475,7 @@ if [[ ! -f /usr/local/bin/mktorrent ]]; then
 fi
 fi
 
-cd ${BASE}
+cd $BASE
 ##[ rTorrent ]##
 if [[ ${torrent} = 'rtorrent' ]]; then
 	source modules/rtorrent/install.sh

@@ -4,10 +4,10 @@ echo -e   "*****${bldred} ADDiNG REPOSiTORiES  ${rst}*****"
 echo -e   "********************************\n"
 
 if [[ ${DISTRO} = 'Ubuntu' ]]; then
-	echo "deb http://archive.ubuntu.com/ubuntu/ ${NAME} multiverse"              > ${REPO_PATH}/multiverse.list  # non-free
-	echo "deb-src http://archive.ubuntu.com/ubuntu/ ${NAME} multiverse"         >> ${REPO_PATH}/multiverse.list  # non-free
-	echo "deb http://archive.ubuntu.com/ubuntu/ ${NAME}-updates multiverse"     >> ${REPO_PATH}/multiverse.list  # non-free
-	echo "deb-src http://archive.ubuntu.com/ubuntu/ ${NAME}-updates multiverse" >> ${REPO_PATH}/multiverse.list  # non-free
+	echo "deb http://archive.ubuntu.com/ubuntu/ ${NAME} multiverse"                 > ${REPO_PATH}/multiverse.list  # non-free
+	echo "deb-src http://archive.ubuntu.com/ubuntu/ ${NAME} multiverse"            >> ${REPO_PATH}/multiverse.list  # non-free
+	echo "deb http://archive.ubuntu.com/ubuntu/ ${NAME}-updates multiverse"        >> ${REPO_PATH}/multiverse.list  # non-free
+	echo "deb-src http://archive.ubuntu.com/ubuntu/ ${NAME}-updates multiverse"    >> ${REPO_PATH}/multiverse.list  # non-free
 
 	echo "deb http://ppa.launchpad.net/cherokee-webserver/ppa/ubuntu ${NAME} main"  > ${REPO_PATH}/autoinstaller.list  # Cherokee
 	echo "deb http://ppa.launchpad.net/stbuehler/ppa/ubuntu ${NAME} main"          >> ${REPO_PATH}/autoinstaller.list  # Lighttp
@@ -19,14 +19,14 @@ if [[ ${DISTRO} = 'Ubuntu' ]]; then
 	log "Repositories ADD | Success"
 
 elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
-	if [[ ${NAME} = 'lenny' ]]; then
-		touch /etc/apt/apt.conf
-		echo 'APT::Default-Release "stable";' >> /etc/apt/apt.conf  # Make lenny the default for package installation
+	if [[ ${NAME} = 'lenny' ]]; then  # Bascially updates to squeeze since packages are so old on lenny
+#		touch /etc/apt/apt.conf
+#		echo 'APT::Default-Release "stable";' >> /etc/apt/apt.conf  # Make lenny the default for package installation
 #		echo "deb http://ftp.debian.org/debian/ lenny non-free contrib"              >> /etc/apt/sources.list
 #		echo "deb http://security.debian.org/ lenny/updates non-free contrib"        >> /etc/apt/sources.list
 		echo "deb http://ftp.debian.org/debian/ squeeze main non-free contrib"       >> /etc/apt/sources.list
 		echo "deb http://security.debian.org/ squeeze/updates main non-free contrib" >> /etc/apt/sources.list
-	elif [[ ${NAME} = 'squeeze' || ${NAME} = 'debian' ]]; then
+	elif [[ ${NAME} = 'squeeze' || ${NAME} = 'debian' ]]; then  # 'debian' is used for mint debian releases
 		echo "deb http://ftp.debian.org/debian/ squeeze non-free contrib"            >> /etc/apt/sources.list
 		echo "deb http://security.debian.org/ squeeze/updates non-free contrib"      >> /etc/apt/sources.list
 	fi
@@ -43,13 +43,14 @@ elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
 else
 	debug_error "${txtred}Failed to add repositories to unknown distro... exiting${rst}"
 fi
-	# Add signing keys
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EBA7BD49
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5A43ED73
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 249AD24C
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 365C5CA1
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 108B243F
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4BB9F05F
+
+	addkey='apt-key adv --keyserver keyserver.ubuntu.com --recv-keys'  # Add signing keys
+	$addkey EBA7BD49
+	$addkey 5A43ED73
+	$addkey 249AD24C
+	$addkey 365C5CA1
+	$addkey 108B243F
+	$addkey 4BB9F05F
 	download http://www.webmin.com/jcameron-key.asc && apt-key add jcameron-key.asc && rm jcameron-key.asc
 	log "Repositories Keys ADD | Success"
 

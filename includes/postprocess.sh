@@ -42,9 +42,10 @@ if [[ -f ${HOME}/.bashrc ]];then
 #	echo "alias install='sudo aptitude install'"      >>     ${HOME}/.bashrc
 #	echo "alias upgrade='sudo aptitude safe-upgrade'" >>     ${HOME}/.bashrc
 #	echo "alias remove='sudo aptitude remove'"        >>     ${HOME}/.bashrc
-if [[ ${torrent} = 'rtorrent' ]];then
-	echo "alias rtorrent-start='dtach -n .dtach/rtorrent rtorrent'" >> ${HOME}/.bashrc
-	echo "alias rtorrent-resume='dtach -a .dtach/rtorrent'"         >> ${HOME}/.bashrc
+	if [[ ${torrent} = 'rtorrent' ]];then
+		echo "alias rtorrent-start='dtach -n .dtach/rtorrent rtorrent'" >> ${HOME}/.bashrc
+		echo "alias rtorrent-resume='dtach -a .dtach/rtorrent'"         >> ${HOME}/.bashrc
+	fi
 fi
 
 ldconfig

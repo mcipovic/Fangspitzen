@@ -2,11 +2,12 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 SERVICE=rtorrent
 FILE=/home/$USER/.session/rtorrent.lock
+MAX=95
 
 df /home/$USER | tail -1 | while read fs size used avail pcnt mount
 do
 	pcnt=$(echo $pcnt | cut -d'%' -f1 )
-	if [[ $pcnt -ge 95 ]]; then
+	if [[ $pcnt -ge $MAX ]]; then
 		echo "Running out of space \"$fs ($pcnt%)\" on $HOSTNAME as on $(date)"
 		exit 1
 	fi

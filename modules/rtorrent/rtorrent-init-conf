@@ -16,10 +16,6 @@ base=
 config=
 
 
-# name of screen session
-srnname="rtorrent-$user"
-
-
 # file to log to (makes for easier debugging if something goes wrong)
 logfile=
 

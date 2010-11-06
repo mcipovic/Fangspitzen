@@ -20,9 +20,12 @@ cd ${BASE}/tmp
 	cd rutorrent && rm -R plugins conf/plugins.ini conf/config.php favicon.ico
 	checkout http://rutorrent.googlecode.com/svn/trunk/plugins  # Checkout plugins-svn
 	E_=$? && debug_error "Plugins Download Failed"
-	cd ..
 
-	cp -R ../modules/rutorrent/pausewebui-0.8 rutorrent/plugins/pausewebui
+	# Grab some plugins from other repos
+	cd plugins
+	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/ pausewebui
+
+	cd ../..
 	cp ../modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini
 	cp ../modules/rutorrent/favicon.ico rutorrent/favicon.ico
 	log "ruTorrent plugins | Downloaded"

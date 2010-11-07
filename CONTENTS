@@ -1,0 +1,32 @@
+                           Directory Contents - /
+
+  includes/
+    These are scripts that are separated from the main script for easier readability.
+
+  modules/
+    All of the extra configuration files for programs are stored here.
+
+  tools/
+    Additional scripts to simplify tasks will be added here.
+
+  logs/
+    This is for the storing log files.
+
+  tmp/
+    This is a temporary folder for storing downloaded sources.
+
+  config.ini
+    This is the conf file for configuring some variables.
+
+  COPYING
+    Legal information is contained in this file.
+
+  README
+    Information on how to run the installer is written here.
+
+  TODO
+    This is a list of items that need to be finished.
+
+  TOOLS
+    This is a description of all the extra scripts in the tools folder
+

@@ -1,18 +1,23 @@
-Finish Cherokee Config
-Finish ShroudBNC install
-Test Transission
-Test Deluge
-Test iplist
-Configure fail2ban
+Legend:
+         ? = unsure
+         + = in progress
 
---- phpsysinfo
---- uTorrent Server
---- add request: irssi
---- add request: ajaxplorer https://ajaxplorer.svn.sourceforge.net/svnroot/ajaxplorer/trunk/core/src
---- add request: headless virtualbox
---- add request: virtualbox webui http://code.google.com/p/phpvirtualbox
---- setup a reverse proxy frontend for our webserver
---- implement dialog
+[+] Finish Cherokee Config
+[ ] Finish ShroudBNC install
+[ ] Test Transission
+[ ] Test Deluge
+[ ] Test iplist
+[+] Configure fail2ban
 
-*** MultiUser (priority)
-*** User Add|Edit|Del functions (priority)
+[ ] phpsysinfo
+[ ] uTorrent Server
+[ ] add request: irssi
+[ ] add request: ajaxplorer https://ajaxplorer.svn.sourceforge.net/svnroot/ajaxplorer/trunk/core/src
+[ ] add request: headless virtualbox
+[ ] add request: virtualbox webui http://code.google.com/p/phpvirtualbox
+[ ] setup a reverse proxy frontend for our webserver
+[ ] implement dialog
+
+[ ] MultiUser (priority)
+[ ] User Add|Edit|Del functions (priority)
+

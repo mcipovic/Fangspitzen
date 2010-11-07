@@ -61,7 +61,14 @@ get_scgi_port()
 	done
 }
 
-do_add()
+chown_rutorrent()
+{
+	if [[ $(stat $rutorrent -c %U) != $webuser ]]; then
+		chown -R $webuser:$webuser $rutorrent
+	fi
+}
+
+create_user()
 {
 	useradd --create-home --shell $user_shell $user_name
 	if [[ $? = 0 ]]; then
@@ -107,7 +114,7 @@ NUMBER=$[($RANDOM % 65534) + 20000]  # Generate a random number from 20000-65534
 	echo "directory = /home/$user_name/downloads" >> .rtorrent.rc
 	echo "session = /home/$user_name/.session"    >> .rtorrent.rc
 
-	echo -e "${bldred}-${rst} rTorrent Config .....[${bldpur} CREATED ${rst}]\n"
+	echo -e "${bldred}-${rst} rTorrent Config .....[${bldpur} CREATED ${rst}]"
 	echo -e "${bldred}-${rst} rTorrent Port .......[${bldpur} $NUMBER ${rst}]\n"
 }
 
@@ -163,7 +170,7 @@ httpd_scgi()
 	if [[ $webserver = 'apache' ]]; then
 		echo "SCGIMount $scgi_mount 127.0.0.1:$scgi_port" >> /etc/apache2/mods-available/scgi.conf
 		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
-		echo -e "${bldred}-${rst} Apache SCGi Mount ...[${bldpur} CREATED ${rst}]\n"
+		echo -e "${bldred}-${rst} Apache SCGi Mount ...[${bldpur} CREATED ${rst}]"
 		echo -e "${bldred}-${rst} Apache SCGi Port ....[${bldpur} $scgi_port ${rst}]\n"
 #	elif [[ $webserver = 'lighttp' ]]; then
 #		sudo -u $user_name echo 'schedule = chmod,0,0,"execute=chmod,777,/tmp/rpc.$user_name.socket"' >> /home/$user_name/.rtorrent.rc
@@ -177,9 +184,10 @@ if [[ ${UID} != 0 ]]; then
 	exit
 else
 	init_variables
+	chown_rutorrent
 	assumption_check
 	get_username
-	do_add
+	create_user
 	make_rtorrent_rc
 	make_rtorrent_init
 	make_rutorrent_conf

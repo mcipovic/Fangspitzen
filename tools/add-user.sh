@@ -18,6 +18,7 @@ init_variables()
 	webuser='www-data'
 	user_name=''
 	shell_reply=''
+	declare -i scgi_port=0
 
 	bldred='\e[1;31m'  # Red
 	bldpur='\e[1;35m'  # Purple
@@ -28,18 +29,18 @@ assumption_check()
 {
 	err=0
 	if [[ ! -f $htpasswd ]]; then
-		echo -e " htpasswd....[${bldred} FAILED ${rst}]" ;err=1
-		else echo -e " htpasswd....[${bldpur} OK ${rst}]" ;fi
+		echo -e "- htpasswd....[${bldred} FAILED ${rst}]" ;err=1
+		else echo -e "- htpasswd....[${bldpur} OK ${rst}]" ;fi
 	if [[ ! -f $htaccess ]]; then
-		echo -e " htaccess....[${bldred} FAILED ${rst}]" ;err=1
-		else echo -e " htaccess....[${bldpur} OK ${rst}]" ;fi
+		echo -e "- htaccess....[${bldred} FAILED ${rst}]" ;err=1
+		else echo -e "- htaccess....[${bldpur} OK ${rst}]" ;fi
 	if [[ ! -d $rutorrent ]]; then
-		echo -e " ruTorrent...[${bldred} FAILED ${rst}]" ;err=1
+		echo -e "- ruTorrent...[${bldred} FAILED ${rst}]" ;err=1
 		else echo -e " ruTorrent...[${bldpur} OK ${rst}] \n" ;fi
 	if [[ $err = 1 ]]; then echo; exit 0 ;fi
 }
 
-get_info()
+get_username()
 {
 	read -p "User Name: " user_name
 	read -p "Give shell access? y|n: " shell_reply
@@ -47,6 +48,17 @@ get_info()
 		user_shell='/usr/sbin/nologin'
 	else user_shell='/bin/bash'
 	fi
+}
+
+get_scgi_port()
+{
+	scgi_mount="/rutorrent/$user_name"
+	read -p "SCGi Port: " scgi_port
+
+	while [[ $scgi_port -lt 1024 || $scgi_port -gt 65535 || $scgi_port -eq 5000 ]]; do
+		echo -e "\n${bldred}- Invalid Port${rst}"
+		read -p "SCGi Port: " scgi_port
+	done
 }
 
 do_add()
@@ -115,7 +127,7 @@ make_rtorrent_init()
 make_rutorrent_conf()
 {
 	cd $rutorrent/conf
-	get_input_scgi
+	get_scgi_port
 	sudo -u $webuser mkdir users/$user_name
 	sudo -u $webuser cp config.php users/$user_name/config.php
 	sudo -u $webuser sed -i "s:\$scgi_port .*:\$scgi_port = $scgi_port;:"                  users/$user_name/config.php
@@ -159,17 +171,6 @@ httpd_scgi()
 	fi
 }
 
-get_input_scgi() {
-	declare -i scgi_port=0
-	scgi_mount="/rutorrent/$user_name"
-	read -p "SCGi Port: " scgi_port
-
-	while [[ $scgi_port -lt 1024 || $scgi_port -gt 65535 || $scgi_port -eq 5000 ]]; do
-		echo -e "\n${bldred}- Invalid Port${rst}"
-		read -p "SCGi Port: " scgi_port
-	done
-}
-
 ##[ Main ]##
 if [[ ${UID} != 0 ]]; then
 	echo -e "${bldred}Run as root user ${rst}"
@@ -177,7 +178,7 @@ if [[ ${UID} != 0 ]]; then
 else
 	init_variables
 	assumption_check
-	get_info
+	get_username
 	do_add
 	make_rtorrent_rc
 	make_rtorrent_init

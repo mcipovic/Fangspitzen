@@ -2,15 +2,14 @@ Fangspitzen Bundled Tools
 ---------------------------
 
 1) add-user.sh
-     This will add a new unix user and set it up with rtorrent and rutorrent.
+	This will add a new unix user and set it up with rtorrent and rutorrent.
 
 2) cron-delete.sh
-
-
+	Cron script to empty contents of a folder on a user defined amount of days.
 
 3) ftp-backup.sh
-
-
+	Compress and send a folder over ftp.
 
 4) launchpad-update.sh
+	Scans all sources.list and adds their signing key to the system.
 

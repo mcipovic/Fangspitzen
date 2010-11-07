@@ -96,6 +96,8 @@ cd $BASE
 PATH_rt=${HOME}/.rtorrent.rc
 cp modules/rtorrent/rtorrent.rc ${PATH_rt}
 
+NUMBER=$[($RANDOM % 65534) + 20000]  # Generate a random number from 20000-65534
+echo "port_range = $NUMBER-$NUMBER"       >> ${PATH_rt}
 echo "directory = /home/$USER/downloads"  >> ${PATH_rt}
 echo "session = /home/$USER/.session"     >> ${PATH_rt}
 
@@ -118,6 +120,7 @@ else
 	debug_wait "No httpd found: Make sure to add sgci mounts to .rtorrent.rc"
 fi
 log "rTorrent Config | Created"
+log "rTorrent listening on port: $NUMBER"
 
 if [[ ! -f /etc/init.d/rtorrent ]]; then  # Copy init script
 	cp modules/rtorrent/rtorrent-init /etc/init.d/rtorrent

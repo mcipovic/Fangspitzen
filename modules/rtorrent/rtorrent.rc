@@ -6,7 +6,6 @@ max_uploads = 250
 download_rate = 12288
 upload_rate = 12288
 
-port_range = 45600-45600
 port_random = no
 
 check_hash = no

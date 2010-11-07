@@ -2,17 +2,19 @@
 
 # Assumptions:
 #	Apache - mod_auth_digest
-#	/etc/apache2/auth.passwd
+#	/etc/apache2/.htpasswd
 #	/var/www/rutorrent/.htaccess
 #
 # You can, of course, change it below
+
+##[ TODO ]##  Make useful for lighttpd and cherokee setups
 
 init_variables()
 {
 	htaccess='/var/www/rutorrent/.htaccess'
 	htpasswd='/etc/apache2/.htpasswd'
 	rutorrent='/var/www/rutorrent'
-	webserver='apache'  # apache or lighttp
+	webserver='apache'  # apache|lighttp|cherokee
 	webuser='www-data'
 	user_name=''
 	shell_reply=''
@@ -49,7 +51,7 @@ get_info()
 
 do_add()
 {
-	useradd --comment ${user_name}-Autoscript --create-home --shell $user_shell $user_name
+	useradd --create-home --shell $user_shell $user_name
 	if [[ $? = 0 ]]; then
 		echo -e "\n${bldred}-${rst} System User .........[${bldpur} CREATED ${rst}]"
 	else
@@ -62,19 +64,6 @@ do_add()
 	else
 		echo -e "\n${bldred}-${rst} User Password .......[${bldred} FAILED ${rst}]"
 	fi
-
-	make_rtorrent_rc
-	make_rtorrent_init
-
-	htdigest $htpasswd "ruTorrent" $user_name
-	if [[ $? = 0 ]]; then
-		echo -e "\n${bldred}-${rst} ruTorrent Password ..[${bldpur} CREATED ${rst}]"
-	else
-		echo -e "\n${bldred}-${rst} ruTorrent Password ..[${bldred} FAILED ${rst}]"
-	fi
-
-	make_rutorrent_conf
-	httpd_scgi
 }
 
 make_rtorrent_rc()
@@ -88,7 +77,6 @@ max_peers_seed = 50
 max_uploads = 250
 download_rate = 12288
 upload_rate = 12288
-port_range = 45600-45600
 port_random = no
 check_hash = no
 hash_read_ahead = 32
@@ -99,14 +87,16 @@ use_udp_trackers = yes
 dht = off
 encoding_list = UTF-8
 encryption = allow_incoming,try_outgoing,enable_retry
-max_open_files = 256
-max_memory_usage = 800M
 #schedule = watch_directory,5,5,load_start=/absolute/path/to/watch/*.torrent
 EOF
+
+NUMBER=$[($RANDOM % 65534) + 20000]  # Generate a random number from 20000-65534
+	echo "port_range = $NUMBER-$NUMBER"           >> .rtorrent.rc
 	echo "directory = /home/$user_name/downloads" >> .rtorrent.rc
 	echo "session = /home/$user_name/.session"    >> .rtorrent.rc
 
 	echo -e "${bldred}-${rst} rTorrent Config .....[${bldpur} CREATED ${rst}]\n"
+	echo -e "${bldred}-${rst} rTorrent Port .......[${bldpur} $NUMBER ${rst}]\n"
 }
 
 make_rtorrent_init()
@@ -115,7 +105,6 @@ make_rtorrent_init()
 		sudo -u $user_name echo "user=$user_name"                              > .rtorrent.init.conf
 		sudo -u $user_name echo "base=/home/$user_name"                       >> .rtorrent.init.conf
 		sudo -u $user_name echo "config=(\"\$base/.rtorrent.rc\")"            >> .rtorrent.init.conf
-		sudo -u $user_name echo "srnname=\"rtorrent-$user_name\""             >> .rtorrent.init.conf
 		sudo -u $user_name echo "logfile=/home/$user_name/.rtorrent.init.log" >> .rtorrent.init.conf
 		echo -e "${bldred}-${rst} rTorrent Init Script.[${bldpur} CREATED ${rst}]\n"
 	else
@@ -126,6 +115,7 @@ make_rtorrent_init()
 make_rutorrent_conf()
 {
 	cd $rutorrent/conf
+	get_input_scgi
 	sudo -u $webuser mkdir users/$user_name
 	sudo -u $webuser cp config.php users/$user_name/config.php
 	sudo -u $webuser sed -i "s:\$scgi_port .*:\$scgi_port = $scgi_port;:"                  users/$user_name/config.php
@@ -146,11 +136,30 @@ canChangeDLRate = no
 canChangeTorrentProperties = yes
 EOF
 	echo -e "${bldred}-${rst} ruTorrent Config ....[${bldpur} CREATED ${rst}]\n"
+
+	htdigest $htpasswd "ruTorrent" $user_name
+	if [[ $? = 0 ]]; then
+		echo -e "\n${bldred}-${rst} ruTorrent Password ..[${bldpur} CREATED ${rst}]"
+	else
+		echo -e "\n${bldred}-${rst} ruTorrent Password ..[${bldred} FAILED ${rst}]"
+	fi
 }
 
 httpd_scgi()
 {
 	cd /home/$user_name
+	if [[ $webserver = 'apache' ]]; then
+		echo "SCGIMount $scgi_mount 127.0.0.1:$scgi_port" >> /etc/apache2/mods-available/scgi.conf
+		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
+		echo -e "${bldred}-${rst} Apache SCGi Mount ...[${bldpur} CREATED ${rst}]\n"
+		echo -e "${bldred}-${rst} Apache SCGi Port ....[${bldpur} $scgi_port ${rst}]\n"
+#	elif [[ $webserver = 'lighttp' ]]; then
+#		sudo -u $user_name echo 'schedule = chmod,0,0,"execute=chmod,777,/tmp/rpc.$user_name.socket"' >> /home/$user_name/.rtorrent.rc
+#		sudo -u $user_name echo "scgi_local = /tmp/rpc.$user_name.socket"                             >> /home/$user_name/.rtorrent.rc
+	fi
+}
+
+get_input_scgi() {
 	declare -i scgi_port=0
 	scgi_mount="/rutorrent/$user_name"
 	read -p "SCGi Port: " scgi_port
@@ -159,18 +168,9 @@ httpd_scgi()
 		echo -e "\n${bldred}- Invalid Port${rst}"
 		read -p "SCGi Port: " scgi_port
 	done
-
-	if [[ $webserver = 'apache' ]]; then
-		echo "SCGIMount $scgi_mount 127.0.0.1:$scgi_port" >> /etc/apache2/mods-available/scgi.conf
-		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
-		echo -e "${bldred}-${rst} Apache SCGi Mount ...[${bldpur} CREATED ${rst}]\n"
-#	elif [[ $webserver = 'lighttp' ]]; then
-#		sudo -u $user_name echo 'schedule = chmod,0,0,"execute=chmod,777,/tmp/rpc.$user_name.socket"' >> /home/$user_name/.rtorrent.rc
-#		sudo -u $user_name echo "scgi_local = /tmp/rpc.$user_name.socket"                             >> /home/$user_name/.rtorrent.rc
-	fi
 }
 
-## Main ##
+##[ Main ]##
 if [[ ${UID} != 0 ]]; then
 	echo -e "${bldred}Run as root user ${rst}"
 	exit
@@ -179,4 +179,8 @@ else
 	assumption_check
 	get_info
 	do_add
+	make_rtorrent_rc
+	make_rtorrent_init
+	make_rutorrent_conf
+	httpd_scgi
 fi

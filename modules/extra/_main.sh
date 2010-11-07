@@ -1,4 +1,6 @@
 #! /bin/bash
+
+log "\nForcing extras installer scripts to run!"
 cd $BASE/modules/extra
 
 echo "Yes or No? [y/n]"
@@ -10,3 +12,6 @@ for script in `find *-install.sh | sed "s:-install.sh::"`; do
 done
 
 
+if [[ $force_mod_extra=1 ]]; then
+	exit 0
+fi

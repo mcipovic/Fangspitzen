@@ -87,7 +87,6 @@ download() {  # uses either wget or axel
 
 error() {  # call this when you know there will be an error
 	echo -e " Error:${bldred} $1 ${rst} \n"
-	#log "Error: $1"
 	exit
 }
 
@@ -164,8 +163,10 @@ yesno() {  # user input for yes|no
 
 init() {
 	echo -n ">>> iNiTiALiZiNG......"
-	#clear_logfile  # Start with a fresh logfile
-	mkdir --parents tmp/  # Create tmp folder
+
+	##[ Create folders if not already created ]##
+	mkdir --parents tmp/
+	mkdir --parents logs/
 
 	##[ Use Axel and Apt-Fast ]##
 	if ! which apt-fast >/dev/null; then
@@ -201,6 +202,7 @@ init() {
 force_mod_extra=0
 SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
 CORES=$(grep -c ^processor /proc/cpuinfo)
+LOG='logs/installer.log'
 
 #!=====================>> COLOR CONTROL <<=====================!#
 ##[ echo -e "${txtblu}test ${rst}" ]##

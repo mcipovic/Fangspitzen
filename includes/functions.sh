@@ -199,8 +199,8 @@ init() {
 }
 
 ##[ VARiABLE iNiT ]##
+let CORES=$(grep -c ^processor /proc/cpuinfo)+1
 SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
-CORES=$(grep -c ^processor /proc/cpuinfo)
 LOG='logs/installer.log'
 
 #!=====================>> COLOR CONTROL <<=====================!#

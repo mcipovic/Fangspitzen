@@ -21,13 +21,11 @@ cd ${BASE}/tmp
 	log "XMLRPC | Downloaded" >> ${LOG}
 
 	if [[ $rtorrent_svn = 'y' ]]; then
-		notice "iNSTALLiNG rTorrent-SVN"
 		svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
 		debug_error "LibTorrent Download Failed"
 		mv trunk/libtorrent libtorrent && mv trunk/rtorrent rtorrent && rm -r trunk
 		log "Lib|rTorrent | Downloaded" >> ${LOG}
 	else
-		notice "iNSTALLiNG rTorrent-STABLE"
 		download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
 		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz     # Grab rtorrent
 		log "Lib|rTorrent | Downloaded" >> ${LOG}
@@ -86,7 +84,7 @@ if [[ -f .rtorrent.rc ]]; then
 	notice "BACKED UP PREVIOUS rTORRENT.RC"
 fi
 
-notice "CREATiNG NEW rTORRENT.RC CONFiG"
+notice "CREATiNG .rtorrent.rc CONFiG"
 cd $HOME
 sudo -u $USER mkdir -p .session
 sudo -u $USER mkdir -p downloads
@@ -138,13 +136,3 @@ else
 	log "Previous rTorrent Init Script Found, skipping..."
 fi
 debug_wait "rtorrent.installed"
-
-echo
-read -p "Start rtorrent now? [y|n]: " start_rt
-if [[ $start_rt = 'y' ]]; then
-	mkdir -p $HOME/.dtach && rm -rf $HOME/.dtach/rtorrent
-	chmod -R 755 $HOME/.dtach
-	chown -R $USER:$USER $HOME/.dtach
-	sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
-	echo "rTorrent has been started with dtach in ~/.dtach/rtorrent"
-fi

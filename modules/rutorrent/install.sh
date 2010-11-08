@@ -23,7 +23,7 @@ cd ${BASE}/tmp
 
 	# Grab some plugins from other repos
 	cd plugins
-	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/ pausewebui
+	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/pausewebui pausewebui
 
 	cd ../..
 	cp ../modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini

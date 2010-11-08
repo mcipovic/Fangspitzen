@@ -15,7 +15,7 @@ done
 
 if [[ $compile_rtorrent = 'true' ]]; then
 cd ${BASE}/tmp
-
+	notice "iNSTALLiNG... rTORRENT"
 	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc && E_=$?  # Checkout xmlrpc ~advanced
 	debug_error "XMLRPC Download Failed"
 	log "XMLRPC | Downloaded" >> ${LOG}
@@ -38,7 +38,7 @@ cd ${BASE}/tmp
 #-->[ Compile xmlrpc ]
 	cd xmlrpc
 	sh configure --prefix=/usr
-	make && E_=$?
+	compile && E_=$?
 		debug_error "XMLRPC Build Failed"
 		log "XMLRPC Compile | Completed"
 	make install
@@ -71,9 +71,9 @@ cd ${BASE}/tmp
 	fi
 	sh autogen.sh
 	sh configure --prefix=/usr --with-xmlrpc-c
-	compile && E_=$?
+	compile
 		debug_error "rTorrent Build Failed"
-		log "rTorrent Compile | Completed"
+		log "rTorrent Compile | Completed in $compile_time seconds"
 	make install
 		log "rTorrent Installation | Completed"
 fi

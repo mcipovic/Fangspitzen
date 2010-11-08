@@ -52,8 +52,12 @@ clear_logfile() {  # clear the logfile
 }
 
 compile() {  # increase verbosity
-	if [[ $DEBUG = 1 ]]; then make -j$CORES $@
-	else make --quiet -j$CORES $@
+	if [[ $DEBUG = 1 ]]; then
+		compile_time=$SECONDS
+		make -j$CORES $@ && E_=$?
+		let compile_time=$compile_time-$SECONDS
+	else
+		make --quiet -j$CORES $@
 	fi	
 }
 

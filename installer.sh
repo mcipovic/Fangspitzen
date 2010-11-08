@@ -181,7 +181,7 @@ elif [[ ${http} = 'cherokee' ]]; then
 	log "Cherokee Installation | Completed"
 	debug_wait "cherokee.installed"
 
-elif [[ ${http} != 'none' ]]; then  # Edit php config
+elif [[ ${http} != @(none|no|[Nn]) ]]; then  # Edit php config
 	sed -i 's:memory_limit .*:memory_limit = 128M:'                                    $PHPini
 	sed -i 's:error_reporting .*:error_reporting = E_ALL & ~E_DEPRECATED & ~E_NOTICE:' $PHPini
 	sed -i 's:expose_php = On:expose_php = Off:'                                       $PHPini
@@ -283,8 +283,8 @@ if [[ ${bnc} = 'znc' ]]; then
 	sleep 3
 	sh configure
 	compile
-	E_=$? && debug_error "ZNC Build Failed"
-		log "ZNC Compile | Completed"
+		debug_error "ZNC Build Failed"
+		log "ZNC Compile | Completed in $compile_time seconds"
 	make install
 		log "ZNC Installation | Completed"
 	debug_wait "znc.compiled"
@@ -301,10 +301,9 @@ elif [[ ${bnc} = 'sbnc' ]]; then
 
 #	cd shroudbnc
 #	sh configure
-#debug_wait
-#	make -j${CORES}
-#E_=$? && debug_error "ShroudBNC Build Failed" && debug_wait
-#		log "ShroudBNC Compile | Completed"
+#	compile
+#		debug_error "ShroudBNC Build Failed" && debug_wait
+#		log "ShroudBNC Compile | Completed in $compile_time seconds"
 #	make install
 #		log "ShroudBNC Installation | Completed"
 
@@ -323,9 +322,10 @@ elif [[ ${bnc} = 'psybnc' ]]; then
 	tar -xzf psyBNC-2.3.2-10.tar.gz && cd psybnc  # Unpack
 		log "PsyBNC | Downloaded + Unpacked"
 	make menuconfig
-		log "PsyBNC Pre-Compile | Completed"
 	compile
-		E_=$? && debug_error "PsyBNC Build Failed" && debug_wait "psybnc.compiled"
+		debug_error "PsyBNC Build Failed"
+		log "PsyBNC Compile | Completed in $compile_time seconds"
+		debug_wait "psybnc.compiled"
 
 
 	PSY_CONF=psybnc.conf
@@ -364,8 +364,8 @@ if [[ ${vnstat} = 'y' ]]; then
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
 	tar xzf vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
 	compile
-		E_=$? && debug_error "VnStat Build Failed"
-		log "VnStat Compile | Completed"
+		debug_error "VnStat Build Failed"
+		log "VnStat Compile | Completed in $compile_time seconds"
 		debug_wait "vnstat.compiled"
 	make install                                                          # Install
 		log "VnStat Installation | Completed"

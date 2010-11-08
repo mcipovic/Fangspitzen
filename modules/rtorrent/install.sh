@@ -38,9 +38,9 @@ cd ${BASE}/tmp
 #-->[ Compile xmlrpc ]
 	cd xmlrpc
 	sh configure --prefix=/usr
-	compile && E_=$?
+	compile
 		debug_error "XMLRPC Build Failed"
-		log "XMLRPC Compile | Completed"
+		log "XMLRPC Compile | Completed in $compile_time seconds"
 	make install
 		log "XMLRPC Installation | Completed"
 		debug_wait "xmlrpc.installed"
@@ -56,9 +56,9 @@ cd ${BASE}/tmp
 		 sh configure --prefix=/usr --with-posix-fallocate  # Use posix_fallocate
 	else sh configure --prefix=/usr
 	fi
-	compile && E_=$?
+	compile
 		debug_error "LibTorrent Build Failed"
-		log "LibTorrent Compile | Completed"
+		log "LibTorrent Compile | Completed in $compile_time seconds"
 	make install
 		log "LibTorrent Installation | Completed"
 		debug_wait "libtorrent.installed"

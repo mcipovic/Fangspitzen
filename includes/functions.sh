@@ -55,7 +55,7 @@ compile() {  # increase verbosity
 	if [[ $DEBUG = 1 ]]; then
 		compile_time=$SECONDS
 		make -j$CORES $@ && E_=$?
-		let compile_time=$compile_time-$SECONDS
+		let compile_time=$SECONDS-$compile_time
 	else
 		make --quiet -j$CORES $@
 	fi	
@@ -203,7 +203,7 @@ init() {
 }
 
 ##[ VARiABLE iNiT ]##
-let CORES=$(grep -c ^processor /proc/cpuinfo)*2
+CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
 LOG='logs/installer.log'
 

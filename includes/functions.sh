@@ -199,7 +199,6 @@ init() {
 }
 
 ##[ VARiABLE iNiT ]##
-force_mod_extra=0
 SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
 CORES=$(grep -c ^processor /proc/cpuinfo)
 LOG='logs/installer.log'

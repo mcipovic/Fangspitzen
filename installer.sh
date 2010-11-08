@@ -24,8 +24,6 @@ source includes/functions.sh  # Source in our functions
 ##[ Check command line switches ]##
 while [ $# -gt 0 ]; do
   	case $1 in
-		--force-extra)  # Run alternate script
-			force_mod_extra=1 ;;
 		-p|--pass)  # Generate strong random 'user defined length' passwords
 			if [[ $2 ]]; then opt=$2
 			else error "Specify Length --pass x "
@@ -58,9 +56,6 @@ if [[ -f config.ini ]]; then  # Die if no config..
 	init  # If user is root lets begin
 else
 	error "config.ini not found!"
-fi
-
-if [[ $force_mod_extra=1 ]]; then source modules/extra/_main.sh
 fi
 
 #[TODO] Reserved for future ##

@@ -48,9 +48,19 @@ if [[ -f ${HOME}/.bashrc ]];then
 	fi
 fi
 
+if [[ ${torrent} = 'rtorrent' ]]; then
+echo && read -p "Start rtorrent now? [y|n]: " start_rt
+	if [[ $start_rt = 'y' ]]; then
+		mkdir -p $HOME/.dtach && rm -rf $HOME/.dtach/rtorrent
+		chmod -R 755 $HOME/.dtach
+		chown -R $USER:$USER $HOME/.dtach
+		sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
+		echo "rTorrent has been started with dtach in ~/.dtach/rtorrent"
+	fi
+fi
+
 ldconfig
-	log "Linking Shared Libaries | Completed"
-	debug_wait "linked.shared.libs"
+log "Linking Shared Libaries | Completed"
 
 echo -en "${bldred} Cleaning up...${rst}"
 apt-get -qq autoremove # remove uneeded and 

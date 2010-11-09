@@ -94,14 +94,7 @@ error() {  # call this when you know there will be an error
 	exit
 }
 
-get_varinfo() {  # get distro; name; version; architecture
-	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(arch)
-	# Distributor -i  > Ubuntu  > Debian  > Debian  > LinuxMint  (DISTRO)
-	# Release     -r  > 10.04   > 5.0.6   > testing > 1          (RELASE)
-	# Codename    -c  > lucid   > lenny   > squeeze > debian     (NAME)
-	echo -e " ${undred}_______________________${rst}"
-	echo -e " Distro:${bldylw} $DISTRO $NAME $RELEASE ${rst}"
-	echo -e " Arch  :${bldylw} $ARCH ${rst}"
+get_varinfo() {
 }
 
 log() {  # send to the logfile
@@ -174,6 +167,11 @@ yes() {  # user input for yes or no
 
 init() {
 	echo -n ">>> iNiTiALiZiNG......"
+
+	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(arch)
+	# Distributor -i  > Ubuntu  > Debian  > Debian  > LinuxMint  > Arch  (DISTRO)
+	# Release     -r  > 10.04   > 5.0.6   > testing > 1          > n/a   (RELASE)
+	# Codename    -c  > lucid   > lenny   > squeeze > debian     > n/a   (NAME)
 
 	##[ Create folders if not already created ]##
 	mkdir --parents tmp/

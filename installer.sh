@@ -97,8 +97,9 @@ cat << "EOF"
 
   If your OS is not listed, this script will most likey explode.
 EOF
-
-get_varinfo
+echo -e " ${undred}_______________________${rst}"
+echo -e " Distro:${bldylw} $DISTRO $NAME $RELEASE ${rst}"
+echo -e " Arch  :${bldylw} $ARCH ${rst}"
 
 echo -en "\n Continue? [y/n]: "
 if ! yes; then  # Cleanup and die if no
@@ -106,6 +107,11 @@ if ! yes; then  # Cleanup and die if no
 	exit 0
 fi
 log "\n*** SCRiPT STARTED | $(date) ***"
+
+if [[ $DISTRO = 'Arch' ]]; then
+	source arch.installer.sh
+	exit
+fi
 
 if [[ ! -f ${REPO_PATH}/autoinstaller.list ]]; then
 	source includes/repositories.sh  # Add repositories if not already present

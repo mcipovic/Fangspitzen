@@ -105,7 +105,7 @@ if ! yes; then  # Cleanup and die if no
 	cleanup && clear
 	exit 0
 fi
-log "\nSCRiPT STARTED | $(date)"
+log "\n*** SCRiPT STARTED | $(date) ***"
 
 if [[ ! -f ${REPO_PATH}/autoinstaller.list ]]; then
 	source includes/repositories.sh  # Add repositories if not already present
@@ -117,7 +117,7 @@ source includes/questionnaire.sh  # Load questionnaire
 #!=====================>> iNSTALLATiON <<=======================!#
 echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
-echo -e   "********************************\n"
+echo -e   "********************************"
 
 notice "REFRESHiNG REPOSiTORiES"
 $UPDATE
@@ -193,13 +193,13 @@ if [[ $ftpd = 'vsftp' ]]; then
 	notice "iNSTALLiNG vsFTPd"
 	$INSTALL vsftpd 2>> $LOG
 		E_=$? && debug_error "vsFTPd failed to install"
-	sed -i 's:anonymous_enable=YES:anonymous_enable=NO:'          /etc/vsftpd.conf
-	sed -i 's:#local_enable .*:local_enable=YES:'                 /etc/vsftpd.conf
-	sed -i 's:#write_enable .*:write_enable=YES:'                 /etc/vsftpd.conf
-	sed -i 's:#local_umask .*:local_umask=022:'                   /etc/vsftpd.conf
-	sed -i 's:#idle_session_timeout .*:idle_session_timeout=600:' /etc/vsftpd.conf
-	sed -i 's:#nopriv_user .*:nopriv_user=ftp:'                   /etc/vsftpd.conf
-	sed -i 's:#chroot_local_user .*:chroot_local_user=YES:'       /etc/vsftpd.conf
+	sed -i 's:anonymous_enable.*:anonymous_enable=NO:'           /etc/vsftpd.conf
+	sed -i 's:#local_enable.*:local_enable=YES:'                 /etc/vsftpd.conf
+	sed -i 's:#write_enable.*:write_enable=YES:'                 /etc/vsftpd.conf
+	sed -i 's:#local_umask.*:local_umask=022:'                   /etc/vsftpd.conf
+	sed -i 's:#idle_session_timeout.*:idle_session_timeout=600:' /etc/vsftpd.conf
+	sed -i 's:#nopriv_user.*:nopriv_user=ftp:'                   /etc/vsftpd.conf
+	sed -i 's:#chroot_local_user.*:chroot_local_user=YES:'       /etc/vsftpd.conf
 
 	log "vsFTP Installation | Completed"
 	debug_wait "vsftpd.installed"
@@ -471,4 +471,9 @@ if [[ $webui = 'y' ]]; then source modules/rutorrent/install.sh ;fi
 if [[ $mod_extra = 1 ]]; then source modules/extra/_main.sh ;fi
 
 source ${BASE}/includes/postprocess.sh
-exit 0  # Completed
+echo -e "\n*******************************"
+echo -e   "******${bldred} SCRiPT COMPLETED! ${rst}******"
+echo -e   "****${bldred} FiNiSHED iN ${bldylw}$SECONDS ${bldred}SECONDS ${rst}**"
+echo -e   "*******************************\n"
+log "*** SCRiPT COMPLETED | $(date) ***\n<---------------------------------> \n"
+exit

@@ -55,7 +55,7 @@ echo && read -p "Start rtorrent now? [y|n]: " start_rt
 		chmod -R 755 $HOME/.dtach
 		chown -R $USER:$USER $HOME/.dtach
 		sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
-		notice "rTorrent has been started with dtach in ~/.dtach/rtorrent"
+		notice "rTorrent has been started with dtach in ~/.dtach/rtorrent \n"
 	fi
 fi
 
@@ -67,10 +67,4 @@ apt-get -qq autoremove # remove uneeded and
 apt-get -qq autoclean  #+cached deb packages
 cleanup
 echo -e "${bldylw} done${rst}"
-
 sudo -K  # forget our password
-echo -e "\n*******************************"
-echo -e   "******${bldred} SCRiPT COMPLETED! ${rst}******"
-echo -e   "****${bldred} FiNiSHED iN ${bldylw}$SECONDS ${bldred}SECONDS ${rst}**"
-echo -e   "*******************************\n"
-log "SCRiPT COMPLETED | $(date) \n<---------------------------------> \n"

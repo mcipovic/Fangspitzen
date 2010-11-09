@@ -27,8 +27,8 @@ fi
 }
 
 checkout() {  # increase verbosity
-	if [[ $DEBUG = 1 ]]; then svn co $1 $2
-	else svn co -q $1 $2
+	if [[ $DEBUG = 1 ]]; then svn co $@
+	else svn co -q $@
 	fi	
 }
 
@@ -42,7 +42,7 @@ checkroot() {  # check if user is root
 
 cleanup() {  # remove tmp folder and restore permissions
 	cd $BASE ; rm --recursive --force tmp/
-	log "Cleaning up \n<--------------------------------->"
+	log "Cleaning up"
 	chown -R ${USER}:${USER} $BASE
 	chmod -R 755 $BASE
 }

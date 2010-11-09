@@ -21,7 +21,7 @@ cd ${BASE}/tmp
 	log "XMLRPC | Downloaded" >> ${LOG}
 
 	if [[ $rtorrent_svn = 'y' ]]; then
-		svn checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
+		checkout -r 1180 svn://rakshasa.no/libtorrent/trunk && E_=$?
 		debug_error "LibTorrent Download Failed"
 		mv trunk/libtorrent libtorrent && mv trunk/rtorrent rtorrent && rm -r trunk
 		log "Lib|rTorrent | Downloaded" >> ${LOG}

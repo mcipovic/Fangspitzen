@@ -7,7 +7,7 @@ if [[ -f /etc/ssh/sshd_config ]]; then
 	sed -i 's:PermitRootLogin yes:PermitRootLogin no:' /etc/ssh/sshd_config
 	sed -i 's:LoginGraceTime 120:LoginGraceTime 30:'   /etc/ssh/sshd_config
 	sed -i 's:X11Forwarding yes:X11Forwarding no:'     /etc/ssh/sshd_config
-/etc/init.d/ssh force-reload
+/etc/init.d/ssh restart
 fi
 if [[ ${http} = 'apache' ]]; then
 	sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s:AllowOverride .*:AllowOverride All:' /etc/apache2/sites-available/default*
@@ -16,11 +16,11 @@ if [[ ${http} = 'apache' ]]; then
 	sed -i 's:KeepAliveTimeout 15:KeepAliveTimeout 5:' /etc/apache2/apache2.conf
 	sed -i 's:ServerTokens Full:ServerTokens Prod:'    /etc/apache2/apache2.conf
 	echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
-/etc/init.d/apache2 force-reload
+/etc/init.d/apache2 restart
 fi
 if [[ ${sql} = 'mysql' ]]; then
 	sed -ie 's:query_cache_limit .*:query_cache_limit = 2M\nquery_cache_type = 1:' /etc/mysql/my.cnf
-/etc/init.d/mysql force-reload
+/etc/init.d/mysql restart
 fi
 if [[ ${sql} = 'postgre' ]]; then  # This needs to change per version
 	post_ver=8.4
@@ -55,7 +55,7 @@ echo && read -p "Start rtorrent now? [y|n]: " start_rt
 		chmod -R 755 $HOME/.dtach
 		chown -R $USER:$USER $HOME/.dtach
 		sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
-		echo "rTorrent has been started with dtach in ~/.dtach/rtorrent"
+		notice "rTorrent has been started with dtach in ~/.dtach/rtorrent"
 	fi
 fi
 

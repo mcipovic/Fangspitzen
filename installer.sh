@@ -105,7 +105,7 @@ if ! yes; then  # Cleanup and die if no
 	cleanup && clear
 	exit 0
 fi
-log "SCRiPT STARTED | $(date) \n"
+log "\nSCRiPT STARTED | $(date)"
 
 if [[ ! -f ${REPO_PATH}/autoinstaller.list ]]; then
 	source includes/repositories.sh  # Add repositories if not already present
@@ -119,7 +119,7 @@ echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
 echo -e   "********************************\n"
 
-notice "REFRESHiNG REPOSiTORiES..."
+notice "REFRESHiNG REPOSiTORiES"
 $UPDATE
 
 notice "iNSTALLiNG BASE PACKAGES... this may take a while"

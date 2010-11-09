@@ -134,7 +134,7 @@ if [[ $http = 'apache' ]]; then
 
 	cd /etc/apache2/
 	if [[ ! -f sites-enabled/000-default-ssl ]]; then  # Enable SSL
-		ln -s sites-available/default-ssl sites-enabled/000-default-ssl
+		a2ensite default-ssl
 	fi
 	if [[ ! -f mods-available/scgi.conf ]]; then  # Add RPC Mountpoint
 		cp $BASE/modules/apache/scgi.conf mods-available/scgi.conf

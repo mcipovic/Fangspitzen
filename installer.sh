@@ -103,8 +103,9 @@ get_varinfo
 echo -en "\n Continue? [y/n]: "
 if ! yes; then  # Cleanup and die if no
 	cleanup && clear
-	exit 0 
+	exit 0
 fi
+log "SCRiPT STARTED | $(date) \n"
 
 if [[ ! -f ${REPO_PATH}/autoinstaller.list ]]; then
 	source includes/repositories.sh  # Add repositories if not already present

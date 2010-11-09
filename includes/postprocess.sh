@@ -10,12 +10,12 @@ if [[ -f /etc/ssh/sshd_config ]]; then
 /etc/init.d/ssh force-reload
 fi
 if [[ ${http} = 'apache' ]]; then
-	sed -i 's:AllowOverride None:AllowOverride All:'   /etc/apache2/sites-available/default
+	sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s:AllowOverride .*:AllowOverride All:' /etc/apache2/sites-available/default*
 	sed -i 's:ServerSignature On:ServerSignature Off:' /etc/apache2/apache2.conf
 	sed -i 's:Timeout 300:Timeout 30:'                 /etc/apache2/apache2.conf
 	sed -i 's:KeepAliveTimeout 15:KeepAliveTimeout 5:' /etc/apache2/apache2.conf
 	sed -i 's:ServerTokens Full:ServerTokens Prod:'    /etc/apache2/apache2.conf
-	echo   "ServerName ${HOSTNAME}" >>                 /etc/apache2/apache2.conf
+	echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
 /etc/init.d/apache2 force-reload
 fi
 if [[ ${sql} = 'mysql' ]]; then

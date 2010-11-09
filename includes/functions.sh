@@ -114,6 +114,13 @@ mkpass() {  # generate a random password of user defined length
 	exit 0
 }
 
+mksslcert() {  # Bump 1024 -> 2048 bit certs and regenerate
+	echo -en "${bldred} Generating SSL Certificate...${rst}"
+	sed -i 's:default_bits .*:default_bits = 2048:' $SSLCERT  
+	make-ssl-cert generate-default-snakeoil --force-overwrite
+	echo -e "${bldylw} done${rst}"
+}
+
 notice() {  # echo status or general info to stdout
 	echo -en "\n${bldred} $1 ... ${rst}\n"
 }
@@ -192,7 +199,6 @@ init() {
 		INSTALL='apt-get install --yes '
 	fi
 
-	#HOST=$(hostname)
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
 	iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
 	if ! [[ ${iP} = *.*.* ]]; then
@@ -208,6 +214,7 @@ CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLCERT=/usr/share/ssl-cert/ssleay.cnf
 REPO_PATH=/etc/apt/sources.list.d/
 LOG='logs/installer.log'
+WEB='/var/www'
 
 #!=====================>> COLOR CONTROL <<=====================!#
 ##[ echo -e "${txtblu}test ${rst}" ]##

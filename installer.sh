@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 trap ctrl_c SIGINT
+#trap 'echo "ERROR ON LINE: ${LINENO}"' ERR
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -117,32 +118,35 @@ echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
 echo -e   "********************************\n"
 
-notice "REFRESHiNG REPOSiTORiES..."; $UPDATE
-notice "iNSTALLiNG BASE PACKAGES... this may take a while"; base_install
+notice "REFRESHiNG REPOSiTORiES..."
+$UPDATE
+
+notice "iNSTALLiNG BASE PACKAGES... this may take a while"
+base_install
 debug_wait "base.packages.installed"
 
-#sed -i 's:default_bits .*:default_bits = 2048:' $SSLCERT  # Bump 1024=>2048 bit certs
-
-cd $BASE
+mksslcert
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
 	$INSTALL apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
 	E_=$? && debug_error "Apache2 failed to install"
 
-	if [[ ! -f /etc/apache2/ssl/private.key ]]; then  # Create SSL Certificate
-		mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLCERT /etc/apache2/ssl/private.key
-		chmod 600 /etc/apache2/ssl/private.key  # Read write permission for owner only
+	cd /etc/apache2/
+	if [[ ! -f sites-enabled/000-default-ssl ]]; then  # Enable SSL
+		ln -s sites-available/default-ssl sites-enabled/000-default-ssl
 	fi
-	if [[ ! -f /etc/apache2/mods-available/scgi.conf ]]; then  # Add RPC Mountpoint
-		cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf
+	if [[ ! -f mods-available/scgi.conf ]]; then  # Add RPC Mountpoint
+		cp $BASE/modules/apache/scgi.conf mods-available/scgi.conf
 	fi
+
 	a2enmod auth_digest ssl php5 scgi expires deflate cache mem_cache && a2dismod cgi  # Enable Modules
 
 	PHPini=/etc/php5/apache/php.ini
 	log "Apache Installation | Completed"
 	debug_wait "apache.installed"
 
+cd $BASE
 ##[ LiGHTTPd ]##
 elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
@@ -150,10 +154,10 @@ elif [[ $http = 'lighttp' ]]; then
 	E_=$? && debug_error "Lighttpd failed to install"
 
 	lighty-enable-mod fastcgi ssl auth access accesslog compress # Enable Modules
-	if [[ ! -f /etc/lighttpd/ssl/server.pem ]]; then  # Create SSL Certificate
-		mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLCERT /etc/lighttpd/ssl/server.pem
-		chmod 600 /etc/lighttpd/ssl/server.pem  # Read write permission for owner only
-	fi
+	#if [[ ! -f /etc/lighttpd/ssl/server.pem ]]; then  # Create SSL Certificate
+	#	mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLCERT /etc/lighttpd/ssl/server.pem
+	#	chmod 600 /etc/lighttpd/ssl/server.pem  # Read write permission for owner only
+	#fi
 	if [[ ! -f /etc/lighttpd/conf-available/99-scgi.conf ]]; then  # Add RPC Mountpoint
 		cp modules/lighttp/99-scgi.conf /etc/lighttpd/conf-available/99-scgi.conf
 	fi
@@ -329,9 +333,9 @@ elif [[ $bnc = 'psybnc' ]]; then
 
 	# Set psybnc port
 	read -p "Please enter a unique port number for psybnc: " PSY_PORT  
-	echo "PSYBNC.SYSTEM.PORT1=$PSY_PORT"   >> $PSY_CONF  # Write to conf
-	echo "PSYBNC.SYSTEM.HOST1=*"           >> $PSY_CONF
-	echo "PSYBNC.HOSTALLOWS.ENTRY0=*;*"    >> $PSY_CONF
+	echo "PSYBNC.SYSTEM.PORT1=$PSY_PORT" >> $PSY_CONF  # Write to conf
+	echo "PSYBNC.SYSTEM.HOST1=*"         >> $PSY_CONF
+	echo "PSYBNC.HOSTALLOWS.ENTRY0=*;*"  >> $PSY_CONF
 
 	#./psybnc $PSY_CONF  # Run
 	log "PsyBNC Installation | Completed"

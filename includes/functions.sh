@@ -118,7 +118,7 @@ notice() {  # echo status or general info to stdout
 	echo -en "\n${bldred} $1 ... ${rst}\n"
 }
 
-show_paths() {  # not used
+show_paths() {  # might be useful?
 	echo
 	echo "The following is a list of all default paths "
 	echo
@@ -152,7 +152,7 @@ usage() {  # help screen
 	exit 1
 }
 
-yesno() {  # user input for yes|no
+yes() {  # user input for yes or no
 	while read line; do
 		case ${line} in
 			y|Y|Yes|YES|yes|yES|yEs|YeS|yeS) return 0
@@ -192,19 +192,21 @@ init() {
 		INSTALL='apt-get install --yes '
 	fi
 
-	HOST=$(hostname)
+	#HOST=$(hostname)
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
 	iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
-	readonly IP iFACE iP
 	if ! [[ ${iP} = *.*.* ]]; then
 		error "Unable to find ip from outside"
 	fi
+
+	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
 	echo -e "[${bldylw} done ${rst}]"
 }
 
 ##[ VARiABLE iNiT ]##
 CORES=$(grep -c ^processor /proc/cpuinfo)
-SSLEAYCNF=/usr/share/ssl-cert/ssleay.cnf
+SSLCERT=/usr/share/ssl-cert/ssleay.cnf
+REPO_PATH=/etc/apt/sources.list.d/
 LOG='logs/installer.log'
 
 #!=====================>> COLOR CONTROL <<=====================!#

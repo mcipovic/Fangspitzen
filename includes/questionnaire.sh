@@ -166,8 +166,8 @@ fi
 
 ##[ CONFiRMATiON ]##
 echo -en "\n Is this correct? [y/n]: "
-	if yesno
-		then skip=true
+	if yes; then
+		skip=true
 		break
 	fi
 done  # Answer was no, so we loop back and do it again

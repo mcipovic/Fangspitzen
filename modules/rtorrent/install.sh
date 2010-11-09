@@ -4,7 +4,7 @@ while [[ $compile_rtorrent = false ]]; do
 		compile_rtorrent='true'
 	else  # Ask to re-compile if rtorrent is already installed
 		echo -en "rTorrent Found.... re-compile? [y/n]: "
-		if  yesno; then  # if user says yes
+		if  yes; then
 			compile_rtorrent='true'
 			break
 		else

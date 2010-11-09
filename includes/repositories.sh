@@ -56,5 +56,3 @@ fi
 
 debug_wait "repos.added"
 clear
-debug_wait "update.and.upgrade"
-update

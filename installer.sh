@@ -26,12 +26,11 @@ while [ $# -gt 0 ]; do
   	case $1 in
 		-p|--pass)  # Generate strong random 'user defined length' passwords
 			if [[ $2 ]]; then opt=$2
-			else error "Specify Length --pass x "
-			fi
+			else error "Specify Length --pass x ";fi
 			mkpass ;;
 		-v|--version)  # Output version and date
 			echo -e "\n v$VERSION  $DATE \n"
-			exit 0 ;;
+			exit ;;
 		*)  # Output usage information
 			echo " Invalid Option"
 			usage ;;
@@ -39,35 +38,29 @@ while [ $# -gt 0 ]; do
 done
 
 ##[ Find Config and Load it ]##
-if [[ -f config.ini ]]; then  # Die if no config..
-	source config.ini
-	E_=$?
-	if [[ ${E_} != 0 ]]; then
+if [[ -f config.ini ]]; then
+	source config.ini && E_=$?
+	if [[ ${E_} != 0 ]]; then 
 		error "config.ini found but not readable!"
-	elif [[ ${iDiDNTEDiTMYCONFiG} ]]; then  # ..or if it hasnt been edited
+	elif [[ ${iDiDNTEDiTMYCONFiG} ]]; then  # Die if it hasnt been edited
 		error "PLEASE EDiT THE CONFiG"
 	elif [[ ${PWD} != ${BASE} ]]; then  # Check if the user declared BASE correctly in the config
 		echo -e "--> ${bldred}Fatal Error: Wrong Directory Detected.${rst}"
 		echo -e "--> ${bldred}Does not match ${BASE}${rst}"
 		exit 1
-	fi ;clear
-	checkroot
-	readonly USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG  # Make sure these aren't overwritten
-	init  # If user is root lets begin
-else
-	error "config.ini not found!"
+	fi ; clear
+	checkroot && init  # If user is root lets begin
+else error "config.ini not found!"  # Cant continue without a config so produce an error and exit
 fi
 
-#[TODO] Reserved for future ##
-#
+#[ TODO Dialog Support ]##
 # if ! which dialog >/dev/null; then
 # 	 echo -n ">>> Installing Dialog Module..."
-# 	 $INSTALL dialog 2>> ${LOG}
+# 	 $INSTALL dialog 2>> $LOG
 #	 echo -e "[${bldylw} done ${rst}]"
 # elif which dialog >/dev/null; then
 #	 echo -e "[${bldylw} done ${rst}]"
 # fi
-#
 
 #!=======================>> DiSCLAiMER <<=======================!#
 cat << "EOF"
@@ -87,16 +80,19 @@ cat << "EOF"
   WARNING:
 
   The installation is quite stable and functional when run on a freshly
-  installed supported Operating System, but upgrades from systems that 
-  have already had these programs installed and/or removed will likely
-  run into problems (not so much the case anymore).
+  installed supported Operating System. Systems that have already had
+  these programs installed and/or removed could run into problems, but
+  not likely. If you do run into problems, please let us know so we can
+  fix it.
 
   You can update your system along with installing those "must have"
-  programs by running this script with no options selected.
+  programs by simply running this script with the --dry option.
 
   The systems currently supported are:
-     Ubuntu >> 9 Jaunty,Karmic >> 10 Lucid,Maverick
-     Debian >> 5 Lenny >> 6 Squeeze
+     Ubuntu [ 9.04 -> 10.10 ]
+     Debian [ 5.0  ->  6.0  ]
+     Arch   [ TODO ]
+     CentOS [ TODO ]
 
   If your OS is not listed, this script will most likey explode.
 EOF
@@ -104,41 +100,38 @@ EOF
 get_varinfo
 
 echo -en "\n Continue? [y/n]: "
-if ! yesno; then  # Cleanup and die if no
+if ! yes; then  # Cleanup and die if no
 	cleanup && clear
 	exit 0 
 fi
 
-readonly REPO_PATH=/etc/apt/sources.list.d/
 if [[ ! -f ${REPO_PATH}/autoinstaller.list ]]; then
 	source includes/repositories.sh  # Add repositories if not already present
 else log "Repositories Already Present, skipping"
 fi
 
-##[ Load Questionnaire ]##
-source includes/questionnaire.sh
+source includes/questionnaire.sh  # Load questionnaire
 
 #!=====================>> iNSTALLATiON <<=======================!#
 echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
 echo -e   "********************************\n"
 
-notice "iNSTALLiNG BASE PACKAGES... this may take a while"
-base_install
-	echo -e "${bldylw} done ${rst}"
-	debug_wait "base.packages.installed"
+notice "REFRESHiNG REPOSiTORiES..."; $UPDATE
+notice "iNSTALLiNG BASE PACKAGES... this may take a while"; base_install
+debug_wait "base.packages.installed"
 
-sed -i 's:default_bits .*:default_bits = 2048:' $SSLEAYCNF  # Bump 1024=>2048 bit certs
+#sed -i 's:default_bits .*:default_bits = 2048:' $SSLCERT  # Bump 1024=>2048 bit certs
 
 cd $BASE
 ##[ APACHE ]##
-if [[ ${http} = 'apache' ]]; then
+if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
-	$INSTALL apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> ${LOG}
+	$INSTALL apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
 	E_=$? && debug_error "Apache2 failed to install"
 
 	if [[ ! -f /etc/apache2/ssl/private.key ]]; then  # Create SSL Certificate
-		mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLEAYCNF /etc/apache2/ssl/private.key
+		mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLCERT /etc/apache2/ssl/private.key
 		chmod 600 /etc/apache2/ssl/private.key  # Read write permission for owner only
 	fi
 	if [[ ! -f /etc/apache2/mods-available/scgi.conf ]]; then  # Add RPC Mountpoint
@@ -151,14 +144,14 @@ if [[ ${http} = 'apache' ]]; then
 	debug_wait "apache.installed"
 
 ##[ LiGHTTPd ]##
-elif [[ ${http} = 'lighttp' ]]; then
+elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
-	$INSTALL lighttpd apache2-utils 2>> ${LOG}
+	$INSTALL lighttpd apache2-utils 2>> $LOG
 	E_=$? && debug_error "Lighttpd failed to install"
 
 	lighty-enable-mod fastcgi ssl auth access accesslog compress # Enable Modules
 	if [[ ! -f /etc/lighttpd/ssl/server.pem ]]; then  # Create SSL Certificate
-		mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLEAYCNF /etc/lighttpd/ssl/server.pem
+		mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLCERT /etc/lighttpd/ssl/server.pem
 		chmod 600 /etc/lighttpd/ssl/server.pem  # Read write permission for owner only
 	fi
 	if [[ ! -f /etc/lighttpd/conf-available/99-scgi.conf ]]; then  # Add RPC Mountpoint
@@ -169,36 +162,36 @@ elif [[ ${http} = 'lighttp' ]]; then
 	debug_wait "lighttpd.installed"
 
 ##[ Cherokee ]##
-elif [[ ${http} = 'cherokee' ]]; then
+elif [[ $http = 'cherokee' ]]; then
 	notice "iNSTALLiNG CHEROKEE"
 	#if [[ $NAME = 'lenny' ]]; then
-	#	$INSTALL cherokee spawn-fcgi 2>> ${LOG} && E_=$?
+	#	$INSTALL cherokee spawn-fcgi 2>> $LOG && E_=$?
 	#else
-		$INSTALL cherokee libcherokee-mod-libssl libcherokee-mod-mysql libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> ${LOG}
+		$INSTALL cherokee libcherokee-mod-libssl libcherokee-mod-mysql libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> $LOG
 		E_=$? && debug_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini
 	log "Cherokee Installation | Completed"
 	debug_wait "cherokee.installed"
 
-elif [[ ${http} != @(none|no|[Nn]) ]]; then  # Edit php config
+elif [[ $http != @(none|no|[Nn]) ]]; then  # Edit php config
 	sed -i 's:memory_limit .*:memory_limit = 128M:'                                    $PHPini
 	sed -i 's:error_reporting .*:error_reporting = E_ALL & ~E_DEPRECATED & ~E_NOTICE:' $PHPini
 	sed -i 's:expose_php = On:expose_php = Off:'                                       $PHPini
 	sed -i 's:display_errors = On:display_errors = Off:'                               $PHPini
 	sed -i 's:log_errors = Off:log_errors = On:'                                       $PHPini
-	sed -i 's:;error_log .*:error_log = /var/log/php-error.log:'               $PHPini
+	sed -i 's:;error_log .*:error_log = /var/log/php-error.log:'                       $PHPini
 fi
 
 ##[ vsFTP ]##
-if [[ ${ftpd} = 'vsftp' ]]; then
+if [[ $ftpd = 'vsftp' ]]; then
 	notice "iNSTALLiNG vsFTPd"
-	$INSTALL vsftpd 2>> ${LOG}
+	$INSTALL vsftpd 2>> $LOG
 		E_=$? && debug_error "vsFTPd failed to install"
-	sed -i 's:anonymous_enable=YES:anonymous_enable=NO:' /etc/vsftpd.conf
-	sed -i 's:#local_enable .*:local_enable=YES:'        /etc/vsftpd.conf
-	sed -i 's:#write_enable .*:write_enable=YES:'        /etc/vsftpd.conf
-	sed -i 's:#local_umask .*:local_umask=022:'          /etc/vsftpd.conf
+	sed -i 's:anonymous_enable=YES:anonymous_enable=NO:'          /etc/vsftpd.conf
+	sed -i 's:#local_enable .*:local_enable=YES:'                 /etc/vsftpd.conf
+	sed -i 's:#write_enable .*:write_enable=YES:'                 /etc/vsftpd.conf
+	sed -i 's:#local_umask .*:local_umask=022:'                   /etc/vsftpd.conf
 	sed -i 's:#idle_session_timeout .*:idle_session_timeout=600:' /etc/vsftpd.conf
 	sed -i 's:#nopriv_user .*:nopriv_user=ftp:'                   /etc/vsftpd.conf
 	sed -i 's:#chroot_local_user .*:chroot_local_user=YES:'       /etc/vsftpd.conf
@@ -207,24 +200,24 @@ if [[ ${ftpd} = 'vsftp' ]]; then
 	debug_wait "vsftpd.installed"
 
 ##[ proFTP ]##
-elif [[ ${ftpd} = 'proftp' ]]; then
+elif [[ $ftpd = 'proftp' ]]; then
 	notice "iNSTALLiNG proFTPd"
-	$INSTALL proftpd-basic 2>> ${LOG}
+	$INSTALL proftpd-basic 2>> $LOG
 	E_=$? && debug_error "ProFTPd failed to install"
 
 	log "ProFTP Installation | Completed"
 	debug_wait "proftpd.installed"
 
 ##[ pureFTP ]##
-elif [[ ${ftpd} = 'pureftp' ]]; then
+elif [[ $ftpd = 'pureftp' ]]; then
 	notice "iNSTALLiNG Pure-FTPd"
-	$INSTALL pure-ftpd pure-ftpd-common 2>> ${LOG}
+	$INSTALL pure-ftpd pure-ftpd-common 2>> $LOG
 	E_=$? && debug_error "PureFTP failed to install"
 
 	debug_wait "Creating PureFTP SSL Key"
 	echo 1 > /etc/pure-ftpd/conf/TLS  # Enable TLS+FTP (2 will allow TLS only, 0 disables it)
 	if [[ ! -f /etc/ssl/private/pure-ftpd.pem ]]; then  # Create SSL Certificate
-		mkdir -p /etc/ssl/private && make-ssl-cert $SSLEAYCNF /etc/ssl/private/pure-ftpd.pem
+		mkdir -p /etc/ssl/private && make-ssl-cert $SSLCERT /etc/ssl/private/pure-ftpd.pem
 		chmod 600 /etc/ssl/private/pure-ftpd.pem  # Read write permission for owner only
 		log "PureFTP SSL Key created"
 	fi
@@ -236,29 +229,29 @@ elif [[ ${ftpd} = 'pureftp' ]]; then
 fi
 
 ##[ mySQL ]##
-if [[ ${sql} = 'mysql' ]]; then
+if [[ $sql = 'mysql' ]]; then
 	notice "iNSTALLiNG MySQL"
-	if [[ ${DISTRO} = 'Ubuntu' ]]; then
-		$INSTALL mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> ${LOG} && E_=$?
-	elif [[ ${DISTRO} = 'Debian' ]]; then
-		$INSTALL mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> ${LOG} && E_=$?
+	if [[ $DISTRO = 'Ubuntu' && $NAME != 'hardy' ]]; then
+		$INSTALL mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> $LOG && E_=$?
+	elif [[ $DISTRO = 'Debian' || $NAME = 'hardy' ]]; then
+		$INSTALL mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> $LOG && E_=$?
 	fi
 	debug_error "MySQL failed to install"
 	log "MySQL Installation | Completed"
 	debug_wait "mysql.installed"
 
 ##[ SQLiTE ]##
-elif [[ ${sql} = 'sqlite' ]]; then
+elif [[ $sql = 'sqlite' ]]; then
 	notice "iNSTALLiNG SQLite"
-	$INSTALL sqlite3 php5-sqlite 2>> ${LOG}
+	$INSTALL sqlite3 php5-sqlite 2>> $LOG
 	E_=$? && debug_error "SQLite failed to install"
 	log "SQLite Installation | Completed"
 	debug_wait "sqlite.installed"
 
 ##[ PostGreSQL ]##
-elif [[ ${sql} = 'postgre' ]]; then
+elif [[ $sql = 'postgre' ]]; then
 	notice "iNSTALLiNG PostgreSQL"
-	$INSTALL postgresql postgresql-client-common postgresql-common 2>> ${LOG}
+	$INSTALL postgresql postgresql-client-common postgresql-common 2>> $LOG
 	E_=$? && debug_error "PostgreSQL failed to install"
 	log "PostgreSQL Installation | Completed"
 	debug_wait "postgresql.installed"
@@ -266,17 +259,17 @@ fi
 
 ##[ Bouncers ]##
 cd $BASE
-if [[ ${bnc} = 'znc' || ${bnc} = 'sbnc' || ${bnc} = 'psybnc' ]]; then
-	$INSTALL libc-ares-dev tcl tcl-dev 2>> ${LOG}
-		E_=$? && debug_error "Required packages failed to install"
+if [[ $bnc != @(none|no|[Nn]) ]]; then
+	$INSTALL libc-ares-dev tcl tcl-dev 2>> $LOG
+	E_=$? && debug_error "Required packages failed to install"
 fi
 
 ##[ ZNC ]##
-if [[ ${bnc} = 'znc' ]]; then
+if [[ $bnc = 'znc' ]]; then
 	notice "iNSTALLiNG ZNC"
 	cd tmp/
-	download http://downloads.sourceforge.net/project/znc/znc/0.094/znc-0.094.tar.gz
-		E_=$? && debug_error "ZNC Download Failed"
+	download http://downloads.sourceforge.net/project/znc/znc/0.094/znc-0.094.tar.gz && E_=$?
+		debug_error "ZNC Download Failed"
 	tar -xzf znc-0.094.tar.gz && cd znc-0.094  # Unpack
 		log "ZNC | Downloaded + Unpacked"
 	notice "Be aware that compiling znc is a cpu intensive task and may take up to 10 min to complete"
@@ -290,8 +283,8 @@ if [[ ${bnc} = 'znc' ]]; then
 	debug_wait "znc.compiled"
 
 #[TODO]#[ sBNC ]##
-elif [[ ${bnc} = 'sbnc' ]]; then
-	cd ${HOME}
+elif [[ $bnc = 'sbnc' ]]; then
+	cd $HOME
 	notice "iNSTALLiNG Shroud BNC"
 	git clone -q http://github.com/gunnarbeutner/shroudbnc.git
 	git clone -q http://github.com/gunnarbeutner/sBNC-Webinterface.git
@@ -314,11 +307,11 @@ elif [[ ${bnc} = 'sbnc' ]]; then
 #	log "--- EDiT ~/sbnc/sbnc.conf"
 
 #TODO#[ psyBNC ]##
-elif [[ ${bnc} = 'psybnc' ]]; then
+elif [[ $bnc = 'psybnc' ]]; then
 	cd ${HOME}
 	notice "iNSTALLiNG PsyBNC"
-	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz
-		E_=$? && debug_error "PsyBNC Download Failed"
+	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz && E_=$?
+		debug_error "PsyBNC Download Failed"
 	tar -xzf psyBNC-2.3.2-10.tar.gz && cd psybnc  # Unpack
 		log "PsyBNC | Downloaded + Unpacked"
 	make menuconfig
@@ -326,7 +319,6 @@ elif [[ ${bnc} = 'psybnc' ]]; then
 		debug_error "PsyBNC Build Failed"
 		log "PsyBNC Compile | Completed in $compile_time seconds"
 		debug_wait "psybnc.compiled"
-
 
 	PSY_CONF=psybnc.conf
 	PSY_OLD=psybnc.conf.old
@@ -337,19 +329,19 @@ elif [[ ${bnc} = 'psybnc' ]]; then
 
 	# Set psybnc port
 	read -p "Please enter a unique port number for psybnc: " PSY_PORT  
-	echo "PSYBNC.SYSTEM.PORT1=${PSY_PORT}" >> $PSY_CONF  # Write to conf
+	echo "PSYBNC.SYSTEM.PORT1=$PSY_PORT"   >> $PSY_CONF  # Write to conf
 	echo "PSYBNC.SYSTEM.HOST1=*"           >> $PSY_CONF
 	echo "PSYBNC.HOSTALLOWS.ENTRY0=*;*"    >> $PSY_CONF
 
-	./psybnc ${PSY_CONF}  # Run
+	#./psybnc $PSY_CONF  # Run
 	log "PsyBNC Installation | Completed"
 fi
 
 ##[ WebMiN ]##
 cd $BASE
-if [[ ${webmin} = 'y' ]]; then
+if [[ $webmin = 'y' ]]; then
 	notice "iNSTALLiNG WEBMiN"
-	$INSTALL webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> ${LOG}
+	$INSTALL webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> $LOG
 	E_=$? && debug_error "Webmin failed to install" && sleep 3
 		log "WebMin Installation | Completed"
 		debug_wait "webmin.installed"
@@ -359,7 +351,7 @@ fi
 cd $BASE/tmp
 if [[ ${vnstat} = 'y' ]]; then
 	notice "iNSTALLiNG VNSTAT"
-	$INSTALL libgd2-xpm libgd2-xpm-dev 2>> ${LOG}
+	$INSTALL libgd2-xpm libgd2-xpm-dev 2>> $LOG
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
 	tar xzf vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
@@ -370,7 +362,6 @@ if [[ ${vnstat} = 'y' ]]; then
 	make install                                                          # Install
 		log "VnStat Installation | Completed"
 	cd ..
-
 
 	if [[ ! -f /etc/init.d/vnstat ]]; then
 		cp ../modules/vnstat/vnstat-debian.init /etc/init.d/vnstat        # Copy init script if one doesnt exist
@@ -417,8 +408,8 @@ if [[ ${buildtorrent} = 'b' ]]; then
 if [[ ! -f /usr/local/bin/buildtorrent ]]; then
 	notice "iNSTALLiNG BuildTorrent"
 	if [[ ! -d buildtorrent ]]; then  # Checkout latest BuildTorrent source
-		git clone -q git://gitorious.org/buildtorrent/buildtorrent.git
-		E_=$? && debug_error "BuildTorrent Download Failed"
+		git clone -q git://gitorious.org/buildtorrent/buildtorrent.git && E_=$?
+		debug_error "BuildTorrent Download Failed"
 		log "BuildTorrent | Downloaded"
 	fi
 
@@ -455,26 +446,24 @@ fi
 
 cd $BASE
 ##[ rTorrent ]##
-if [[ ${torrent} = 'rtorrent' ]]; then source modules/rtorrent/install.sh
+if [[ $torrent = 'rtorrent' ]]; then source modules/rtorrent/install.sh
 
 ##[ Transmission ]##
-elif [[ ${torrent} = 'tranny' ]]; then source modules/transmission/install.sh
+elif [[ $torrent = 'tranny' ]]; then source modules/transmission/install.sh
 
 ##[ Deluge ]##
-elif [[ ${torrent} = 'deluge' ]]; then source modules/deluge/install.sh
+elif [[ $torrent = 'deluge' ]]; then source modules/deluge/install.sh
 fi
 
 ##[ ruTorrent ]##
-if [[ ${webui} = 'y' ]]; then source modules/rutorrent/install.sh
-fi
+if [[ $webui = 'y' ]]; then source modules/rutorrent/install.sh ;fi
 
 ##[TODO][ uTorrent alpha ]##
 #if [[ ${utorrent} = 'y' ]]; then
 #	source modules/utorrent/install.sh
 #fi
 
-if [[ $mod_extra = 1 ]]; then source modules/extra/_main.sh
-fi
+if [[ $mod_extra = 1 ]]; then source modules/extra/_main.sh ;fi
 
 source ${BASE}/includes/postprocess.sh
 exit 0  # Completed

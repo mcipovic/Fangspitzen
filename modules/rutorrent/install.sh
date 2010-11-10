@@ -23,8 +23,8 @@ cd ${BASE}/tmp
 
 	# Grab extra plugins
 	cd plugins
-	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/pausewebui pausewebui
-
+	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/pausewebui
+	tar xzf ../../../modules/rutorrent/plugin-nfo.tar.gz
 	cd ../.. && log "ruTorrent plugins | Downloaded"
 
 	cp ../modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini

@@ -194,7 +194,7 @@ init() {
 	else
 		UPDATE='apt-fast update -qq'
 		UPGRADE='apt-fast upgrade --yes -qq'
-		INSTALL='apt-get install --yes '
+		INSTALL='apt-get install --yes -qq'
 	fi
 
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')

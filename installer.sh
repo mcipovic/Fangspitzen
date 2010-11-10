@@ -92,8 +92,6 @@ cat << "EOF"
   The systems currently supported are:
      Ubuntu [ 9.04 -> 10.10 ]
      Debian [ 5.0  ->  6.0  ]
-     Arch   [ TODO ]
-     CentOS [ TODO ]
 
   If your OS is not listed, this script will most likey explode.
 EOF
@@ -125,14 +123,9 @@ echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
 echo -e   "********************************"
 
-notice "REFRESHiNG REPOSiTORiES"
-$UPDATE
-
-notice "iNSTALLiNG BASE PACKAGES... this may take a while"
 base_install
-debug_wait "base.packages.installed"
-
 mksslcert
+
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
@@ -147,7 +140,7 @@ if [[ $http = 'apache' ]]; then
 		cp $BASE/modules/apache/scgi.conf mods-available/scgi.conf
 	fi
 
-	a2enmod auth_digest ssl php5 scgi expires deflate cache mem_cache && a2dismod cgi  # Enable Modules
+	a2enmod auth_digest ssl php5 scgi expires deflate mem_cache && a2dismod cgi  # Enable Modules
 
 	PHPini=/etc/php5/apache/php.ini
 	log "Apache Installation | Completed"
@@ -160,14 +153,15 @@ elif [[ $http = 'lighttp' ]]; then
 	$INSTALL lighttpd apache2-utils 2>> $LOG
 	E_=$? && debug_error "Lighttpd failed to install"
 
-	lighty-enable-mod fastcgi ssl auth access accesslog compress # Enable Modules
-	#if [[ ! -f /etc/lighttpd/ssl/server.pem ]]; then  # Create SSL Certificate
-	#	mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLCERT /etc/lighttpd/ssl/server.pem
-	#	chmod 600 /etc/lighttpd/ssl/server.pem  # Read write permission for owner only
-	#fi
-	if [[ ! -f /etc/lighttpd/conf-available/99-scgi.conf ]]; then  # Add RPC Mountpoint
-		cp modules/lighttp/99-scgi.conf /etc/lighttpd/conf-available/99-scgi.conf
+	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
+		make-ssl-cert $SSLCERT /etc/lighttpd/server.pem
 	fi
+	if [[ ! -f /etc/lighttpd/conf-available/99-scgi.conf ]]; then  # Add RPC Mountpoint
+		cp modules/rutorrent/lighttp-scgi-auth.conf /etc/lighttpd/conf-available/99-scgi.conf
+	fi
+
+	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable Modules
+
 	PHPini=/etc/php5/cgi/php.ini
 	log "Lighttp Installation | Completed"
 	debug_wait "lighttpd.installed"

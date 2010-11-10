@@ -21,7 +21,8 @@ else buildtorrent='n' ;fi
 echo -e "\n       **** [ Extra Options ] ****"
 read -p " [iRC Bouncer]              [znc|psybnc|sbnc|none]: " bnc
 if [[ ! -d /usr/share/webmin ]]; then
-read -p " [WebMiN]                                    [y|n]: " webmin ;fi
+read -p " [WebMiN]                                    [y|n]: " webmin
+else webmin='i';fi
 read -p " [VnStat WebUi]                              [y|n]: " vnstat
 
 
@@ -151,6 +152,8 @@ if [[ ${webmin} = 'y' ]]; then
 	v1=$(aptitude show webmin | grep Version)
 	v2=$(aptitude show webmin | grep Package)
 	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+elif [[ ${webmin} = 'i' ]]; then
+	echo -e "${bldylw} WEBMiN iS ALREADY iNSTALLED${rst}"
 elif [[ ${webmin} = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} WEBMiN NOT BEiNG iNSTALLED${rst}"
 else echo -e "${bldred}--> ERROR iN WEBMiN iNPUT!${rst}" ; webmin='n'

@@ -1,12 +1,11 @@
 ##!=======================>> FUNCTiONS <<=======================!##
 base_install() {  #[TODO] find a better way to do this
-
-STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gcc git-core gzip htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion unrar unzip zip"
+	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
+STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gamin gcc git-core gzip htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion unrar unzip zip"
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libexpat1 libncurses5 libncurses5-dev libsigc++-2.0-dev libxml2"
 if [[ $http != 'none' ]]; then
 PHP="php5 php5-cgi php5-cli php5-common php5-curl php5-gd php5-dev php5-mcrypt php5-mhash php5-mysql php5-suhosin php5-xmlrpc"
 fi
-
 	if [[ $DISTRO = 'Ubuntu' ]]; then
 		if [[ $NAME = 'karmic' || $NAME = 'lucid' || $NAME='maverick' ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG && E_=$?
@@ -24,11 +23,12 @@ fi
 
 	debug_error "Required system packages failed to install"
 	log "Base Installation | Completed"
+	echo -e "${bldylw} done${rst}"
 }
 
 checkout() {  # increase verbosity
-	if [[ $DEBUG = 1 ]]; then svn co $@
-	else svn co -q $@
+	if [[ $DEBUG = 1 ]]; then svn co $@ && E_=$?
+	else svn co -q $@ && E_=$?
 	fi	
 }
 
@@ -51,14 +51,10 @@ clear_logfile() {  # clear the logfile
 	if [[ -f $LOG ]]; then rm --force $LOG ;fi
 }
 
-compile() {  # increase verbosity
-	if [[ $DEBUG = 1 ]]; then
-		compile_time=$SECONDS
-		make -j$CORES $@ && E_=$?
-		let compile_time=$SECONDS-$compile_time
-	else
-		make --quiet -j$CORES $@
-	fi	
+compile() {  # compile with num of threads as cpu cores and time it
+	compile_time=$SECONDS
+	make -j$CORES $@ && E_=$?
+	let compile_time=$SECONDS-$compile_time
 }
 
 ctrl_c() {  # interrupt trap
@@ -85,8 +81,10 @@ debug_wait() {  # prints a message and wait for user before continuing
 	fi
 }
 
-download() {  # uses either wget or axel
-	($DL "$1")
+download() {  # show progress bars if debug is on
+	if [[ $DEBUG = 1 ]]; then axel --alternate $1
+	else axel --quiet $1
+	fi
 }
 
 error() {  # call this when you know there will be an error
@@ -107,15 +105,17 @@ mkpass() {  # generate a random password of user defined length
 	exit 0
 }
 
-mksslcert() {  # Bump 1024 -> 2048 bit certs and regenerate
+mksslcert() {  # use 2048 bit certs, use sha256, and regenerate
 	echo -en "${bldred} Generating SSL Certificate...${rst}"
-	sed -i 's:default_bits .*:default_bits = 2048:' $SSLCERT  
+	sed -i 's:default_bits .*:default_bits = 2048:' /usr/share/ssl-cert/ssleay.cnf
+	sed -i 's:default_bits .*:default_bits = 2048:' /etc/ssl/openssl.cnf
+	sed -i 's:default_md .*:default_md = sha256:'   /etc/ssl/openssl.cnf
 	make-ssl-cert generate-default-snakeoil --force-overwrite
 	echo -e "${bldylw} done${rst}"
 }
 
 notice() {  # echo status or general info to stdout
-	echo -en "\n${bldred} $1 ... ${rst}\n"
+	echo -en "\n${bldred} $1... ${rst}\n"
 }
 
 show_paths() {  # might be useful?
@@ -132,16 +132,6 @@ show_paths() {  # might be useful?
 	echo "	8 - $MAN"
 	echo
 	# read ENTER
-}
-
-update() {  # Apt-get update|upgrade
-	echo -en "${bldred} Refreshing Packages....${rst}"
-	$UPDATE && echo -e "${bldylw} done! ${rst}"
-	log "System Update | Success"
-
-	echo -en "${bldred} Updating System....${rst}"
-	$UPGRADE && echo -e "${bldylw} done! ${rst}"
-	log "System Upgrade | Success"
 }
 
 usage() {  # help screen
@@ -177,24 +167,12 @@ init() {
 	mkdir --parents tmp/
 	mkdir --parents logs/
 
-	##[ Use Axel and Apt-Fast ]##
-	if ! which apt-fast >/dev/null; then
-		apt-get install -yqq axel lsb-release
-		axel --quiet http://www.mattparnell.com/linux/apt-fast/apt-fast.sh
+	$UPDATE
+	##[ Install axel and apt-fast ]##
+	if ! which axel >/dev/null; then
+		$INSTALL axel lsb-release
+		download http://www.mattparnell.com/linux/apt-fast/apt-fast.sh
 		mv apt-fast.sh /usr/bin/apt-fast && chmod +x /usr/bin/apt-fast
-	fi
-
-	##[ Be more verbose if DEBUG is enabled and keep quiet if not ]##
-	if [[ $DEBUG = 1 ]]; then
-		DL='axel --num-connections=4 --alternate'
-		UPDATE='apt-fast update'
-		UPGRADE='apt-fast upgrade --yes'
-		INSTALL='apt-get install --yes'
-	else
-		DL='axel --num-connections=4 '
-		UPDATE='apt-fast update -qq'
-		UPGRADE='apt-fast upgrade --yes -qq'
-		INSTALL='apt-get install --yes '
 	fi
 
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
@@ -211,6 +189,9 @@ init() {
 CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLCERT=/usr/share/ssl-cert/ssleay.cnf
 REPO_PATH=/etc/apt/sources.list.d/
+UPDATE='apt-get update -qq'
+UPGRADE='apt-get upgrade --yes -qq'
+INSTALL='apt-get install --yes -qq'
 LOG='logs/installer.log'
 WEB='/var/www'
 

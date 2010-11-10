@@ -7,7 +7,6 @@ Legend:
 [ ] Test Transission
 [ ] Test Deluge
 [ ] Test iplist
-[+] Configure fail2ban
 
 [ ] phpsysinfo
 [ ] uTorrent Server
@@ -18,6 +17,6 @@ Legend:
 [ ] setup a reverse proxy frontend for our webserver
 [ ] implement dialog
 
-[ ] MultiUser (priority)
-[ ] User Add|Edit|Del functions (priority)
+[+] MultiUser (priority)
+[+] User Add|Edit|Del functions (priority)
 

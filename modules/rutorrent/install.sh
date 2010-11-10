@@ -13,32 +13,32 @@ if [[ $install_rutorrent = 'true' ]]; then
 cd ${BASE}/tmp
 	notice "iNSTALLiNG ruTorrent"
 	checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent  # Checkout ruTorrent
-	E_=$? && debug_error "ruTorrent Download Failed"
+	debug_error "ruTorrent Download Failed"
 	log "ruTorrent | Downloaded"
 	
 	notice "iNSTALLiNG Plugins"
-	cd rutorrent && rm -R plugins conf/plugins.ini conf/config.php favicon.ico
+	cd rutorrent && rm -R plugins conf/plugins.ini favicon.ico
 	checkout http://rutorrent.googlecode.com/svn/trunk/plugins  # Checkout plugins-svn
-	E_=$? && debug_error "Plugins Download Failed"
+	debug_error "Plugins Download Failed"
 
-	# Grab some plugins from other repos
+	# Grab extra plugins
 	cd plugins
 	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/pausewebui pausewebui
 
-	cd ../..
+	cd ../.. && log "ruTorrent plugins | Downloaded"
+
 	cp ../modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini
 	cp ../modules/rutorrent/favicon.ico rutorrent/favicon.ico
-	log "ruTorrent plugins | Downloaded"
+	sed -i "s:\$saveUploadedTorrents .*:\$saveUploadedTorrents = false;:"       rutorrent/conf/config.php
+	sed -i "s:\$topDirectory .*:\$topDirectory = '/home';:"                     rutorrent/conf/config.php
+	sed -i "s:\$XMLRPCMountPoint .*:\$XMLRPCMountPoint = \"/rutorrent/RPC2\";:" rutorrent/conf/config.php
 
 	echo
-	if [[ -d /etc/apache2 ]]; then  # Apache
-		htdigest -c /etc/apache2/.htpasswd "ruTorrent" ${USER}  # Create user authentication
+	if [[ $(pidof apache2) ]]; then  # Apache
+		htdigest -c /etc/apache2/.htpasswd "ruTorrent" $USER  # Create user authentication
 		cp ../modules/apache/htaccess rutorrent/.htaccess
-		cp ../modules/rutorrent/config.php.apache rutorrent/conf/config.php
-	elif [[ -d /etc/lighttpd ]]; then  # Lighttp
-		htdigest -c /etc/lighttpd/.htpasswd "ruTorrent" ${USER}  # Create user authentication
-		cp ../modules/lighttpd/99-auth.conf /etc/lighttpd/conf-available/99-auth.conf
-		cp ../modules/rutorrent/config.php.lighttp rutorrent/conf/config.php
+	elif [[ $(pidof lighttpd) ]]; then  # Lighttp
+		htdigest -c /etc/lighttpd/.htpasswd "ruTorrent" $USER  # Create user authentication
 	fi
 
 	if [[ -f /usr/local/bin/buildtorrent ]]; then
@@ -50,9 +50,9 @@ cd ${BASE}/tmp
 	fi
 	log "ruTorrent Config | Created"
 
-	cp -R rutorrent ${WEB}  # Move rutorrent to webroot
-	chmod -R 755 ${WEB}
-	chown -R www-data:www-data ${WEB}
+	cp -R rutorrent $WEB  # Move rutorrent to webroot
+	chmod -R 755 $WEB
+	chown -R www-data:www-data $WEB
 	log "ruTorrent Installation | Completed"
 	debug_wait "rutorrent.installed"
 fi

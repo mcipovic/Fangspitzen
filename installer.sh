@@ -92,8 +92,6 @@ cat << "EOF"
   The systems currently supported are:
      Ubuntu [ 9.04 -> 10.10 ]
      Debian [ 5.0  ->  6.0  ]
-     Arch   [ TODO ]
-     CentOS [ TODO ]
 
   If your OS is not listed, this script will most likey explode.
 EOF

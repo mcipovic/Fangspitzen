@@ -141,7 +141,7 @@ show_paths() {  # might be useful?
 	# read ENTER
 }
 
-update() {  # Apt-get update|upgrade
+update() {  # refresh and update packages
 	echo -en "${bldred} Refreshing Packages....${rst}"
 	$UPDATE && echo -e "${bldylw} done! ${rst}"
 	log "System Update | Success"
@@ -190,11 +190,11 @@ init() {
 	if [[ $DEBUG = 1 ]]; then
 		UPDATE='apt-fast update'
 		UPGRADE='apt-fast upgrade --yes'
-		INSTALL='apt-get install --yes'
+		INSTALL='apt-fast install --yes'
 	else
 		UPDATE='apt-fast update -qq'
 		UPGRADE='apt-fast upgrade --yes -qq'
-		INSTALL='apt-get install --yes '
+		INSTALL='apt-fast install --yes -qq'
 	fi
 
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')

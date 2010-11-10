@@ -151,7 +151,7 @@ elif [[ $http = 'lighttp' ]]; then
 		make-ssl-cert $SSLCERT /etc/lighttpd/server.pem
 	fi
 	if [[ ! -f /etc/lighttpd/conf-available/99-scgi.conf ]]; then  # Add RPC Mountpoint
-		cp modules/lighttp/99-scgi.conf /etc/lighttpd/conf-available/99-scgi.conf
+		cp modules/rutorrent/lighttp-scgi-auth.conf /etc/lighttpd/conf-available/99-scgi.conf
 	fi
 
 	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable Modules

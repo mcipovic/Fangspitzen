@@ -51,14 +51,10 @@ clear_logfile() {  # clear the logfile
 	if [[ -f $LOG ]]; then rm --force $LOG ;fi
 }
 
-compile() {  # increase verbosity
-	if [[ $DEBUG = 1 ]]; then
-		compile_time=$SECONDS
-		make -j$CORES $@ && E_=$?
-		let compile_time=$SECONDS-$compile_time
-	else
-		make --quiet -j$CORES $@
-	fi	
+compile() {  # compile with num of threads as cpu cores and time it
+	compile_time=$SECONDS
+	make -j$CORES $@ && E_=$?
+	let compile_time=$SECONDS-$compile_time
 }
 
 ctrl_c() {  # interrupt trap
@@ -85,8 +81,12 @@ debug_wait() {  # prints a message and wait for user before continuing
 	fi
 }
 
-download() {  # uses either wget or axel
-	($DL "$1")
+download() {  # show progress bars if debug is on
+	if [[ $DEBUG = 1 ]]; then
+		axel --alternate $1
+	else
+		axel --quiet $1
+	fi
 }
 
 error() {  # call this when you know there will be an error
@@ -188,12 +188,10 @@ init() {
 
 	##[ Be more verbose if DEBUG is enabled and keep quiet if not ]##
 	if [[ $DEBUG = 1 ]]; then
-		DL='axel --num-connections=4 --alternate'
 		UPDATE='apt-fast update'
 		UPGRADE='apt-fast upgrade --yes'
 		INSTALL='apt-get install --yes'
 	else
-		DL='axel --num-connections=4 '
 		UPDATE='apt-fast update -qq'
 		UPGRADE='apt-fast upgrade --yes -qq'
 		INSTALL='apt-get install --yes '

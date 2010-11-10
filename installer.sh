@@ -141,7 +141,7 @@ if [[ $http = 'apache' ]]; then
 		cp $BASE/modules/apache/scgi.conf mods-available/scgi.conf
 	fi
 
-	a2enmod auth_digest ssl php5 scgi expires deflate cache mem_cache && a2dismod cgi  # Enable Modules
+	a2enmod auth_digest ssl php5 scgi expires deflate mem_cache && a2dismod cgi  # Enable Modules
 
 	PHPini=/etc/php5/apache/php.ini
 	log "Apache Installation | Completed"

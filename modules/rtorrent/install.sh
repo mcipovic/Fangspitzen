@@ -15,7 +15,6 @@ done
 
 if [[ $compile_rtorrent = 'true' ]]; then
 cd ${BASE}/tmp
-	notice "iNSTALLiNG... rTORRENT"
 	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc && E_=$?  # Checkout xmlrpc ~advanced
 	debug_error "XMLRPC Download Failed"
 	log "XMLRPC | Downloaded" >> ${LOG}

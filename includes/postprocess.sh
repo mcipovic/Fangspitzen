@@ -55,7 +55,7 @@ echo && read -p "Start rtorrent now? [y|n]: " start_rt
 		chmod -R 755 $HOME/.dtach
 		chown -R $USER:$USER $HOME/.dtach
 		sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
-		notice "rTorrent has been started with dtach in ~/.dtach/rtorrent \n"
+		echo -e "${bldred}rTorrent has been started with dtach in ~/.dtach/rtorrent \n${rst}"
 	fi
 fi
 

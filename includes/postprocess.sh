@@ -88,7 +88,14 @@ logpath = /var/log/auth.log
 maxretry = 5
 EOF
 	fi
-/etc/init.d/fail2ban restart
+
+	echo -n "stopping fail2ban-server ."
+	killall -q -15 fail2ban-server
+	while [[ -f /var/run/fail2ban/fail2ban.sock ]]; do
+		echo -n " ."
+		sleep 1
+	done
+/etc/init.d/fail2ban start
 fi
 
 if [[ $torrent = 'rtorrent' ]]; then

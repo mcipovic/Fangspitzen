@@ -61,8 +61,8 @@ if [[ -d /etc/fail2ban ]]; then
 		sed -i '/[proftpd]/,/filter   = proftpd/ s:enabled .*:enabled = true:' $f2b_jail
 	elif [[ $ftp = 'pureftp' ]]; then
 		sed -i 's:[wuftpd]:[pure-ftpd]:' $f2b_jail
-		sed -i 's:filter   = wuftpd:filter   = pure-ftpd:' $f2b_jail
-		sed -i '/[pure-ftpd]/,/filter   = pure-ftpd/ s:enabled .*:enabled = true:' $f2b_jail
+		sed -i 's:filter   = wuftpd:filter   = pure-ftpd:'                                            $f2b_jail
+		sed -i '/[pure-ftpd]/,/filter   = pure-ftpd/ s:enabled .*:enabled = true:'                    $f2b_jail
 		sed -i '/filter   = pure-ftpd/,/maxretry = 6/ s:logpath .*:logpath  = /var/log/pureftpd.log:' $f2b_jail
 	fi
 	if [[ $http = 'apache' ]]; then
@@ -88,6 +88,7 @@ logpath = /var/log/auth.log
 maxretry = 5
 EOF
 	fi
+/etc/init.d/fail2ban restart
 fi
 
 if [[ $torrent = 'rtorrent' ]]; then

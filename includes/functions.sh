@@ -141,14 +141,6 @@ show_paths() {  # might be useful?
 	# read ENTER
 }
 
-update() {  # refresh and update packages
-	echo -en "${bldred} Refreshing Packages....${rst}"
-	$UPDATE && echo -e "${bldylw} done! ${rst}"
-	echo -en "${bldred} Updating System....${rst}"
-	$UPGRADE && echo -e "${bldylw} done! ${rst}"
-	log "System Packages Updated and Upgraded"
-}
-
 usage() {  # help screen
 	echo -e "\n${bldpur} Usage:${bldred} $0 ${bldpur}[${bldred}option${bldpur}]"
 	echo -e " Options:"
@@ -177,6 +169,7 @@ init() {
 	mkdir --parents tmp/
 	mkdir --parents logs/
 
+	$UPDATE
 	##[ Install axel and apt-fast ]##
 	if ! which axel >/dev/null; then
 		$INSTALL axel lsb-release
@@ -192,7 +185,6 @@ init() {
 
 	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
 	echo -e "[${bldylw} done ${rst}]"
-	update
 }
 
 ##[ VARiABLE iNiT ]##

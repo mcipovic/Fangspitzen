@@ -89,12 +89,10 @@ maxretry = 5
 EOF
 	fi
 
-	echo -n "stopping fail2ban-server ."
 	killall -q -15 fail2ban-server
-	while [[ -f /var/run/fail2ban/fail2ban.sock ]]; do
-		echo -n " ."
-		sleep 1
-	done
+	if [[ -e /var/run/fail2ban/fail2ban.sock ]]; then
+		rm /var/run/fail2ban/fail2ban.sock
+	fi
 /etc/init.d/fail2ban start
 fi
 

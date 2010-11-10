@@ -104,14 +104,14 @@ echo && read -p "Start rtorrent now? [y|n]: " start_rt
 		chmod -R 755 $HOME/.dtach
 		chown -R $USER:$USER $HOME/.dtach
 		sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
-		echo -e "${bldred}rTorrent has been started with dtach in ~/.dtach/rtorrent \n${rst}"
+		echo "rTorrent has been started with dtach in ~/.dtach/rtorrent"
 	fi
 fi
 
 ldconfig
 log "Linking Shared Libaries | Completed"
 
-echo -en "${bldred} Cleaning up...${rst}"
+echo -en "\n${bldred} Cleaning up...${rst}"
 apt-get -qq autoremove # remove uneeded and 
 apt-get -qq autoclean  #+cached deb packages
 cleanup

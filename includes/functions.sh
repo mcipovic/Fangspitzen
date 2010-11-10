@@ -1,6 +1,6 @@
 ##!=======================>> FUNCTiONS <<=======================!##
 base_install() {  #[TODO] find a better way to do this
-	echo -en "${bldred} iNSTALLiNG BASE PACKAGES   this may take a while...${rst}"
+	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gamin gcc git-core gzip htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion unrar unzip zip"
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libexpat1 libncurses5 libncurses5-dev libsigc++-2.0-dev libxml2"
 if [[ $http != 'none' ]]; then
@@ -24,12 +24,11 @@ fi
 	debug_error "Required system packages failed to install"
 	log "Base Installation | Completed"
 	echo -e "${bldylw} done${rst}"
-	debug_wait "base.packages.installed"
 }
 
 checkout() {  # increase verbosity
-	if [[ $DEBUG = 1 ]]; then svn co $@
-	else svn co -q $@
+	if [[ $DEBUG = 1 ]]; then svn co $@ && E_=$?
+	else svn co -q $@ && E_=$?
 	fi	
 }
 

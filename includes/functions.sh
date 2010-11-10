@@ -82,10 +82,8 @@ debug_wait() {  # prints a message and wait for user before continuing
 }
 
 download() {  # show progress bars if debug is on
-	if [[ $DEBUG = 1 ]]; then
-		axel --alternate $1
-	else
-		axel --quiet $1
+	if [[ $DEBUG = 1 ]]; then axel --alternate $1
+	else axel --quiet $1
 	fi
 }
 
@@ -116,7 +114,9 @@ mkpass() {  # generate a random password of user defined length
 
 mksslcert() {  # Bump 1024 -> 2048 bit certs and regenerate
 	echo -en "${bldred} Generating SSL Certificate...${rst}"
-	sed -i 's:default_bits .*:default_bits = 2048:' $SSLCERT  
+	sed -i 's:default_bits .*:default_bits = 2048:' /usr/share/ssl-cert/ssleay.cnf
+	sed -i 's:default_bits .*:default_bits = 2048:' /etc/ssl/openssl.cnf
+	sed -i 's:default_md .*:default_md = sha256:'   /etc/ssl/openssl.cnf
 	make-ssl-cert generate-default-snakeoil --force-overwrite
 	echo -e "${bldylw} done${rst}"
 }

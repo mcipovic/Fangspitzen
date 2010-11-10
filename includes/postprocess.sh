@@ -6,6 +6,8 @@ echo -e   "********************************\n"
 if [[ -f /etc/ssh/sshd_config ]]; then
 	sed -i 's:PermitRootLogin yes:PermitRootLogin no:' /etc/ssh/sshd_config
 	sed -i 's:LoginGraceTime 120:LoginGraceTime 30:'   /etc/ssh/sshd_config
+	sed -i 's:StrictModes no:StrictModes yes:'         /etc/ssh/sshd_config
+	sed -i 's:ServerKeyBits .*:ServerKeyBits 1024:'    /etc/ssh/sshd_config
 	sed -i 's:X11Forwarding yes:X11Forwarding no:'     /etc/ssh/sshd_config
 /etc/init.d/ssh restart
 fi

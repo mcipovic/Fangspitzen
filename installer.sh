@@ -147,15 +147,14 @@ elif [[ $http = 'lighttp' ]]; then
 	$INSTALL lighttpd apache2-utils 2>> $LOG
 	E_=$? && debug_error "Lighttpd failed to install"
 
-	#if [[ ! -f /etc/lighttpd/ssl/server.pem ]]; then  # Create SSL Certificate
-	#	mkdir -p /etc/apache2/ssl && make-ssl-cert $SSLCERT /etc/lighttpd/ssl/server.pem
-	#	chmod 600 /etc/lighttpd/ssl/server.pem  # Read write permission for owner only
-	#fi
+	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
+		make-ssl-cert $SSLCERT /etc/lighttpd/server.pem
+	fi
 	if [[ ! -f /etc/lighttpd/conf-available/99-scgi.conf ]]; then  # Add RPC Mountpoint
 		cp modules/lighttp/99-scgi.conf /etc/lighttpd/conf-available/99-scgi.conf
 	fi
 
-	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress #ssl # Enable Modules
+	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable Modules
 
 	PHPini=/etc/php5/cgi/php.ini
 	log "Lighttp Installation | Completed"

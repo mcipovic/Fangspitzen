@@ -144,11 +144,9 @@ show_paths() {  # might be useful?
 update() {  # refresh and update packages
 	echo -en "${bldred} Refreshing Packages....${rst}"
 	$UPDATE && echo -e "${bldylw} done! ${rst}"
-	log "System Update | Success"
-
 	echo -en "${bldred} Updating System....${rst}"
 	$UPGRADE && echo -e "${bldylw} done! ${rst}"
-	log "System Upgrade | Success"
+	log "System Packages Updated and Upgraded"
 }
 
 usage() {  # help screen
@@ -179,22 +177,11 @@ init() {
 	mkdir --parents tmp/
 	mkdir --parents logs/
 
-	##[ Use Axel and Apt-Fast ]##
-	if ! which apt-fast >/dev/null; then
-		apt-get install -yqq axel lsb-release
-		axel --quiet http://www.mattparnell.com/linux/apt-fast/apt-fast.sh
+	##[ Install axel and apt-fast ]##
+	if ! which axel >/dev/null; then
+		$INSTALL axel lsb-release
+		download http://www.mattparnell.com/linux/apt-fast/apt-fast.sh
 		mv apt-fast.sh /usr/bin/apt-fast && chmod +x /usr/bin/apt-fast
-	fi
-
-	##[ Be more verbose if DEBUG is enabled and keep quiet if not ]##
-	if [[ $DEBUG = 1 ]]; then
-		UPDATE='apt-fast update'
-		UPGRADE='apt-fast upgrade --yes'
-		INSTALL='apt-get install --yes'
-	else
-		UPDATE='apt-fast update -qq'
-		UPGRADE='apt-fast upgrade --yes -qq'
-		INSTALL='apt-get install --yes -qq'
 	fi
 
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
@@ -212,6 +199,9 @@ init() {
 CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLCERT=/usr/share/ssl-cert/ssleay.cnf
 REPO_PATH=/etc/apt/sources.list.d/
+UPDATE='apt-get update -qq'
+UPGRADE='apt-get upgrade --yes -qq'
+INSTALL='apt-get install --yes -qq'
 LOG='logs/installer.log'
 WEB='/var/www'
 

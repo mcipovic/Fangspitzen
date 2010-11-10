@@ -190,11 +190,11 @@ init() {
 	if [[ $DEBUG = 1 ]]; then
 		UPDATE='apt-fast update'
 		UPGRADE='apt-fast upgrade --yes'
-		INSTALL='apt-fast install --yes'
+		INSTALL='apt-get install --yes'
 	else
 		UPDATE='apt-fast update -qq'
 		UPGRADE='apt-fast upgrade --yes -qq'
-		INSTALL='apt-fast install --yes -qq'
+		INSTALL='apt-get install --yes '
 	fi
 
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
@@ -205,6 +205,7 @@ init() {
 
 	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
 	echo -e "[${bldylw} done ${rst}]"
+	update
 }
 
 ##[ VARiABLE iNiT ]##

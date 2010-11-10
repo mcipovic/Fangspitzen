@@ -119,9 +119,6 @@ echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
 echo -e   "********************************"
 
-notice "REFRESHiNG REPOSiTORiES"
-$UPDATE
-
 notice "iNSTALLiNG BASE PACKAGES... this may take a while"
 base_install
 debug_wait "base.packages.installed"

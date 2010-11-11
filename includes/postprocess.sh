@@ -19,6 +19,8 @@ if [[ $http = 'apache' ]]; then
 	sed -i 's:ServerTokens Full:ServerTokens Prod:'    /etc/apache2/apache2.conf
 	echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
 /etc/init.d/apache2 restart
+elif [[ $http = 'lighttp' ]]; then
+/etc/init.d/lighttpd restart
 fi
 if [[ $sql = 'mysql' ]]; then
 	sed -ie 's:query_cache_limit .*:query_cache_limit = 2M\nquery_cache_type = 1:' /etc/mysql/my.cnf

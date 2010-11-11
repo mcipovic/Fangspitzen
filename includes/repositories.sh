@@ -52,7 +52,8 @@ fi
 	$addkey 108B243F
 	$addkey 4BB9F05F
 	download http://www.webmin.com/jcameron-key.asc && apt-key add jcameron-key.asc && rm jcameron-key.asc
-	log "Repositories Keys ADD | Success"
 
-debug_wait "repos.added"
+	$UPDATE
+	log "Repositories Added and Updated"
+	debug_wait "repos.added"
 clear

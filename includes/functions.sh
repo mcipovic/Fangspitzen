@@ -165,7 +165,6 @@ init() {
 	mkdir --parents tmp/
 	mkdir --parents logs/
 
-	$UPDATE
 	##[ Install axel and apt-fast ]##
 	if ! which axel >/dev/null; then
 		$INSTALL axel lsb-release

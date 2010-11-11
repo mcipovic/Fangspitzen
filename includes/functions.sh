@@ -1,11 +1,12 @@
 ##!=======================>> FUNCTiONS <<=======================!##
 base_install() {  #[TODO] find a better way to do this
-	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
+
 STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gamin gcc git-core gzip htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion unrar unzip zip"
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libexpat1 libncurses5 libncurses5-dev libsigc++-2.0-dev libxml2"
 if [[ $http != 'none' ]]; then
 PHP="php5 php5-cgi php5-cli php5-common php5-curl php5-gd php5-dev php5-mcrypt php5-mhash php5-mysql php5-suhosin php5-xmlrpc"
 fi
+	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 	if [[ $DISTRO = 'Ubuntu' ]]; then
 		if [[ $NAME = 'karmic' || $NAME = 'lucid' || $NAME='maverick' ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG && E_=$?
@@ -90,9 +91,6 @@ download() {  # show progress bars if debug is on
 error() {  # call this when you know there will be an error
 	echo -e " Error:${bldred} $1 ${rst} \n"
 	exit
-}
-
-get_varinfo() {
 }
 
 log() {  # send to the logfile

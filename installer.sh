@@ -41,15 +41,15 @@ done
 ##[ Find Config and Load it ]##
 if [[ -f config.ini ]]; then
 	source config.ini && E_=$?
-	if [[ ${E_} != 0 ]]; then 
+	if [[ $E_ != 0 ]]; then 
 		error "config.ini found but not readable!"
-	elif [[ ${iDiDNTEDiTMYCONFiG} ]]; then  # Die if it hasnt been edited
+	elif [[ $iDiDNTEDiTMYCONFiG ]]; then  # Die if it hasnt been edited
 		error "PLEASE EDiT THE CONFiG"
-	elif [[ ${PWD} != ${BASE} ]]; then  # Check if the user declared BASE correctly in the config
-		echo -e "--> ${bldred}Fatal Error: Wrong Directory Detected.${rst}"
-		echo -e "--> ${bldred}Does not match ${BASE}${rst}"
+	elif [[ $PWD != $BASE ]]; then  # Check if the user declared BASE correctly in the config
+		echo -e "-->${bldred} Fatal Error: Wrong Directory Detected. ${rst}"
+		echo -e "-->${bldred} Does not match $BASE ${rst}"
 		exit 1
-	fi ; clear
+	fi
 	checkroot && init  # If user is root lets begin
 else error "config.ini not found!"  # Cant continue without a config so produce an error and exit
 fi
@@ -172,7 +172,7 @@ elif [[ $http = 'cherokee' ]]; then
 	#if [[ $NAME = 'lenny' ]]; then
 	#	$INSTALL cherokee spawn-fcgi 2>> $LOG && E_=$?
 	#else
-		$INSTALL cherokee libcherokee-mod-libssl libcherokee-mod-mysql libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> $LOG
+		$INSTALL cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> $LOG
 		E_=$? && debug_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini

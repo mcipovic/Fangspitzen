@@ -30,9 +30,9 @@ cd ${BASE}/tmp
 
 	cp ../modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini
 	cp ../modules/rutorrent/favicon.ico rutorrent/favicon.ico
-	sed -i "s:\$saveUploadedTorrents .*:\$saveUploadedTorrents = false;:"       rutorrent/conf/config.php
-	sed -i "s:\$topDirectory .*:\$topDirectory = '/home';:"                     rutorrent/conf/config.php
-	sed -i "s:\$XMLRPCMountPoint .*:\$XMLRPCMountPoint = \"/rutorrent/RPC2\";:" rutorrent/conf/config.php
+	sed -i "s:\$saveUploadedTorrents .*:\$saveUploadedTorrents = false;:"         rutorrent/conf/config.php
+	sed -i "s:\$topDirectory .*:\$topDirectory = '/home';:"                       rutorrent/conf/config.php
+	sed -i "s:\$XMLRPCMountPoint .*:\$XMLRPCMountPoint = \"/rutorrent/master\";:" rutorrent/conf/config.php
 
 	echo
 	if [[ $(pidof apache2) ]]; then  # Apache

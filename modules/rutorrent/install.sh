@@ -3,7 +3,7 @@ while [[ $install_rutorrent = false ]]; do
 	if [[ ! -d $WEB/rutorrent ]]; then  # Compile rtorrent
 		install_rutorrent='true'
 	else  # Ask to re-compile if rtorrent is already installed
-		echo -en "ruTorrent Found => Updating...  " && sleep 1
+		echo -en "ruTorrent Found => Updating...  " ; sleep 1
 		cd $WEB/rutorrent && svn up
 		break
 	fi
@@ -25,7 +25,8 @@ cd ${BASE}/tmp
 	cd plugins
 	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/pausewebui
 	tar xzf ../../../modules/rutorrent/plugin-nfo.tar.gz
-	cd ../.. && log "ruTorrent plugins | Downloaded"
+	cd ../..
+		log "ruTorrent plugins | Downloaded"
 
 	cp ../modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini
 	cp ../modules/rutorrent/favicon.ico rutorrent/favicon.ico

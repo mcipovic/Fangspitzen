@@ -92,7 +92,7 @@ EOF
 	fi
 	
 	echo -n "Restarting fail2ban..."
-	killall -q -15 fail2ban-server && sleep 2
+	killall -q -15 fail2ban-server ; sleep 2
 	if [[ -e /var/run/fail2ban/fail2ban.sock ]]; then
 		rm /var/run/fail2ban/fail2ban.sock
 	fi
@@ -100,9 +100,9 @@ EOF
 fi
 
 if [[ $torrent = 'rtorrent' ]]; then
-echo && read -p "Start rtorrent now? [y|n]: " start_rt
+echo ; read -p "Start rtorrent now? [y|n]: " start_rt
 	if [[ $start_rt = 'y' ]]; then
-		mkdir -p $HOME/.dtach && rm -rf $HOME/.dtach/rtorrent
+		mkdir -p $HOME/.dtach ; rm -f $HOME/.dtach/rtorrent
 		chmod -R 755 $HOME/.dtach
 		chown -R $USER:$USER $HOME/.dtach
 		sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent

@@ -9,16 +9,16 @@ fi
 	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 	if [[ $DISTRO = 'Ubuntu' ]]; then
 		if [[ $NAME = 'karmic' || $NAME = 'lucid' || $NAME='maverick' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG && E_=$?
+			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'jaunty' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar2 2>> $LOG && E_=$?
+			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar2 2>> $LOG ; E_=$?
 		fi
 
 	elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
 		if [[ $NAME = 'squeeze' || $NAME = 'debian' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG && E_=$?
+			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'lenny' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar0 2>> $LOG && E_=$?
+			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar0 2>> $LOG ; E_=$?
 		fi
 	fi
 
@@ -28,8 +28,8 @@ fi
 }
 
 checkout() {  # increase verbosity
-	if [[ $DEBUG = 1 ]]; then svn co $@ && E_=$?
-	else svn co -q $@ && E_=$?
+	if [[ $DEBUG = 1 ]]; then svn co $@ ; E_=$?
+	else svn co -q $@ ; E_=$?
 	fi	
 }
 
@@ -54,7 +54,7 @@ clear_logfile() {  # clear the logfile
 
 compile() {  # compile with num of threads as cpu cores and time it
 	compile_time=$SECONDS
-	make -j$CORES $@ && E_=$?
+	make -j$CORES $@ ; E_=$?
 	let compile_time=$SECONDS-$compile_time
 }
 
@@ -83,8 +83,8 @@ debug_wait() {  # prints a message and wait for user before continuing
 }
 
 download() {  # show progress bars if debug is on
-	if [[ $DEBUG = 1 ]]; then axel --alternate $1
-	else axel --quiet $1
+	if [[ $DEBUG = 1 ]]; then axel --alternate $1 ; E_=$?
+	else axel --quiet $1 ; E_=$?
 	fi
 }
 
@@ -179,6 +179,7 @@ init() {
 	fi
 
 	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
+	$UPDATE
 	echo -e "[${bldylw} done ${rst}]"
 }
 

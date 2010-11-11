@@ -40,7 +40,7 @@ done
 
 ##[ Find Config and Load it ]##
 if [[ -f config.ini ]]; then
-	source config.ini && E_=$?
+	source config.ini ; E_=$?
 	if [[ $E_ != 0 ]]; then 
 		error "config.ini found but not readable!"
 	elif [[ $iDiDNTEDiTMYCONFiG ]]; then  # Die if it hasnt been edited
@@ -50,7 +50,7 @@ if [[ -f config.ini ]]; then
 		echo -e "-->${bldred} Does not match $BASE ${rst}"
 		exit 1
 	fi
-	checkroot && init  # If user is root lets begin
+	checkroot ; init  # If user is root lets begin
 else error "config.ini not found!"  # Cant continue without a config so produce an error and exit
 fi
 
@@ -64,6 +64,7 @@ fi
 # fi
 
 #!=======================>> DiSCLAiMER <<=======================!#
+if [[ -f $LOG ]]; then  # only show for first run
 cat << "EOF"
                       ______
                    .-"      "-.
@@ -100,11 +101,11 @@ echo -e " Distro:${bldylw} $DISTRO $NAME $RELEASE ${rst}"
 echo -e " Arch  :${bldylw} $ARCH ${rst}"
 
 echo -en "\n Continue? [y/n]: "
-if ! yes; then  # Cleanup and die if no
-	cleanup && clear
-	exit 0
+	if ! yes; then  # Cleanup and die if no
+		cleanup ; clear ; exit
+	fi
 fi
-log "\n*** SCRiPT STARTED | $(date) ***"
+log "\n*** SCRiPT STARTiNG | $(date) ***"
 
 if [[ $DISTRO = 'Arch' ]]; then
 	source arch.installer.sh
@@ -130,7 +131,7 @@ mksslcert
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
 	$INSTALL apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
-	E_=$? && debug_error "Apache2 failed to install"
+	E_=$? ; debug_error "Apache2 failed to install"
 
 	cd /etc/apache2/
 	if [[ ! -f sites-enabled/000-default-ssl ]]; then  # Enable SSL
@@ -151,7 +152,7 @@ cd $BASE
 elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
 	$INSTALL lighttpd apache2-utils 2>> $LOG
-	E_=$? && debug_error "Lighttpd failed to install"
+	E_=$? ; debug_error "Lighttpd failed to install"
 
 	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
 		make-ssl-cert $SSLCERT /etc/lighttpd/server.pem
@@ -170,10 +171,10 @@ elif [[ $http = 'lighttp' ]]; then
 elif [[ $http = 'cherokee' ]]; then
 	notice "iNSTALLiNG CHEROKEE"
 	#if [[ $NAME = 'lenny' ]]; then
-	#	$INSTALL cherokee spawn-fcgi 2>> $LOG && E_=$?
+	#	$INSTALL cherokee spawn-fcgi 2>> $LOG
 	#else
 		$INSTALL cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> $LOG
-		E_=$? && debug_error "Cherokee failed to install"
+		E_=$? ; debug_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini
 	log "Cherokee Installation | Completed"
@@ -192,7 +193,7 @@ fi
 if [[ $ftpd = 'vsftp' ]]; then
 	notice "iNSTALLiNG vsFTPd"
 	$INSTALL vsftpd 2>> $LOG
-		E_=$? && debug_error "vsFTPd failed to install"
+		E_=$? ; debug_error "vsFTPd failed to install"
 	sed -i 's:anonymous_enable.*:anonymous_enable=NO:'           /etc/vsftpd.conf
 	sed -i 's:#local_enable.*:local_enable=YES:'                 /etc/vsftpd.conf
 	sed -i 's:#write_enable.*:write_enable=YES:'                 /etc/vsftpd.conf
@@ -208,7 +209,7 @@ if [[ $ftpd = 'vsftp' ]]; then
 elif [[ $ftpd = 'proftp' ]]; then
 	notice "iNSTALLiNG proFTPd"
 	$INSTALL proftpd-basic 2>> $LOG
-	E_=$? && debug_error "ProFTPd failed to install"
+	E_=$? ; debug_error "ProFTPd failed to install"
 
 	log "ProFTP Installation | Completed"
 	debug_wait "proftpd.installed"
@@ -217,7 +218,7 @@ elif [[ $ftpd = 'proftp' ]]; then
 elif [[ $ftpd = 'pureftp' ]]; then
 	notice "iNSTALLiNG Pure-FTPd"
 	$INSTALL pure-ftpd pure-ftpd-common 2>> $LOG
-	E_=$? && debug_error "PureFTP failed to install"
+	E_=$? ; debug_error "PureFTP failed to install"
 
 	debug_wait "Creating PureFTP SSL Key"
 	echo 1 > /etc/pure-ftpd/conf/TLS  # Enable TLS+FTP (2 will allow TLS only, 0 disables it)
@@ -249,7 +250,7 @@ if [[ $sql = 'mysql' ]]; then
 elif [[ $sql = 'sqlite' ]]; then
 	notice "iNSTALLiNG SQLite"
 	$INSTALL sqlite3 php5-sqlite 2>> $LOG
-	E_=$? && debug_error "SQLite failed to install"
+	E_=$? ; debug_error "SQLite failed to install"
 	log "SQLite Installation | Completed"
 	debug_wait "sqlite.installed"
 
@@ -257,7 +258,7 @@ elif [[ $sql = 'sqlite' ]]; then
 elif [[ $sql = 'postgre' ]]; then
 	notice "iNSTALLiNG PostgreSQL"
 	$INSTALL postgresql postgresql-client-common postgresql-common 2>> $LOG
-	E_=$? && debug_error "PostgreSQL failed to install"
+	E_=$? ; debug_error "PostgreSQL failed to install"
 	log "PostgreSQL Installation | Completed"
 	debug_wait "postgresql.installed"
 fi
@@ -266,14 +267,14 @@ fi
 cd $BASE
 if [[ $bnc != @(none|no|[Nn]) ]]; then
 	$INSTALL libc-ares-dev tcl tcl-dev 2>> $LOG
-	E_=$? && debug_error "Required packages failed to install"
+	E_=$? ; debug_error "Required packages failed to install"
 fi
 
 ##[ ZNC ]##
 if [[ $bnc = 'znc' ]]; then
 	notice "iNSTALLiNG ZNC"
 	cd tmp/
-	download http://downloads.sourceforge.net/project/znc/znc/0.094/znc-0.094.tar.gz && E_=$?
+	download http://downloads.sourceforge.net/project/znc/znc/0.094/znc-0.094.tar.gz
 		debug_error "ZNC Download Failed"
 	tar -xzf znc-0.094.tar.gz && cd znc-0.094  # Unpack
 		log "ZNC | Downloaded + Unpacked"
@@ -300,7 +301,7 @@ elif [[ $bnc = 'sbnc' ]]; then
 #	cd shroudbnc
 #	sh configure
 #	compile
-#		debug_error "ShroudBNC Build Failed" && debug_wait
+#		debug_error "ShroudBNC Build Failed" ; debug_wait
 #		log "ShroudBNC Compile | Completed in $compile_time seconds"
 #	make install
 #		log "ShroudBNC Installation | Completed"
@@ -315,7 +316,7 @@ elif [[ $bnc = 'sbnc' ]]; then
 elif [[ $bnc = 'psybnc' ]]; then
 	cd ${HOME}
 	notice "iNSTALLiNG PsyBNC"
-	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz && E_=$?
+	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz
 		debug_error "PsyBNC Download Failed"
 	tar -xzf psyBNC-2.3.2-10.tar.gz && cd psybnc  # Unpack
 		log "PsyBNC | Downloaded + Unpacked"
@@ -347,7 +348,7 @@ cd $BASE
 if [[ $webmin = 'y' ]]; then
 	notice "iNSTALLiNG WEBMiN"
 	$INSTALL webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> $LOG
-	E_=$? && debug_error "Webmin failed to install" && sleep 3
+	E_=$? ; debug_error "Webmin failed to install"
 		log "WebMin Installation | Completed"
 		debug_wait "webmin.installed"
 fi
@@ -413,7 +414,7 @@ if [[ ${buildtorrent} = 'b' ]]; then
 if [[ ! -f /usr/local/bin/buildtorrent ]]; then
 	notice "iNSTALLiNG BuildTorrent"
 	if [[ ! -d buildtorrent ]]; then  # Checkout latest BuildTorrent source
-		git clone -q git://gitorious.org/buildtorrent/buildtorrent.git && E_=$?
+		git clone -q git://gitorious.org/buildtorrent/buildtorrent.git ; E_=$?
 		debug_error "BuildTorrent Download Failed"
 		log "BuildTorrent | Downloaded"
 	fi
@@ -424,7 +425,7 @@ if [[ ! -f /usr/local/bin/buildtorrent ]]; then
 	autoheader
 	automake -a -c
 	sh configure
-	make install && E=$?
+	make install ; E=$?
 
 	debug_error "BuildTorrent Build Failed"
 	log "BuildTorrent Installation | Completed"
@@ -436,12 +437,12 @@ if [[ ! -f /usr/local/bin/mktorrent ]]; then
 	notice "iNSTALLiNG MkTorrent"
 	if [[ ! -d mktorrent ]]; then  # Checkout latest mktorrent source
 		git clone -q git://github.com/esmil/mktorrent.git
-		E_=$? && debug_error "MkTorrent Download Failed"
+		E_=$? ; debug_error "MkTorrent Download Failed"
 		log "MkTorrent | Downloaded"
 	fi
 
 	cd mktorrent
-	make install && E_=$?
+	make install ; E_=$?
 
 	debug_error "MkTorrent Build Failed"
 	log "MkTorrent Installation | Completed"

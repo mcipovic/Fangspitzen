@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 # Assumptions:
-#	Apache - mod_auth_digest
+#	Apache or Lighttp using mod_auth_digest
 #	/etc/apache2/.htpasswd
+#	/etc/lighttpd/.htpasswd
 #	/var/www/rutorrent/.htaccess
 #
 # You can, of course, change it below
@@ -11,15 +12,17 @@
 
 init_variables()
 {
-	htaccess='/var/www/rutorrent/.htaccess'
+	webserver='apache'
+	#webserver='lighttp'
 	htpasswd='/etc/apache2/.htpasswd'
+	#htpasswd='/etc/lighttpd/.htpasswd'
+
+	htaccess='/var/www/rutorrent/.htaccess'
 	rutorrent='/var/www/rutorrent'
-	webserver='apache'  # apache|lighttp|cherokee
 	webuser='www-data'
 	user_name=''
 	shell_reply=''
 	declare -i scgi_port=0
-
 	bldred='\e[1;31m'  # Red
 	bldpur='\e[1;35m'  # Purple
 	rst='\e[0m'        # Reset
@@ -172,9 +175,9 @@ httpd_scgi()
 		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
 		echo -e "${bldred}-${rst} Apache SCGi Mount ...[${bldpur} CREATED ${rst}]"
 		echo -e "${bldred}-${rst} Apache SCGi Port ....[${bldpur} $scgi_port ${rst}]\n"
-#	elif [[ $webserver = 'lighttp' ]]; then
-#		sudo -u $user_name echo 'schedule = chmod,0,0,"execute=chmod,777,/tmp/rpc.$user_name.socket"' >> /home/$user_name/.rtorrent.rc
-#		sudo -u $user_name echo "scgi_local = /tmp/rpc.$user_name.socket"                             >> /home/$user_name/.rtorrent.rc
+	elif [[ $webserver = 'lighttp' ]]; then
+		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
+		#TODO config /etc/lighttpd/conf-available/99-scgi.conf
 	fi
 }
 

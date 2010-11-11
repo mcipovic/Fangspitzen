@@ -409,9 +409,8 @@ echo -e "\n*******************************"
 echo -e   "**${bldred} TORRENT CLiENT iNSTALLiNG ${rst}**"
 echo      "*******************************"
 
-if [[ ${buildtorrent} = 'b' ]]; then
+if [[ $buildtorrent = 'b' ]]; then
 #-->##[ BuildTorrent ]##
-if [[ ! -f /usr/local/bin/buildtorrent ]]; then
 	notice "iNSTALLiNG BuildTorrent"
 	if [[ ! -d buildtorrent ]]; then  # Checkout latest BuildTorrent source
 		git clone -q git://gitorious.org/buildtorrent/buildtorrent.git ; E_=$?
@@ -430,10 +429,9 @@ if [[ ! -f /usr/local/bin/buildtorrent ]]; then
 	debug_error "BuildTorrent Build Failed"
 	log "BuildTorrent Installation | Completed"
 	debug_wait "buildtorrent.installed"
-fi
 else
 #-->##[ mkTorrent ]##
-if [[ ! -f /usr/local/bin/mktorrent ]]; then
+if [[ ! -f /usr/local/bin/mktorrent || $buildtorrent = 'm' ]]; then
 	notice "iNSTALLiNG MkTorrent"
 	if [[ ! -d mktorrent ]]; then  # Checkout latest mktorrent source
 		git clone -q git://github.com/esmil/mktorrent.git

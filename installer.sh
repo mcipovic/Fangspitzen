@@ -127,27 +127,23 @@ echo -e   "********************************"
 base_install
 mksslcert
 
+cd $BASE
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
 	$INSTALL apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
 	E_=$? ; debug_error "Apache2 failed to install"
 
-	cd /etc/apache2/
-	if [[ ! -f sites-enabled/000-default-ssl ]]; then  # Enable SSL
-		a2ensite default-ssl
-	fi
-	if [[ ! -f mods-available/scgi.conf ]]; then  # Add RPC Mountpoint
-		cp $BASE/modules/apache/scgi.conf mods-available/scgi.conf
-	fi
+	cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
 
-	a2enmod auth_digest ssl php5 scgi expires deflate mem_cache && a2dismod cgi  # Enable Modules
+	a2enmod auth_digest ssl php5 scgi expires deflate mem_cache  # Enable modules
+	a2dismod cgi
+	a2ensite default-ssl
 
 	PHPini=/etc/php5/apache/php.ini
 	log "Apache Installation | Completed"
 	debug_wait "apache.installed"
 
-cd $BASE
 ##[ LiGHTTPd ]##
 elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
@@ -157,11 +153,11 @@ elif [[ $http = 'lighttp' ]]; then
 	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
 		make-ssl-cert $SSLCERT /etc/lighttpd/server.pem
 	fi
-	if [[ ! -f /etc/lighttpd/conf-available/99-scgi.conf ]]; then  # Add RPC Mountpoint
-		cp modules/rutorrent/lighttp-scgi-auth.conf /etc/lighttpd/conf-available/99-scgi.conf
-	fi
 
-	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable Modules
+	cp modules/lighttp/scgi.conf /etc/lighttpd/conf-available/99-scgi.conf  # Add mountpoint
+	cp modules/lighttp/auth.conf /etc/lighttpd/conf-available/99-auth.conf  # and secure it with auth
+
+	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable modules
 
 	PHPini=/etc/php5/cgi/php.ini
 	log "Lighttp Installation | Completed"

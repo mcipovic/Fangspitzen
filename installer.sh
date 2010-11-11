@@ -154,8 +154,8 @@ elif [[ $http = 'lighttp' ]]; then
 		make-ssl-cert $SSLCERT /etc/lighttpd/server.pem
 	fi
 
-	cp modules/lighttp/scgi.conf /etc/lighttpd/conf-available/99-scgi.conf  # Add mountpoint
-	cp modules/lighttp/auth.conf /etc/lighttpd/conf-available/99-auth.conf  # and secure it with auth
+	cp modules/lighttp/scgi.conf /etc/lighttpd/conf-available/20-scgi.conf  # Add mountpoint
+	cp modules/lighttp/auth.conf /etc/lighttpd/conf-available/06-auth.conf  # and secure it with auth
 
 	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable modules
 

@@ -64,7 +64,7 @@ fi
 # fi
 
 #!=======================>> DiSCLAiMER <<=======================!#
-if [[ -f $LOG ]]; then  # only show for first run
+if [[ ! -f $LOG ]]; then  # only show for first run
 cat << "EOF"
                       ______
                    .-"      "-.

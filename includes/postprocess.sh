@@ -106,7 +106,12 @@ echo ; read -p "Start rtorrent now? [y|n]: " start_rt
 		chmod -R 755 $HOME/.dtach
 		chown -R $USER:$USER $HOME/.dtach
 		sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
-		echo "rTorrent has been started with dtach in ~/.dtach/rtorrent"
+
+		TESTrt=$(pgrep -u $USER rtorrent)
+		if [[ $? = 0 ]]; then
+			echo "rTorrent has been started with dtach in ~/.dtach/rtorrent"
+		else echo "rtorrent FAILED to start!"
+		fi
 	fi
 fi
 

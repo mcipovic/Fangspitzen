@@ -183,6 +183,21 @@ httpd_scgi()
 	fi
 }
 
+start_rtorrent()
+{
+	read -p "Start rtorrent for $user_name? [y|n]: " start_rt
+	if [[ $start_rt = 'y' ]]; then
+		sudo -u $user_name mkdir -p /home/$user_name/.dtach
+		sudo -u $user_name dtach -n /home/$user_name/.dtach/rtorrent rtorrent
+
+		TESTrt=$(pgrep -u $user_name rtorrent)
+		if [[ $? = 0 ]]; then
+			echo "rTorrent has been started with dtach in /home/$user_name/.dtach/rtorrent"
+		else echo "rtorrent FAILED to start!"
+		fi
+	fi
+}
+
 ##[ Main ]##
 if [[ ${UID} != 0 ]]; then
 	echo -e "${bldred}Run as root user ${rst}"
@@ -197,4 +212,5 @@ else
 	make_rtorrent_init
 	make_rutorrent_conf
 	httpd_scgi
+	start_rtorrent
 fi

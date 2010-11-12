@@ -17,9 +17,9 @@ cd $BASE/tmp
 	log "ruTorrent | Downloaded"
 
 cd rutorrent
-	rm plugins conf/plugins.ini favicon.ico
-	cp $BASE/modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini
-	cp $BASE/modules/rutorrent/favicon.ico rutorrent/favicon.ico
+	rm -R plugins conf/plugins.ini favicon.ico
+	cp $BASE/modules/rutorrent/plugins.ini conf/plugins.ini
+	cp $BASE/modules/rutorrent/favicon.ico favicon.ico
 
 	notice "iNSTALLiNG Plugins"
 	checkout http://rutorrent.googlecode.com/svn/trunk/plugins  # Checkout plugins-svn

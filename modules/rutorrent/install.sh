@@ -10,26 +10,26 @@ while [[ $install_rutorrent = false ]]; do
 done
 
 if [[ $install_rutorrent = 'true' ]]; then
-cd ${BASE}/tmp
+cd $BASE/tmp
 	notice "iNSTALLiNG ruTorrent"
 	checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent  # Checkout ruTorrent
 	debug_error "ruTorrent Download Failed"
 	log "ruTorrent | Downloaded"
-	
+
+	rm plugins conf/plugins.ini favicon.ico
+	cp $BASE/modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini
+	cp $BASE/modules/rutorrent/favicon.ico rutorrent/favicon.ico
+
 	notice "iNSTALLiNG Plugins"
-	cd rutorrent && rm -R plugins conf/plugins.ini favicon.ico
 	checkout http://rutorrent.googlecode.com/svn/trunk/plugins  # Checkout plugins-svn
-	debug_error "Plugins Download Failed"
 
-	# Grab extra plugins
-	cd plugins
+	# Install extra plugins
+cd rutorrent/plugins
 	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/pausewebui
-	tar xzf ../../../modules/rutorrent/plugin-nfo.tar.gz
-	cd ../..
-		log "ruTorrent plugins | Downloaded"
+	tar xzf $BASE/modules/rutorrent/plugin-nfo.tar.gz
+	log "ruTorrent plugins | Downloaded"
 
-	cp ../modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini
-	cp ../modules/rutorrent/favicon.ico rutorrent/favicon.ico
+cd $BASE/tmp
 	sed -i "s:\$saveUploadedTorrents .*:\$saveUploadedTorrents = false;:"         rutorrent/conf/config.php
 	sed -i "s:\$topDirectory .*:\$topDirectory = '/home';:"                       rutorrent/conf/config.php
 	sed -i "s:\$XMLRPCMountPoint .*:\$XMLRPCMountPoint = \"/rutorrent/master\";:" rutorrent/conf/config.php

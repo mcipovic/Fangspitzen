@@ -177,7 +177,7 @@ httpd_scgi()
 		echo -e "${bldred}-${rst} Apache SCGi Port ....[${bldpur} $scgi_port ${rst}]\n"
 	elif [[ $webserver = 'lighttp' ]]; then
 		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
-		sed -i "s:),:),\n\t\"/rutorrent/$user_name\" =>\n\t( \n\t\t\"127.0.0.1\" =>\n\t\t(\n\t\t\"host\"         => \"127.0.0.1\",\n\t\t\"port\"         => $scgi_port,\n\t\t\"check-local\"  => \"disable\",\n\t\t):" /etc/apache2/mods-available/scgi.conf
+		sed -i "s:),:),\n\t\"/rutorrent/$user_name\" =>\n\t( \n\t\t\"127.0.0.1\" =>\n\t\t(\n\t\t\"host\"         => \"127.0.0.1\",\n\t\t\"port\"         => $scgi_port,\n\t\t\"check-local\"  => \"disable\",\n\t\t):" /etc/lighttpd/conf-available/20-scgi.conf
 	fi
 }
 

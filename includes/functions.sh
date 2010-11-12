@@ -68,9 +68,11 @@ ctrl_c() {  # interrupt trap
 
 debug_error() {  # call this to catch a bad return code and log the error
 	if [[ $E_ != 0 ]]; then
-		echo -e " Error:${bldred} $1 ${rst} ($E)"
-		log "Error: $1 ($E)"
+		echo -e " Error:${bldred} $1 ${rst} ($E_)"
+		log "Error: $1 ($E_)"
 		cleanup
+		read -p "Press ENTER to exit" ENTER
+		exit 1
 	fi
 }
 

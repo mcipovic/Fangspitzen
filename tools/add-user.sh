@@ -12,8 +12,8 @@
 
 init_variables()
 {
-	webserver='apache'
-	#webserver='lighttp'
+	webserver='apache2'
+	#webserver='lighttpd'
 	htpasswd='/etc/apache2/.htpasswd'
 	#htpasswd='/etc/lighttpd/.htpasswd'
 
@@ -34,7 +34,7 @@ assumption_check()
 	if [[ ! -f $htpasswd ]]; then
 		echo -e "- htpasswd....[${bldred} FAILED ${rst}]" ;err=1
 		else echo -e "- htpasswd....[${bldpur} OK ${rst}]" ;fi
-	if [[ $webserver = 'apache' ]]; then
+	if [[ $webserver = 'apache2' ]]; then
 	if [[ ! -f $htaccess ]]; then
 		echo -e "- htaccess....[${bldred} FAILED ${rst}]" ;err=1
 		else echo -e "- htaccess....[${bldpur} OK ${rst}]" ;fi
@@ -172,31 +172,33 @@ EOF
 httpd_scgi()
 {
 	cd /home/$user_name
-	if [[ $webserver = 'apache' ]]; then
+	if [[ $webserver = 'apache2' ]]; then
 		echo "SCGIMount $scgi_mount 127.0.0.1:$scgi_port" >> /etc/apache2/mods-available/scgi.conf
 		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
 		echo -e "${bldred}-${rst} Apache SCGi Mount ...[${bldpur} CREATED ${rst}]"
 		echo -e "${bldred}-${rst} Apache SCGi Port ....[${bldpur} $scgi_port ${rst}]\n"
-	elif [[ $webserver = 'lighttp' ]]; then
+	elif [[ $webserver = 'lighttpd' ]]; then
 		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
-		sed -i "s:),:),\n\t\"/rutorrent/$user_name\" =>\n\t( \n\t\t\"127.0.0.1\" =>\n\t\t(\n\t\t\"host\"         => \"127.0.0.1\",\n\t\t\"port\"         => $scgi_port,\n\t\t\"check-local\"  => \"disable\",\n\t\t):" /etc/lighttpd/conf-available/20-scgi.conf
+		sed -i "s:),:),\n\t\"/rutorrent/$user_name\" =>\n\t( \n\t\t\"127.0.0.1\" =>\n\t\t(\n\t\t\"host\"         => \"127.0.0.1\",\n\t\t\"port\"         => $scgi_port,\n\t\t\"check-local\"  => \"disable\",\n\t\t)\n\t):" /etc/lighttpd/conf-available/20-scgi.conf
 	fi
 }
 
 start_rtorrent()
 {
-	read -p "Start rtorrent for $user_name? [y|n]: " start_rt
+	echo ; read -p "Start rtorrent for $user_name? [y|n]: " start_rt
 	if [[ $start_rt = 'y' ]]; then
 		sudo -u $user_name mkdir -p /home/$user_name/.dtach
 		sudo -u $user_name dtach -n /home/$user_name/.dtach/rtorrent rtorrent
 
 		TESTrt=$(pgrep -u $user_name rtorrent)
+		echo -en "${bldred}-${rst} rTorrent Starting ...["
 		if [[ $? = 0 ]]; then
-			echo "rTorrent has been started with dtach in /home/$user_name/.dtach/rtorrent"
-		else echo "rtorrent FAILED to start!"
+			echo "${bldpur} SUCCESS ${rst}]"
+		else echo "${bldred} FAiLED ${rst}]"
 		fi
 	fi
 }
+
 
 ##[ Main ]##
 if [[ ${UID} != 0 ]]; then
@@ -213,4 +215,5 @@ else
 	make_rutorrent_conf
 	httpd_scgi
 	start_rtorrent
+	/etc/init.d/$webserver restart
 fi

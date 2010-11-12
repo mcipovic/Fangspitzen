@@ -22,12 +22,14 @@ cd $BASE/tmp
 
 	if [[ $rtorrent_svn = 'y' ]]; then
 		checkout -r 1180 svn://rakshasa.no/libtorrent/trunk
-		debug_error "LibTorrent Download Failed"
+		debug_error "Lib|rTorrent Download Failed"
 		mv trunk/libtorrent libtorrent && mv trunk/rtorrent rtorrent && rm -r trunk
 		log "Lib|rTorrent | Downloaded" >> $LOG
 	else
 		download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
+			debug_error "LibTorrent Download Failed"
 		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz     # Grab rtorrent
+			debug_error "rTorrent Download Failed"
 		log "Lib|rTorrent | Downloaded" >> $LOG
 		tar xzf libtorrent-0.12.6.tar.gz && tar xzf rtorrent-0.8.6.tar.gz          # Unpack
 		mv libtorrent-0.12.6 libtorrent && mv rtorrent-0.8.6 rtorrent

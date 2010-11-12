@@ -34,12 +34,14 @@ assumption_check()
 	if [[ ! -f $htpasswd ]]; then
 		echo -e "- htpasswd....[${bldred} FAILED ${rst}]" ;err=1
 		else echo -e "- htpasswd....[${bldpur} OK ${rst}]" ;fi
+	if [[ $webserver = 'apache' ]]; then
 	if [[ ! -f $htaccess ]]; then
 		echo -e "- htaccess....[${bldred} FAILED ${rst}]" ;err=1
 		else echo -e "- htaccess....[${bldpur} OK ${rst}]" ;fi
+	fi
 	if [[ ! -d $rutorrent ]]; then
 		echo -e "- ruTorrent...[${bldred} FAILED ${rst}]" ;err=1
-		else echo -e " ruTorrent...[${bldpur} OK ${rst}] \n" ;fi
+		else echo -e "- ruTorrent...[${bldpur} OK ${rst}] \n" ;fi
 	if [[ $err = 1 ]]; then echo; exit 0 ;fi
 }
 
@@ -139,9 +141,9 @@ make_rutorrent_conf()
 	cd $rutorrent/conf
 	get_scgi_port
 	sudo -u $webuser mkdir users/$user_name
-	sudo -u $webuser cp config.php users/$user_name/config.php
-	sudo -u $webuser sed -i "s:\$scgi_port .*:\$scgi_port = $scgi_port;:"                  users/$user_name/config.php
-	sudo -u $webuser sed -i "s:$XMLRPCMountPoint .*:$XMLRPCMountPoint = \"$scgi_mount\";:" users/$user_name/config.php
+	sudo -u $webuser cp config.php users/$user_name
+	sudo -u $webuser sed -i "s:\$scgi_port .*:\$scgi_port = $scgi_port;:"                    users/$user_name/config.php
+	sudo -u $webuser sed -i "s:\$XMLRPCMountPoint .*:\$XMLRPCMountPoint = \"$scgi_mount\";:" users/$user_name/config.php
 
 	sudo -u $webuser cat >> users/$user_name/access.ini << "EOF"
 [settings]

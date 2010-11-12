@@ -16,16 +16,19 @@ cd $BASE/tmp
 	debug_error "ruTorrent Download Failed"
 	log "ruTorrent | Downloaded"
 
+cd rutorrent
 	rm plugins conf/plugins.ini favicon.ico
 	cp $BASE/modules/rutorrent/plugins.ini rutorrent/conf/plugins.ini
 	cp $BASE/modules/rutorrent/favicon.ico rutorrent/favicon.ico
 
 	notice "iNSTALLiNG Plugins"
 	checkout http://rutorrent.googlecode.com/svn/trunk/plugins  # Checkout plugins-svn
+	debug_error "ruTorrent Plugins Download Failed"
 
 	# Install extra plugins
-cd rutorrent/plugins
+cd plugins
 	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/pausewebui
+	debug_error "ruTorrent Extra Plugins Download Failed"
 	tar xzf $BASE/modules/rutorrent/plugin-nfo.tar.gz
 	log "ruTorrent plugins | Downloaded"
 

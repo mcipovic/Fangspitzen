@@ -198,6 +198,18 @@ if [[ $ftpd = 'vsftp' ]]; then
 	sed -i 's:#nopriv_user.*:nopriv_user=ftp:'                   /etc/vsftpd.conf
 	sed -i 's:#chroot_local_user.*:chroot_local_user=YES:'       /etc/vsftpd.conf
 
+	echo "rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem"          >> /etc/vsftpd.conf
+	echo "rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key" >> /etc/vsftpd.conf
+	echo "ssl_enable=YES" >> /etc/vsftpd.conf
+	echo "ssl_tlsv1=YES"  >> /etc/vsftpd.conf
+	echo "ssl_sslv2=NO"   >> /etc/vsftpd.conf
+	echo "ssl_sslv3=YES"  >> /etc/vsftpd.conf
+
+	echo ; read -p "Force SSL? [y/n]: " vsftpfssl
+	if [[ $vsftpfssl = 'y' ]; then
+		echo "force_local_logins_ssl=YES" >> /etc/vsftpd.conf
+		echo "force_local_data_ssl=YES"   >> /etc/vsftpd.conf
+	fi
 	log "vsFTP Installation | Completed"
 	debug_wait "vsftpd.installed"
 

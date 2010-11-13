@@ -45,6 +45,13 @@ assumption_check()
 	if [[ $err = 1 ]]; then echo; exit 0 ;fi
 }
 
+chown_rutorrent()
+{
+	if [[ $(stat $rutorrent -c %U) != $webuser ]]; then
+		chown -R $webuser:$webuser $rutorrent
+	fi
+}
+
 get_username()
 {
 	read -p "User Name: " user_name
@@ -52,24 +59,6 @@ get_username()
 	if [[ $shell_reply = 'n' ]]; then
 		user_shell='/usr/sbin/nologin'
 	else user_shell='/bin/bash'
-	fi
-}
-
-get_scgi_port()
-{
-	scgi_mount="/rutorrent/$user_name"
-	read -p "SCGi Port: " scgi_port
-
-	while [[ $scgi_port -lt 1024 || $scgi_port -gt 65535 || $scgi_port -eq 5000 ]]; do
-		echo -e "\n${bldred}- Invalid Port${rst}"
-		read -p "SCGi Port: " scgi_port
-	done
-}
-
-chown_rutorrent()
-{
-	if [[ $(stat $rutorrent -c %U) != $webuser ]]; then
-		chown -R $webuser:$webuser $rutorrent
 	fi
 }
 
@@ -113,6 +102,7 @@ encoding_list = UTF-8
 encryption = allow_incoming,try_outgoing,enable_retry
 #schedule = watch_directory,5,5,load_start=/absolute/path/to/watch/*.torrent
 EOF
+
 
 NUMBER=$[($RANDOM % 65534) + 20000]  # Generate a random number from 20000-65534
 	echo "port_range = $NUMBER-$NUMBER"           >> .rtorrent.rc
@@ -169,6 +159,17 @@ EOF
 	fi
 }
 
+get_scgi_port()
+{
+	scgi_mount="/rutorrent/$user_name"
+	read -p "SCGi Port: " scgi_port
+
+	while [[ $scgi_port -lt 1024 || $scgi_port -gt 65535 || $scgi_port -eq 5000 ]]; do
+		echo -e "\n${bldred}- Invalid Port${rst}"
+		read -p "SCGi Port: " scgi_port
+	done
+}
+
 httpd_scgi()
 {
 	cd /home/$user_name
@@ -181,6 +182,7 @@ httpd_scgi()
 		sudo -u $user_name echo "scgi_port = localhost:$scgi_port" >> .rtorrent.rc
 		sed -i "s:),:),\n\t\"/rutorrent/$user_name\" =>\n\t( \n\t\t\"127.0.0.1\" =>\n\t\t(\n\t\t\"host\"         => \"127.0.0.1\",\n\t\t\"port\"         => $scgi_port,\n\t\t\"check-local\"  => \"disable\",\n\t\t)\n\t):" /etc/lighttpd/conf-available/20-scgi.conf
 	fi
+	/etc/init.d/$webserver restart
 }
 
 start_rtorrent()
@@ -193,8 +195,8 @@ start_rtorrent()
 		TESTrt=$(pgrep -u $user_name rtorrent)
 		echo -en "${bldred}-${rst} rTorrent Starting ...["
 		if [[ $? = 0 ]]; then
-			echo "${bldpur} SUCCESS ${rst}]"
-		else echo "${bldred} FAiLED ${rst}]"
+			echo -e "${bldpur} SUCCESS ${rst}]"
+		else echo -e "${bldred} FAiLED ${rst}]"
 		fi
 	fi
 }
@@ -206,8 +208,8 @@ if [[ ${UID} != 0 ]]; then
 	exit
 else
 	init_variables
-	chown_rutorrent
 	assumption_check
+	chown_rutorrent
 	get_username
 	create_user
 	make_rtorrent_rc
@@ -215,5 +217,4 @@ else
 	make_rutorrent_conf
 	httpd_scgi
 	start_rtorrent
-	/etc/init.d/$webserver restart
 fi

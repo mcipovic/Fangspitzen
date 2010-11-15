@@ -1,6 +1,5 @@
 ##!=======================>> QUESTiONS <<========================!##
 while [[ ${skip} = false ]]; do
-clear
 echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<---------------${rst}"
 
 read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: " http

@@ -117,6 +117,7 @@ if [[ ! -f ${REPO_PATH}/autoinstaller.list ]]; then
 else log "Repositories Already Present, skipping"
 fi
 
+clear
 source includes/questionnaire.sh  # Load questionnaire
 
 #!=====================>> iNSTALLATiON <<=======================!#

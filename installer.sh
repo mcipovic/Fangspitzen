@@ -213,7 +213,7 @@ if [[ $ftpd = 'vsftp' ]]; then
 	echo "ssl_sslv3=YES"  >> /etc/vsftpd.conf
 
 	echo ; read -p "Force SSL? [y/n]: " vsftpfssl
-	if [[ $vsftpfssl = 'y' ]; then
+	if [[ $vsftpfssl = 'y' ]]; then
 		echo "force_local_logins_ssl=YES" >> /etc/vsftpd.conf
 		echo "force_local_data_ssl=YES"   >> /etc/vsftpd.conf
 	fi

@@ -3,12 +3,12 @@ cd ${BASE}/tmp
 	${INSTALL} deluge-common deluge-console deluge-web deluged 2>> ${LOG}
 		E_=$? && debug_error "Deluge failed to install"
 
-	deluged ; killall deluged
-	deluge-web --fork ; killall deluge-web
+	deluged && sleep 1 ; killall deluged
+	#deluge-web --fork && sleep 1 ; killall deluge-web
 
 	cp ../modules/deluge/deluge-daemon.defaults /etc/default/deluge-daemon  # Copy init config
 	cp ../modules/deluge/deluge-daemon.init     /etc/init.d/deluge-daemon   # Copy init script
-
+	echo
 	read -p " WEBUi User Name: "   dUser
 	read -p " WEBUi  Password: "   dPass
 	read -p " Port Range [from]: " dPort1
@@ -37,6 +37,8 @@ cd ${BASE}/tmp
 
 	sed -i "s:6881,:$dPort1,:" $deluge_conf
 	sed -i "s:6891,:$dPort2:"  $deluge_conf
+
+	deluged && deluge-web
 
 	log "Deluge Config | Created"
 	log "Deluge WebUi listening on Port 8112"

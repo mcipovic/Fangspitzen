@@ -448,7 +448,8 @@ if [[ $buildtorrent = 'b' ]]; then
 	debug_error "BuildTorrent Build Failed"
 	log "BuildTorrent Installation | Completed"
 	debug_wait "buildtorrent.installed"
-else
+
+elif [[ $buildtorrent != 'n' ]]; then
 #-->##[ mkTorrent ]##
 if [[ ! -f /usr/local/bin/mktorrent || $buildtorrent = 'm' ]]; then
 	notice "iNSTALLiNG MkTorrent"

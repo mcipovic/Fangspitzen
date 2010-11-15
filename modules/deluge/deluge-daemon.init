@@ -2,26 +2,26 @@
 
 ### BEGIN INIT INFO
 # Provides:			deluge-daemon
-# Required-Start: $local_fs $remote_fs
+# Required-Start:   $local_fs $remote_fs
 # Required-Stop:	$local_fs $remote_fs
 # Should-Start:  	$network
 # Should-Stop:   	$network
 # Default-Start: 	2 3 4 5
 # Default-Stop:  	0 1 6
-# Description: 	Daemonized version of deluge and webui.
-# 						Starts the deluge daemon with the user specified in
-#						/etc/default/deluge-daemon.
+# Description: 	    Daemonized version of deluge and webui.
+# 					Starts the deluge daemon with the user specified in
+#					/etc/default/deluge-daemon.
 ### END INIT INFO
 # Author: Adolfo R. Brandes 
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DESC="Deluge Daemon"
 NAME1="deluged"
-NAME2="deluge"
+NAME2="deluge-web"
 DAEMON1=/usr/bin/deluged
-DAEMON1_ARGS="-d"
-DAEMON2=/usr/bin/deluge
-DAEMON2_ARGS="-u web"
+DAEMON1_ARGS=""
+DAEMON2=/usr/bin/deluge-web
+DAEMON2_ARGS=""
 PIDFILE1=/var/run/$NAME1.pid
 PIDFILE2=/var/run/$NAME2.pid
 PKGNAME=deluge-daemon
@@ -48,8 +48,8 @@ fi
 
 if [ -z "$DELUGED_USER" ]
 then
-log_warning_msg "Not starting $PKGNAME, DELUGED_USER not set in /etc/default/$PKGNAME."
-exit 0
+	log_warning_msg "Not starting $PKGNAME, DELUGED_USER not set in /etc/default/$PKGNAME."
+	exit 0
 fi
 
 #
@@ -62,19 +62,19 @@ do_start()
    #   1 if daemon was already running
    #   2 if daemon could not be started
    start-stop-daemon --start --background --quiet --pidfile $PIDFILE1 --exec $DAEMON1 \
-  --chuid $DELUGED_USER --user $DELUGED_USER --test > /dev/null
+		--chuid $DELUGED_USER --user $DELUGED_USER --test > /dev/null
    RETVAL1="$?"
    start-stop-daemon --start --background --quiet --pidfile $PIDFILE2 --exec $DAEMON2 \
-  --chuid $DELUGED_USER --user $DELUGED_USER --test > /dev/null
+		--chuid $DELUGED_USER --user $DELUGED_USER --test > /dev/null
    RETVAL2="$?"
    [ "$RETVAL1" = "0" -a "$RETVAL2" = "0" ] || return 1
 
    start-stop-daemon --start --background --quiet --pidfile $PIDFILE1 --make-pidfile --exec $DAEMON1 \
-  --chuid $DELUGED_USER --user $DELUGED_USER -- $DAEMON1_ARGS
+		--chuid $DELUGED_USER --user $DELUGED_USER -- $DAEMON1_ARGS
    RETVAL1="$?"
-sleep 2
+		sleep 2
    start-stop-daemon --start --background --quiet --pidfile $PIDFILE2 --make-pidfile --exec $DAEMON2 \
-  --chuid $DELUGED_USER --user $DELUGED_USER -- $DAEMON2_ARGS
+		--chuid $DELUGED_USER --user $DELUGED_USER -- $DAEMON2_ARGS
    RETVAL2="$?"
    [ "$RETVAL1" = "0" -a "$RETVAL2" = "0" ] || return 2
 }
@@ -106,34 +106,34 @@ case "$1" in
    [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME1"
    do_start
    case "$?" in
-  0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-  2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+      0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+      2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
    esac
    ;;
   stop)
    [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME1"
    do_stop
    case "$?" in
-  0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-  2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+      0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+      2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
    esac
    ;;
   restart|force-reload)
    log_daemon_msg "Restarting $DESC" "$NAME1"
    do_stop
    case "$?" in
- 0|1)
-  do_start
-  case "$?" in
- 0) log_end_msg 0 ;;
- 1) log_end_msg 1 ;; # Old process is still running
- *) log_end_msg 1 ;; # Failed to start
-  esac
-  ;;
- *)
-# Failed to stop
-  log_end_msg 1
-  ;;
+     0|1)
+      do_start
+      case "$?" in
+         0) log_end_msg 0 ;;
+         1) log_end_msg 1 ;; # Old process is still running
+         *) log_end_msg 1 ;; # Failed to start
+      esac
+      ;;
+     *)
+        # Failed to stop
+      log_end_msg 1
+      ;;
    esac
    ;;
   *)

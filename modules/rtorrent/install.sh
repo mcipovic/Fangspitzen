@@ -39,7 +39,7 @@ cd $BASE/tmp
 	notice "COMPiLiNG... XMLRPC"
 #-->[ Compile xmlrpc ]
 	cd xmlrpc
-	sh configure --prefix=/usr
+	sh configure --prefix=/usr --disable-cplusplus
 	compile
 		debug_error "XMLRPC Build Failed"
 		log "XMLRPC Compile | Completed in $compile_time seconds"

@@ -9,23 +9,19 @@ if [[ -f /etc/ssh/sshd_config ]]; then
 	sed -i 's:StrictModes no:StrictModes yes:'         /etc/ssh/sshd_config
 	sed -i 's:ServerKeyBits .*:ServerKeyBits 1024:'    /etc/ssh/sshd_config
 	sed -i 's:X11Forwarding yes:X11Forwarding no:'     /etc/ssh/sshd_config
-/etc/init.d/ssh restart
+	/etc/init.d/ssh restart
 fi
+
 if [[ $http = 'apache' ]]; then
-	sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s:AllowOverride .*:AllowOverride All:' /etc/apache2/sites-available/default*
-	sed -i 's:ServerSignature On:ServerSignature Off:' /etc/apache2/apache2.conf
-	sed -i 's:Timeout 300:Timeout 30:'                 /etc/apache2/apache2.conf
-	sed -i 's:KeepAliveTimeout 15:KeepAliveTimeout 5:' /etc/apache2/apache2.conf
-	sed -i 's:ServerTokens Full:ServerTokens Prod:'    /etc/apache2/apache2.conf
-	echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
-/etc/init.d/apache2 restart
+	/etc/init.d/apache2 restart
 elif [[ $http = 'lighttp' ]]; then
-/etc/init.d/lighttpd restart
+	/etc/init.d/lighttpd restart
 fi
+
 if [[ $sql = 'mysql' ]]; then
-	sed -ie 's:query_cache_limit .*:query_cache_limit = 2M\nquery_cache_type = 1:' /etc/mysql/my.cnf
-/etc/init.d/mysql restart
+	/etc/init.d/mysql restart
 fi
+
 if [[ $sql = 'postgre' ]]; then  # This needs to change per version
 	post_ver=8.4
 	if [[ $NAME = 'lenny' ]]; then
@@ -34,7 +30,7 @@ if [[ $sql = 'postgre' ]]; then  # This needs to change per version
 	post_conf=/etc/postgresql/${post_ver}/main/postgresql.conf
 	sed -i "s:#autovacuum .*:autovacuum = on:"     $post_conf
 	sed -i "s:#track_counts .*:track_counts = on:" $post_conf
-/etc/init.d/postgresql-${post_ver} restart
+	/etc/init.d/postgresql-${post_ver} restart
 fi
 
 #[ Add Some Useful Command Alias' ]#
@@ -96,7 +92,7 @@ EOF
 	if [[ -e /var/run/fail2ban/fail2ban.sock ]]; then
 		rm /var/run/fail2ban/fail2ban.sock
 	fi
-/etc/init.d/fail2ban start && echo " done"
+	/etc/init.d/fail2ban start && echo " done"
 fi
 
 if [[ $torrent = 'rtorrent' ]]; then

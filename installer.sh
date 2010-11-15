@@ -140,6 +140,13 @@ if [[ $http = 'apache' ]]; then
 	a2dismod cgi
 	a2ensite default-ssl
 
+	sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s:AllowOverride .*:AllowOverride All:' /etc/apache2/sites-available/default*
+	sed -i 's:ServerSignature On:ServerSignature Off:' /etc/apache2/apache2.conf
+	sed -i 's:Timeout 300:Timeout 30:'                 /etc/apache2/apache2.conf
+	sed -i 's:KeepAliveTimeout 15:KeepAliveTimeout 5:' /etc/apache2/apache2.conf
+	sed -i 's:ServerTokens Full:ServerTokens Prod:'    /etc/apache2/apache2.conf
+	echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
+
 	PHPini=/etc/php5/apache/php.ini
 	log "Apache Installation | Completed"
 	debug_wait "apache.installed"
@@ -217,7 +224,8 @@ if [[ $ftpd = 'vsftp' ]]; then
 elif [[ $ftpd = 'proftp' ]]; then
 	notice "iNSTALLiNG proFTPd"
 	$INSTALL proftpd-basic 2>> $LOG
-	E_=$? ; debug_error "ProFTPd failed to install"
+		E_=$? ; debug_error "ProFTPd failed to install"
+	sed -i 's:#DefaultRoot .*:DefaultRoot ~:' /etc/proftpd/proftpd.conf
 
 	log "ProFTP Installation | Completed"
 	debug_wait "proftpd.installed"
@@ -250,6 +258,9 @@ if [[ $sql = 'mysql' ]]; then
 	elif [[ $DISTRO = 'Debian' || $NAME = 'hardy' ]]; then
 		$INSTALL mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> $LOG && E_=$?
 	fi
+
+	sed -ie 's:query_cache_limit .*:query_cache_limit = 2M\nquery_cache_type = 1:' /etc/mysql/my.cnf
+
 	debug_error "MySQL failed to install"
 	log "MySQL Installation | Completed"
 	debug_wait "mysql.installed"

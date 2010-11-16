@@ -69,5 +69,5 @@ sed -i 's|open_basedir = .*|open_basedir = /srv/http/:/home/:/tmp/:/usr/share/pe
 #that will need some looking into!!
 
 sed -i 's:allow_url_fopen .*:allow_url_fopen = On:'   /etc/php/php.ini
-sed -i 's:extension=sockets.so:extension=sockets.so:' /etc/php/php.ini
-sed -i 's:extension=xmlrpc.so:extension=xmlrpc.so:'   /etc/php/php.ini
+sed -i 's:;extension=sockets.so:extension=sockets.so:' /etc/php/php.ini
+sed -i 's:;extension=xmlrpc.so:extension=xmlrpc.so:'   /etc/php/php.ini

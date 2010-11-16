@@ -50,6 +50,7 @@ if [[ -f config.ini ]]; then
 		echo -e "-->${bldred} Does not match $BASE ${rst}"
 		exit 1
 	fi
+	clear
 	checkroot ; init  # If user is root lets begin
 else error "config.ini not found!"  # Cant continue without a config so produce an error and exit
 fi
@@ -123,7 +124,7 @@ source includes/questionnaire.sh  # Load questionnaire
 #!=====================>> iNSTALLATiON <<=======================!#
 echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
-echo -e   "********************************"
+echo -e   "********************************\n"
 
 base_install
 mksslcert

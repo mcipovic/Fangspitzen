@@ -3,7 +3,7 @@ cd ${BASE}/tmp
 	${INSTALL} deluge-common deluge-console deluge-web deluged 2>> ${LOG}
 		E_=$? && debug_error "Deluge failed to install"
 
-	deluged && sleep 1 ; killall deluged
+	sudo -u $USER deluged && sleep 1 ; killall deluged
 	#deluge-web --fork && sleep 1 ; killall deluge-web
 
 	cp ../modules/deluge/deluge-daemon.defaults /etc/default/deluge-daemon  # Copy init config
@@ -11,8 +11,6 @@ cd ${BASE}/tmp
 	echo
 	read -p " WEBUi User Name: "   dUser
 	read -p " WEBUi  Password: "   dPass
-	read -p " Port Range [from]: " dPort1
-	read -p " Port Range [  to]: " dPort2
 
 	echo "$dUser:$dPass:10" >> $HOME/.config/deluge/auth
 	sed -i "s:DELUGED_USER=:DELUGED_USER=\"$USER\":" /etc/default/deluge-daemon  # Put UserName in script
@@ -35,10 +33,12 @@ cd ${BASE}/tmp
 	sed -i "s,\"allow_remote\": .*,\"allow_remote\": \"true\"," $deluge_conf
 	sed -i "s,\"dht\": .*,\"dht\": \"false\","                  $deluge_conf
 
-	sed -i "s:6881,:$dPort1,:" $deluge_conf
-	sed -i "s:6891,:$dPort2:"  $deluge_conf
+	NUMBER=$[($RANDOM % 65534) + 20000]  # Generate a random number from 20000-65534
+	sed -i "s:6881,:$NUMBER,:" $deluge_conf
+	sed -i "s:6891,:$NUMBER:"  $deluge_conf
 
-	deluged && deluge-web
+	sudo -u $USER deluged deluged
+	sudo -u $USER deluged deluge-web
 
 	log "Deluge Config | Created"
 	log "Deluge WebUi listening on Port 8112"

@@ -183,7 +183,7 @@ init() {
 	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
 	$UPDATE
 	echo -e "[${bldylw} done ${rst}]"
-	sleep 2
+	sleep 1
 }
 
 ##[ VARiABLE iNiT ]##

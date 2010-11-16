@@ -1,89 +1,73 @@
 #!/usr/bin/env bash
 
-ARCH RTORRENT INSTALL
+pacman -Syu --noconfirm base-devel fakeroot #update core install base
 
-!install francharc repo and sys upgrade install yaourt
-!add to the end of /etc/pacman.conf
+#add yaourt
+echo "[archlinuxfr]" >> /etc/pacman.conf
+echo 'Server = http://repo.archlinux.fr/$arch' >> /etc/pacman.conf
 
-[archlinuxfr] 
-Server = http://repo.archlinux.fr/$arch
+pacman -Syu --noconfirm yaourt
 
-pacman -Syu yaourt
+#install abs
+pacman -Syu --noconfirm abs
 
-!install rtorrent and apache as of https://wiki.archlinux.org/index.php/Rtgui saves compiling right?
+sed -i 's:REPO=(core extra community testing community-testing):REPO=(core extra community !testing !community-testing):' /etc/abs.conf
 
-pacman -S rtorrent apache php php-apache
+abs #update abs
 
-!install mod_scgi
+#install apache and others
 
-yaourt -S mod_scgi
+pacman -S --noconfirm apache php php-apache
 
-CONFIGUATION APACHE PHP
+#grab rtorrent and depends PKGBUILD
 
-!base for apache configs is /etc/httpd/conf/httpd.conf
+mkdir $HOME/abs
 
-!we add as lines 121, 122
+yaourt -G mod_scgi
 
-LoadModule php5_module modules/libphp5.so
-LoadModule scgi_module modules/mod_scgi.so
+mv $HOME/mod-scgi                   $HOME/abs/
+cp -r /var/abs/community/rtorrent   $HOME/abs/ 
+cp -r /var/abs/community/libtorrent $HOME/abs/
+cp -r /var/abs/community/xmlrpc-c   $HOME/abs/
 
-!change line 173 from DocumentRoot "/src/http" to read
+chown -R $USER:$USER rtorrent libtorrent xmlrpc-c
 
-DocumentRoot "/var/www"
+#make xmlrpc-c
+cd xmlrpc-c && makepkg -s
+pacman -U *tar.xz
 
-!Change line 200 from <Directory "/src/http">
+#make libtorrent
+cd ../libtorrent && makepkg -s 
+pacman -U *tar.xz
 
-<Directory "/var/www">
+#make rtorrent
+cd ../rtorrent && makepkg -s
+pacman -U *tar.xz
 
-//just to localise the rutorrent scripts
+#make mod_scgi
+cd ../mod_scgi && makepkg -s
+pacman -U *tar.xz 
 
-!add as lines 468, 469
+echo "Client installed!"
+cd $BASE
 
-# PHP Config
-Include conf/extra/php5_module.conf
+#add http to daemons
+sed -i 's:DAEMONS=(syslog-ng network netfs crond):DAEMONS=(syslog-ng network netfs crond httpd):' /etc/rc.conf
 
-!add SCGIMount to the end
+#if that works WOW!
+#make some changes to httpd.conf
 
-SCGIMount /RPC2 127.0.0.1:5000
+sed -i 's:DocumentRoot .*:DocumentRoot "/var/www"' /etc/httpd/conf/httpd.conf
+sed -i 's:<Directory .*:<Directory "/var/www">'   /etc/httpd/conf/httpd.conf
 
-//line 483 in my conf
+echo -e "LoadModule php5_module modules/libphp5.so\nLoadModule scgi_module modules/mod_scgi.so" >> /etc/httpd/conf/httpd.conf
+echo "Include conf/extra/php5_module.conf" >> /etc/httpd/conf/httpd.conf
+echo "SCGIMount /rutorrent/master 127.0.0.1:5000" >> /etc/httpd/conf/httpd.conf
 
-!php conf in /etc/php/php.ini
-!add to line 379 /var/www/
-!so it reads as
+sed -i 's|open_basedir = .*|open_basedir = /srv/http/:/home/:/tmp/:/usr/share/pear/:/var/www/|' /etc/php/php.ini
 
-open_basedir = /srv/http/:/home/:/tmp/:/usr/share/pear/:/var/www/
+#that will need some looking into!!
 
-!change line 890 from  allow_url_fopen = Off to read
-
-allow_url_fopen = On
-
-!remove the ; from lines 974, 981
-
-;extension=sockets.so
-;extension=xmlrpc.so
-
-//read as before changes
-
-!restart apche
-
-/etc/rc.d/httpd restart
-
-!install rutorrent from he is the same as before.
-
-ADDING HTTPD TO DAEMONS
-!this can be done in /etc/rc.conf
-!line 97 newly installed deamon line reads
-
-DAEMONS=(syslog-ng network netfs crond)
-
-!mine reads just need to add httpd before the )
-
-DAEMONS=(syslog-ng dbus hal network netfs crond alsa gdm httpd)
-
-//add to daemons to load at boot
-
-
-LEGAND
-! = subtitles
-// = little comments
+sed -i 's:allow_url_fopen .*:allow_url_fopen = On:'   /etc/php/php.ini
+sed -i 's:extension=sockets.so:extension=sockets.so:' /etc/php/php.ini
+sed -i 's:extension=xmlrpc.so:extension=xmlrpc.so:'   /etc/php/php.ini

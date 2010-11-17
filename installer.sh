@@ -393,12 +393,11 @@ if [[ $vnstat = 'y' ]]; then
 	sed -i "s:SaveInterval 5:SaveInterval 10:"      /etc/vnstat.conf  # Less saves to disk
 	sed -i "s:UseLogging 2:UseLogging 1:"           /etc/vnstat.conf  # Log to file instead of syslog
 
-	rm -rf vnstat-web/themes/espresso vnstat-web/themes/light vnstat-web/themes/red    # Remove extra themes
-	rm -rf vnstat-web/COPYING vnstat-web/vera_copyright.txt vnstat-web/config.php      # Remove extra files
-	rm vnstat-web/config.php  # Remove and replace
-	cp ../modules/vnstat/config.php vnstat-web
+	rm -rf vnstat-web/themes/espresso vnstat-web/themes/light vnstat-web/themes/red  # Remove extra themes
+	rm -f vnstat-web/COPYING vnstat-web/vera_copyright.txt vnstat-web/config.php     # Remove extra files
 
-	sed -i "s:\$iface_list = .*:\$iface_list = array('$iFACE');:" vnstat-web/config.php  # Edit web config
+	cp ../modules/vnstat/config.php vnstat-web
+	sed -i "s|\$iface_list = .*|\$iface_list = array('$iFACE');|" vnstat-web/config.php  # Edit web config
 
 	mv vnstat-web $WEB  # Copy VnStat-web to WebRoot
 		 log "Frontend Installed | http://${iP}/vnstat-web"

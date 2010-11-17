@@ -308,7 +308,7 @@ if [[ $bnc = 'znc' ]]; then
 		debug_wait "znc.compiled"
 	make install
 		log "ZNC Installation | Completed"
-	notice "Starting znc for first time... ${rst}"
+	notice "Starting znc for first time ${rst}"
 	cd $HOME
 	sudo -u $USER znc --makeconf	
 
@@ -324,7 +324,7 @@ elif [[ $bnc = 'sbnc' ]]; then
 	cd shroudbnc
 	sudo -u $USER sh autogen.sh
 	sudo -u $USER sh configure
-	sudo -u $USER compile
+	sudo -u $USER make -j$CORES
 		debug_error "ShroudBNC Build Failed"
 		log "ShroudBNC Compile | Completed in $compile_time seconds"
 	sudo -u $USER make install
@@ -346,7 +346,7 @@ elif [[ $bnc = 'psybnc' ]]; then
 
 	cd psybnc
 	sudo -u $USER make menuconfig
-	sudo -u $USER compile
+	sudo -u $USER make -j$CORES
 		debug_error "PsyBNC Build Failed"
 		log "PsyBNC Compile | Completed in $compile_time seconds"
 	log "PsyBNC Installation | Completed"
@@ -365,7 +365,7 @@ fi
 
 ##[ vnStat ]##
 cd $BASE/tmp
-if [[ ${vnstat} = 'y' ]]; then
+if [[ $vnstat = 'y' ]]; then
 	notice "iNSTALLiNG VNSTAT"
 	$INSTALL libgd2-xpm libgd2-xpm-dev 2>> $LOG
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
@@ -380,10 +380,9 @@ if [[ ${vnstat} = 'y' ]]; then
 	cd ..
 
 	if [[ ! -f /etc/init.d/vnstat ]]; then
-		cp ../modules/vnstat/vnstat-debian.init /etc/init.d/vnstat        # Copy init script if one doesnt exist
+		cp vnstat-1.10/examples/init.d/debian/vnstat /etc/init.d/         # Copy init script if one doesnt exist
 		chmod a+x /etc/init.d/vnstat && update-rc.d vnstat defaults       # Start at boot
 		log "VnStat | Created Init Script"
-		debug_wait "vnstat.init.copied"
 	else log "VnStat | Previous Init Script Found, skipping..."
 	fi
 
@@ -394,31 +393,30 @@ if [[ ${vnstat} = 'y' ]]; then
 	sed -i "s:SaveInterval 5:SaveInterval 10:"      /etc/vnstat.conf  # Less saves to disk
 	sed -i "s:UseLogging 2:UseLogging 1:"           /etc/vnstat.conf  # Log to file instead of syslog
 
+	rm -rf vnstat-web/themes/espresso vnstat-web/themes/light vnstat-web/themes/red    # Remove extra themes
+	rm -rf vnstat-web/COPYING vnstat-web/vera_copyright.txt vnstat-web/config.php      # Remove extra files
 	rm vnstat-web/config.php  # Remove and replace
 	cp ../modules/vnstat/config.php vnstat-web
 
-	sed -i "s:$iface_list = .*:$iface_list = array('${iFACE}');:" vnstat-web/config.php  # Edit web config
+	sed -i "s:\$iface_list = .*:\$iface_list = array('$iFACE');:" vnstat-web/config.php  # Edit web config
 
-	rm -rf vnstat-web/themes/espresso vnstat-web/themes/light vnstat-web/themes/red      # Remove extra themes
-	rm -rf vnstat-web/COPYING vnstat-web/vera_copyright.txt vnstat-web/config.php        # Remove extra files
-
-	if [[ ! -d ${WEB}/vnstat-web ]]; then
-		mv vnstat-web ${WEB}  # Copy VnStat-web to WebRoot
+	mv vnstat-web $WEB  # Copy VnStat-web to WebRoot
 		 log "Frontend Installed | http://${iP}/vnstat-web"
-	else log "VnStat | Previous vnstat-web Found, skipping..."
-	fi
+
 	if [[ ! $(pidof vnstatd) ]]; then
-		vnstat -u -i ${iFACE}  # Make interface database
-		vnstatd -d             # Start daemon
+		vnstat -u -i $iFACE  # Make interface database
+		vnstatd -d           # Start daemon
 	fi
 	debug_wait "vnstat-web.installed"
 fi
 
-cd $BASE/tmp
+if [[ $torrent = @(rtorrent|tranny|deluge) ]]; then
 echo -e "\n*******************************"
 echo -e   "**${bldred} TORRENT CLiENT iNSTALLiNG ${rst}**"
 echo      "*******************************"
+fi
 
+cd $BASE/tmp
 if [[ $buildtorrent = 'b' ]]; then
 #-->##[ BuildTorrent ]##
 	notice "iNSTALLiNG BuildTorrent"
@@ -462,14 +460,11 @@ fi
 cd $BASE
 ##[ rTorrent ]##
 if [[ $torrent = 'rtorrent' ]]; then source modules/rtorrent/install.sh
-
 ##[ Transmission ]##
 elif [[ $torrent = 'tranny' ]]; then source modules/transmission/install.sh
-
 ##[ Deluge ]##
 elif [[ $torrent = 'deluge' ]]; then source modules/deluge/install.sh
 fi
-
 ##[ ruTorrent ]##
 if [[ $webui = 'y' ]]; then source modules/rutorrent/install.sh ;fi
 
@@ -480,7 +475,7 @@ if [[ $webui = 'y' ]]; then source modules/rutorrent/install.sh ;fi
 
 if [[ $mod_extra = 1 ]]; then source modules/extra/_main.sh ;fi
 
-source ${BASE}/includes/postprocess.sh
+source $BASE/includes/postprocess.sh
 echo -e "\n*******************************"
 echo -e   "******${bldred} SCRiPT COMPLETED! ${rst}******"
 echo -e   "****${bldred} FiNiSHED iN ${bldylw}$SECONDS ${bldred}SECONDS ${rst}**"

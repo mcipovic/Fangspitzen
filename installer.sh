@@ -301,41 +301,40 @@ if [[ $bnc = 'znc' ]]; then
 		log "ZNC | Downloaded + Unpacked"
 	notice "Be aware that compiling znc is a cpu intensive task and may take up to 10 min to complete"
 	sleep 3
-	sh configure
+	sh configure --enable-extra
 	compile
 		debug_error "ZNC Build Failed"
 		log "ZNC Compile | Completed in $compile_time seconds"
 	make install
 		log "ZNC Installation | Completed"
+	notice "Create your config with znc --makeconf"
 	debug_wait "znc.compiled"
 
-#[TODO]#[ sBNC ]##
+##[ sBNC ]##
 elif [[ $bnc = 'sbnc' ]]; then
-	cd $HOME
-	notice "iNSTALLiNG Shroud BNC"
+	cd tmp
+	notice "iNSTALLiNG ShroudBNC"
+	$INSTALL swig 2>> $LOG
 	git clone -q http://github.com/gunnarbeutner/shroudbnc.git
 	git clone -q http://github.com/gunnarbeutner/sBNC-Webinterface.git
-#	git clone -q http://github.com/Kunsi/sBNC-Webinterface.git
-	log "ShroudBNC | Downloaded"
-	notice "ShroudBNC Downloaded to ${HOME}, you still need to compile it"
+	chown -R $USER:$USER shroudbnc sBNC-Webinterface
+		log "ShroudBNC | Downloaded"
+	cd shroudbnc
+	sudo -u $USER sh autogen.sh
+	sudo -u $USER sh configure
+	sudo -u $USER compile
+		debug_error "ShroudBNC Build Failed"
+		log "ShroudBNC Compile | Completed in $compile_time seconds"
+	sudo -u $USER make install
 
-#	cd shroudbnc
-#	sh configure
-#	compile
-#		debug_error "ShroudBNC Build Failed" ; debug_wait
-#		log "ShroudBNC Compile | Completed in $compile_time seconds"
-#	make install
-#		log "ShroudBNC Installation | Completed"
+	notice "Starting sbnc for first time... ${rst}"
+	cd $HOME/sbnc
+	sh sbnc
+	log "ShroudBNC Installation | Completed"
 
-#echo -e "${bldred} \a\nStarting sbnc...Please answer a few questions ${rst}\n"
-#debug_wait
-#sbnc  # Run to create config
-#echo -e "${bldred} EDiT ~/sbnc/sbnc.conf ${rst}\n"
-#	log "--- EDiT ~/sbnc/sbnc.conf"
-
-#TODO#[ psyBNC ]##
+##[ psyBNC ]##
 elif [[ $bnc = 'psybnc' ]]; then
-	cd ${HOME}
+	cd $HOME
 	notice "iNSTALLiNG PsyBNC"
 	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz
 		debug_error "PsyBNC Download Failed"
@@ -354,14 +353,9 @@ elif [[ $bnc = 'psybnc' ]]; then
 		touch $PSY_CONF        # Create new empty conf
 	fi
 
-	# Set psybnc port
-	read -p "Please enter a unique port number for psybnc: " PSY_PORT  
-	echo "PSYBNC.SYSTEM.PORT1=$PSY_PORT" >> $PSY_CONF  # Write to conf
-	echo "PSYBNC.SYSTEM.HOST1=*"         >> $PSY_CONF
-	echo "PSYBNC.HOSTALLOWS.ENTRY0=*;*"  >> $PSY_CONF
-
-	#./psybnc $PSY_CONF  # Run
+	chown -R $USER:$USER ../psybnc
 	log "PsyBNC Installation | Completed"
+	notice "Installed to ~/psybnc"
 fi
 
 ##[ WebMiN ]##

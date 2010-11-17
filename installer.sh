@@ -305,10 +305,12 @@ if [[ $bnc = 'znc' ]]; then
 	compile
 		debug_error "ZNC Build Failed"
 		log "ZNC Compile | Completed in $compile_time seconds"
+		debug_wait "znc.compiled"
 	make install
 		log "ZNC Installation | Completed"
-	notice "Create your config with znc --makeconf"
-	debug_wait "znc.compiled"
+	notice "Starting znc for first time... ${rst}"
+	cd $HOME
+	sudo -u $USER znc --makeconf	
 
 ##[ sBNC ]##
 elif [[ $bnc = 'sbnc' ]]; then
@@ -338,22 +340,15 @@ elif [[ $bnc = 'psybnc' ]]; then
 	notice "iNSTALLiNG PsyBNC"
 	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz
 		debug_error "PsyBNC Download Failed"
-	tar -xzf psyBNC-2.3.2-10.tar.gz && cd psybnc  # Unpack
+	tar xzf psyBNC-2.3.2-10.tar.gz
+	chown -R $USER:$USER psybnc
 		log "PsyBNC | Downloaded + Unpacked"
-	make menuconfig
-	compile
+
+	cd psybnc
+	sudo -u $USER make menuconfig
+	sudo -u $USER compile
 		debug_error "PsyBNC Build Failed"
 		log "PsyBNC Compile | Completed in $compile_time seconds"
-		debug_wait "psybnc.compiled"
-
-	PSY_CONF=psybnc.conf
-	PSY_OLD=psybnc.conf.old
-	if [[ -e $PSY_CONF ]]; then
-		mv $PSY_CONF $PSY_OLD  # Backup old conf
-		touch $PSY_CONF        # Create new empty conf
-	fi
-
-	chown -R $USER:$USER ../psybnc
 	log "PsyBNC Installation | Completed"
 	notice "Installed to ~/psybnc"
 fi

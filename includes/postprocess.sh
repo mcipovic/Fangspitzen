@@ -1,7 +1,7 @@
 ##!===================>> Post Processing <<======================!##
-echo -e "\n********************************"
-echo -e   "****${bldred} PROCESSiNG AND CLEANUP ${rst}****"
-echo -e   "********************************\n"
+echo -e "\n*******************************"
+echo -e   "***${bldred} PROCESSiNG AND CLEANUP ${rst}****"
+echo -e   "*******************************\n"
 
 if [[ -f /etc/ssh/sshd_config ]]; then
 	sed -i 's:PermitRootLogin yes:PermitRootLogin no:' /etc/ssh/sshd_config

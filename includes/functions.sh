@@ -146,14 +146,14 @@ usage() {  # help screen
 
 yes() {  # user input for yes or no
 	while read line; do
-		case ${line} in
-			y|Y|Yes|YES|yes|yES|yEs|YeS|yeS) return 0
-			;;
-			n|N|No|NO|no|nO) return 1
-			;;
-			*) echo -n " Please enter ${undrln}y${rst} or ${undrln}y${rst}: "
-			;;
-		esac
+	case $line in
+		y|Y|Yes|YES|yes|yES|yEs|YeS|yeS) return 0
+		;;
+		n|N|No|NO|no|nO) return 1
+		;;
+		*) echo -n " Please enter ${undrln}y${rst} or ${undrln}y${rst}: "
+		;;
+	esac
 	done
 }
 

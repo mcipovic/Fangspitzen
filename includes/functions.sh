@@ -158,6 +158,7 @@ yes() {  # user input for yes or no
 }
 
 init() {
+	clear
 	echo -n ">>> iNiTiALiZiNG......"
 
 	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(arch)

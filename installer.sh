@@ -38,6 +38,8 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
+checkroot
+
 ##[ Find Config and Load it ]##
 if [[ -f config.ini ]]; then
 	source config.ini ; E_=$?
@@ -46,14 +48,13 @@ if [[ -f config.ini ]]; then
 	elif [[ $iDiDNTEDiTMYCONFiG ]]; then  # Die if it hasnt been edited
 		error "PLEASE EDiT THE CONFiG"
 	elif [[ $PWD != $BASE ]]; then  # Check if the user declared BASE correctly in the config
-		echo -e "-->${bldred} Fatal Error: Wrong Directory Detected. ${rst}"
-		echo -e "-->${bldred} Does not match $BASE ${rst}"
-		exit 1
+		echo "Wrong Directory Detected..."
+		error "Does not match $BASE"
 	fi
-	clear
-	checkroot ; init  # If user is root lets begin
 else error "config.ini not found!"  # Cant continue without a config so produce an error and exit
 fi
+
+init
 
 #[ TODO Dialog Support ]##
 # if ! which dialog >/dev/null; then

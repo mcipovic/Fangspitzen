@@ -410,6 +410,25 @@ if [[ $vnstat = 'y' ]]; then
 	debug_wait "vnstat-web.installed"
 fi
 
+if [[ $phpsysinfo = 'y' ]]; then
+	notice "iNSTALLiNG phpSysInfo"
+	#checkout https://phpsysinfo.svn.sourceforge.net/svnroot/phpsysinfo/trunk phpsysinfo
+	download http://downloads.sourceforge.net/project/phpsysinfo/phpsysinfo/3.0.7/phpsysinfo-3.0.7.tar.gz
+	tar xzf phpsysinfo-3.0.7.tar.gz
+	cd phpsysinfo
+	rm ChangeLog COPYING README README_PLUGIN 
+	cp config.php.new config.php
+
+	sed -i "s:define('PSI_PLUGINS'.*:define('PSI_PLUGINS', 'MDStatus,PS,PSStatus,Quotas,SMART');:"  config.php
+	sed -i "s:define('PSI_TEMP_FORMAT'.*:define('PSI_TEMP_FORMAT', 'c-f');:"                        config.php
+	sed -i "s:define('PSI_HDD_TEMP'.*:define('PSI_HDD_TEMP', 'command');:"                          config.php
+	sed -i "s:define('PSI_DEFAULT_TEMPLATE',.*);:define('PSI_DEFAULT_TEMPLATE', 'nextgen');:"       config.php
+
+	cd ..
+	mv phpsysinfo $WEB 
+	log "phpSysInfo Installed"
+fi
+
 if [[ $torrent = @(rtorrent|tranny|deluge) ]]; then
 echo -e "\n*******************************"
 echo -e   "**${bldred} TORRENT CLiENT iNSTALLiNG ${rst}**"
@@ -472,8 +491,6 @@ if [[ $webui = 'y' ]]; then source modules/rutorrent/install.sh ;fi
 #if [[ ${utorrent} = 'y' ]]; then
 #	source modules/utorrent/install.sh
 #fi
-
-if [[ $mod_extra = 1 ]]; then source modules/extra/_main.sh ;fi
 
 source $BASE/includes/postprocess.sh
 echo -e "\n*******************************"

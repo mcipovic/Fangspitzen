@@ -1,5 +1,5 @@
 ##!=======================>> QUESTiONS <<========================!##
-while [[ ${skip} = false ]]; do
+while [[ $skip = false ]]; do
 echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<---------------${rst}"
 
 read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: " http
@@ -24,6 +24,11 @@ read -p " [WebMiN]                                    [y|n]: " webmin
 else webmin='i';fi
 read -p " [VnStat WebUi]                              [y|n]: " vnstat
 
+##!=========================>> EXTRAS <<=========================!##
+if [[ $extras = true ]]; then
+read -p " [phpSysInfo]                                [y|n]: " phpsysinfo
+fi
+
 
 #!=====================>> CONFIRMATION <<=======================!#
 if [[ $http = 'lighttpd' ]]; then $http='lighttp' ;fi 
@@ -35,15 +40,15 @@ echo -e   "*******************************\n"
 if [[ $http = 'apache' ]]; then
 	v1=$(aptitude show apache2 | grep Version)  # Returns Version number
 	v2=$(aptitude show apache2 | grep Package)  # Returns Package name
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $http = 'lighttp' ]]; then
 	v1=$(aptitude show lighttpd | grep Version)
 	v2=$(aptitude show lighttpd | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $http = 'cherokee' ]]; then
 	v1=$(aptitude show cherokee | grep Version)
 	v2=$(aptitude show cherokee | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $http = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} WEB SERVER NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN HTTP iNPUT! ${rst}"; http='none'
@@ -53,15 +58,15 @@ fi
 if [[ $sql = 'mysql' ]]; then
 	v1=$(aptitude show mysql-server | grep Version)
 	v2=$(aptitude show mysql-server | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $sql = 'sqlite' ]]; then
 	v1=$(aptitude show sqlite3 | grep Version)
 	v2=$(aptitude show sqlite3 | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $sql = 'postgre' ]]; then
 	v1=$(aptitude show postgresql | grep Version)
 	v2=$(aptitude show postgresql | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $sql = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} SQL SERVER NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN SQL iNPUT! ${rst}"; sql='none'
@@ -71,15 +76,15 @@ fi
 if [[ $ftpd = 'vsftp' ]]; then
 	v1=$(aptitude show vsftpd | grep Version)
 	v2=$(aptitude show vsftpd | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}";
+	echo -e "${bldblu} $v2 : $v1 ${rst}";
 elif [[ $ftpd = 'proftp' ]]; then
 	v1=$(aptitude show proftpd-basic | grep Version)
 	v2=$(aptitude show proftpd-basic | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $ftpd = 'pureftp' ]]; then
 	v1=$(aptitude show pure-ftpd | grep Version)
 	v2=$(aptitude show pure-ftpd | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $ftpd = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} FTP SERVER NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN FTP iNPUT! ${rst}"; ftpd='none'
@@ -103,7 +108,7 @@ elif [[ $torrent = 'tranny' ]]; then
 	else
 		v1=$(aptitude show transmission-daemon | grep Version)
 		v2=$(aptitude show transmission-daemon | grep Package)
-		echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+		echo -e "${bldblu} $v2 : $v1 ${rst}"
 	fi
 elif [[ $torrent = 'deluge' ]]; then
 	if [[ ${NAME} = 'lenny' ]]; then
@@ -112,7 +117,7 @@ elif [[ $torrent = 'deluge' ]]; then
 	else
 		v1=$(aptitude show deluge | grep Version)
 		v2=$(aptitude show deluge | grep Package)
-		echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+		echo -e "${bldblu} $v2 : $v1 ${rst}"
 	fi
 elif [[ $torrent = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} TORRENT CLiENT NOT BEiNG iNSTALLED ${rst}"
@@ -151,9 +156,7 @@ fi
 if [[ $webmin = 'y' ]]; then
 	v1=$(aptitude show webmin | grep Version)
 	v2=$(aptitude show webmin | grep Package)
-	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
-elif [[ $webmin = 'i' ]]; then
-	echo -e "${bldylw} WEBMiN iS ALREADY iNSTALLED ${rst}"
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $webmin = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} WEBMiN NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN WEBMiN iNPUT! ${rst}"; webmin='n'
@@ -165,6 +168,14 @@ if [[ $vnstat = 'y' ]]; then
 elif [[ $vnstat = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} VNSTAT NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN VNSTAT iNPUT! ${rst}"; vnstat='n'
+fi
+
+##[ Check for phpSysInfo ]##
+if [[ $phpsysinfo = 'y' ]]; then
+	echo -e "${bldblu} Package: phpSysInfo : Version: 3.1~svn ${rst}"
+elif [[ $phpsysinfo = @(none|no|[Nn]) ]]; then
+	echo -e "${bldylw} phpSysInfo NOT BEiNG iNSTALLED ${rst}"
+else echo -e "${bldred}--> ERROR iN phpSysInfo iNPUT! ${rst}"; phpsysinfo='n'
 fi
 
 ##[ CONFiRMATiON ]##

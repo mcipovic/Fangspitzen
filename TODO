@@ -2,9 +2,8 @@ Legend:
          ? = unsure
          + = in progress
 
-[+] Finish Cherokee Config
-[?] Finish ShroudBNC install
-[ ] Test Transission
+[?] Finish Cherokee Config
+[+] Test Transission
 [ ] Test Deluge
 [ ] Test iplist
 
@@ -15,7 +14,7 @@ Legend:
 [ ] add request: headless virtualbox
 [ ] add request: virtualbox webui http://code.google.com/p/phpvirtualbox
 [?] setup a reverse proxy frontend for our webserver
-[ ] implement dialog
+[+] implement dialog
 
 [+] MultiUser (priority)
 [+] User Add|Edit|Del functions (priority)

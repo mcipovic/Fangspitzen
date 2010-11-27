@@ -46,9 +46,11 @@ elif [[ $http = 'lighttp' ]]; then
 	v2=$(aptitude show lighttpd | grep Package)
 	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $http = 'cherokee' ]]; then
-	v1=$(aptitude show cherokee | grep Version)
-	v2=$(aptitude show cherokee | grep Package)
-	echo -e "${bldblu} $v2 : $v1 ${rst}"
+	#v1=$(aptitude show cherokee | grep Version)
+	#v2=$(aptitude show cherokee | grep Package)
+	#echo -e "${bldblu} $v2 : $v1 ${rst}"
+	echo -e "${bldred} [TODO] ${rst}"
+	http='none'
 elif [[ $http = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} WEB SERVER NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN HTTP iNPUT! ${rst}"; http='none'

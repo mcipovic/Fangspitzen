@@ -18,7 +18,7 @@ trap ctrl_c SIGINT
 
 ##################################################################
 VERSION='0.9.9~svn'                                              #
-DATE='Oct 22 2010'                                               #
+DATE='Nov 24 2010'                                               #
 ##################################################################
 source includes/functions.sh  # Source in our functions
 
@@ -55,15 +55,6 @@ else error "config.ini not found!"  # Cant continue without a config so produce 
 fi
 
 init
-
-#[ TODO Dialog Support ]##
-# if ! which dialog >/dev/null; then
-# 	 echo -n ">>> Installing Dialog Module..."
-# 	 $INSTALL dialog 2>> $LOG
-#	 echo -e "[${bldylw} done ${rst}]"
-# elif which dialog >/dev/null; then
-#	 echo -e "[${bldylw} done ${rst}]"
-# fi
 
 #!=======================>> DiSCLAiMER <<=======================!#
 if [[ ! -f $LOG ]]; then  # only show for first run

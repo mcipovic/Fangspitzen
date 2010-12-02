@@ -22,6 +22,8 @@ fi
 		elif [[ $NAME = 'lenny' ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar0 2>> $LOG ; E_=$?
 		fi
+	elif [[ $DISTRO = 'Arch' ]]; then
+			$INSTALL base-devel fakeroot yaourt php 2>> $LOG ; E_=$?
 	fi
 
 	debug_error "Required system packages failed to install"
@@ -174,10 +176,10 @@ elif [ $OS = "Linux" ] ; then
 		error "TODO - REDHAT"
 	elif [ -f /etc/arch-release ]; then
 		#error "See ARCH folder"
-		REPO_PATH=/etc/pacman.d/mirror.list
-		UPDATE='pacman -Sy'
-		UPGRADE='pacman -Syu'
-		INSTALL='pacman -S'
+		REPO_PATH=/etc/pacman.conf
+		UPDATE='pacman --sync --refresh --noconfirm'
+		UPGRADE='pacman --sync --refresh --sysupgrade --noconfirm'
+		INSTALL='pacman --sync --noconfirm'
 	elif [ -f /etc/etc/fedora-release ]; then
 		error "TODO - Fedora"
 	elif [ -f /etc/gentoo-release ]; then

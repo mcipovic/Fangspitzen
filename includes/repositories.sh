@@ -3,7 +3,7 @@ echo -e "\n********************************"
 echo -e   "*****${bldred} ADDiNG REPOSiTORiES  ${rst}*****"
 echo -e   "********************************\n"
 
-if [[ ${DISTRO} = 'Ubuntu' ]]; then
+if [[ $DISTRO = 'Ubuntu' ]]; then
 	echo "deb http://archive.ubuntu.com/ubuntu/ $NAME multiverse"                > $REPO_PATH/multiverse.list  # non-free
 	echo "deb-src http://archive.ubuntu.com/ubuntu/ $NAME multiverse"           >> $REPO_PATH/multiverse.list  # non-free
 	echo "deb http://archive.ubuntu.com/ubuntu/ $NAME-updates multiverse"       >> $REPO_PATH/multiverse.list  # non-free
@@ -41,10 +41,15 @@ elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
 	echo "deb http://download.webmin.com/download/repository sarge contrib"       >> $REPO_PATH/autoinstaller.list  # Webmin
 	log "Repositories ADD | Success"
 
+elif [[ $DISTRO = 'Arch' ]]; then
+	echo '[archlinuxfr]'                           >> $REPO_PATH
+	echo 'Server = http://repo.archlinux.fr/$arch' >> $REPO_PATH
 else
-	debug_error "${txtred} Failed to add repositories to unknown distro... exiting ${rst}"
+	debug_error "${txtred} Failed to add repositories to unknown distro ($DISTRO) ...exiting ${rst}"
 fi
 
+##!=====================>> PUBLiC KEYS <<========================!##
+if [[ $DISTRO = 'Ubuntu' || $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
 	addkey='apt-key adv --keyserver keyserver.ubuntu.com --recv-keys'  # Add signing keys
 	$addkey EBA7BD49
 	$addkey 5A43ED73
@@ -53,6 +58,7 @@ fi
 	$addkey 108B243F
 	$addkey 4BB9F05F
 	download http://www.webmin.com/jcameron-key.asc && apt-key add jcameron-key.asc && rm jcameron-key.asc
+fi
 
 	$UPDATE
 	log "Repositories Added and Updated"

@@ -18,7 +18,7 @@ trap ctrl_c SIGINT
 
 ##################################################################
 VERSION='0.9.9~svn'                                              #
-DATE='Nov 24 2010'                                               #
+DATE='Dec 01 2010'                                               #
 ##################################################################
 source includes/functions.sh  # Source in our functions
 

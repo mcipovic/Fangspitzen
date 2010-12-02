@@ -21,7 +21,7 @@ echo -e "\n       **** [ Extra Options ] ****"
 read -p " [iRC Bouncer]              [znc|psybnc|sbnc|none]: " bnc
 if [[ ! -d /usr/share/webmin ]]; then
 read -p " [WebMiN]                                    [y|n]: " webmin
-else webmin='i';fi
+else webmin='n';fi
 read -p " [VnStat WebUi]                              [y|n]: " vnstat
 
 ##!=========================>> EXTRAS <<=========================!##
@@ -46,10 +46,9 @@ elif [[ $http = 'lighttp' ]]; then
 	v2=$(aptitude show lighttpd | grep Package)
 	echo -e "${bldblu} $v2 : $v1 ${rst}"
 elif [[ $http = 'cherokee' ]]; then
-	#v1=$(aptitude show cherokee | grep Version)
-	#v2=$(aptitude show cherokee | grep Package)
-	#echo -e "${bldblu} $v2 : $v1 ${rst}"
-	echo -e "${bldred} [TODO] ${rst}"
+	v1=$(aptitude show cherokee | grep Version)
+	v2=$(aptitude show cherokee | grep Package)
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
 	http='none'
 elif [[ $http = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} WEB SERVER NOT BEiNG iNSTALLED ${rst}"

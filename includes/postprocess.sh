@@ -16,6 +16,8 @@ if [[ $http = 'apache' ]]; then
 	/etc/init.d/apache2 restart
 elif [[ $http = 'lighttp' ]]; then
 	/etc/init.d/lighttpd restart
+elif [[ $http = 'cherokee' ]]; then
+	notice "Run sudo cherokee-admin -b to configure Cherokee."
 fi
 
 if [[ $sql = 'mysql' ]]; then

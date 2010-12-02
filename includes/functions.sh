@@ -172,19 +172,28 @@ elif [ $OS = "Linux" ] ; then
 	# TODO
 	if [ -f /etc/redhat-release ]; then  # check this first, some non rpm distro's include it
 		error "TODO - REDHAT"
-	#	elif [ -f /etc/arch-release ]; then
-	#	elif [ -f /etc/etc/fedora-release ]; then
-	#	elif [ -f /etc/gentoo-release ]; then
-	#	elif [ -f /etc/slackware-version ]; then
-	#	elif [ -f /etc/SuSE-release ]; then
+	elif [ -f /etc/arch-release ]; then
+		#error "See ARCH folder"
+		REPO_PATH=/etc/pacman.d/mirror.list
+		UPDATE='pacman -Sy'
+		UPGRADE='pacman -Syu'
+		INSTALL='pacman -S'
+	elif [ -f /etc/etc/fedora-release ]; then
+		error "TODO - Fedora"
+	elif [ -f /etc/gentoo-release ]; then
+		error "TODO - Gentoo"
+	elif [ -f /etc/slackware-version ]; then
+		error "TODO - Slackware"
+	elif [ -f /etc/SuSE-release ]; then
+		error "TODO - OpenSUSE"
 
 	else  # we are going to assume a deb based system
 		REPO_PATH=/etc/apt/sources.list.d/
 		UPDATE='apt-get update -qq'
 		UPGRADE='apt-get upgrade --yes -qq'
 		INSTALL='apt-get install --yes -qq'
-		$UPDATE  # refresh our package list
-		if ! which axel >/dev/null; then  # install axel and lsb-release
+
+		if ! which axel >/dev/null; then  # install axel and lsb-release (debian doesnt package it)
 			$INSTALL axel lsb-release
 		fi
 		# Distributor -i > Ubuntu  > Debian  > Debian   > LinuxMint     > Arch  (DISTRO)
@@ -205,6 +214,7 @@ elif [ $OS = "Linux" ] ; then
 	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
 
 fi
+	$UPDATE  # refresh our package list
 	echo -e "[${bldylw} done ${rst}]" ; sleep 1
 }
 

@@ -27,7 +27,8 @@ elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
 		echo "deb http://ftp.debian.org/debian/ squeeze main non-free contrib"       >> /etc/apt/sources.list
 		echo "deb http://security.debian.org/ squeeze/updates main non-free contrib" >> /etc/apt/sources.list
 		echo "deb http://ppa.launchpad.net/stbuehler/ppa/ubuntu jaunty main"         >> $REPO_PATH/autoinstaller.list  # Lighttp
-	elif [[ $NAME = 'squeeze' || $NAME = 'debian' ]]; then  # 'debian' is used for mint debian releases
+	#elif [[ $NAME = 'squeeze' || $NAME = 'debian' ]]; then  # 'debian' is used for mint debian releases
+	else
 		echo "deb http://ftp.debian.org/debian/ squeeze non-free contrib"            >> /etc/apt/sources.list
 		echo "deb http://security.debian.org/ squeeze/updates non-free contrib"      >> /etc/apt/sources.list
 	fi

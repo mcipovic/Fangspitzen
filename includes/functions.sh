@@ -1,5 +1,5 @@
 ##!=======================>> FUNCTiONS <<=======================!##
-base_install() {  #[TODO] find a better way to do this
+base_install() {  # install dependencies
 
 STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gamin gcc git-core gzip hddtemp htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion unrar unzip zip"
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libexpat1 libncurses5 libncurses5-dev libsigc++-2.0-dev libxml2"
@@ -160,42 +160,57 @@ yes() {  # user input for yes or no
 init() {
 	clear
 	echo -n ">>> iNiTiALiZiNG......"
+	OS=$(uname -s)
 
-	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(arch)
-	# Distributor -i  > Ubuntu  > Debian  > Debian  > LinuxMint  > Arch  (DISTRO)
-	# Release     -r  > 10.04   > 5.0.6   > testing > 1          > n/a   (RELASE)
-	# Codename    -c  > lucid   > lenny   > squeeze > debian     > n/a   (NAME)
+##[ Determine OS ]##
+if [ $OS = "SunOS" ] ; then
+	OS='Solaris'
+	ARCH=$(uname -p)
+	error "Solaris is not supported"
+
+elif [ $OS = "Linux" ] ; then
+	# TODO
+	if [ -f /etc/redhat-release ]; then  # check this first, some non rpm distro's include it
+		error "TODO - REDHAT"
+	#	elif [ -f /etc/arch-release ]; then
+	#	elif [ -f /etc/etc/fedora-release ]; then
+	#	elif [ -f /etc/gentoo-release ]; then
+	#	elif [ -f /etc/slackware-version ]; then
+	#	elif [ -f /etc/SuSE-release ]; then
+
+	else  # we are going to assume a deb based system
+		REPO_PATH=/etc/apt/sources.list.d/
+		UPDATE='apt-get update -qq'
+		UPGRADE='apt-get upgrade --yes -qq'
+		INSTALL='apt-get install --yes -qq'
+		$UPDATE  # refresh our package list
+		if ! which axel >/dev/null; then  # install axel and lsb-release
+			$INSTALL axel lsb-release
+		fi
+		# Distributor -i > Ubuntu  > Debian  > Debian   > LinuxMint     > Arch  (DISTRO)
+		# Release     -r > 10.04   > 5.0.6   > testing  > 1|10          > n/a   (RELASE)
+		# Codename    -c > lucid   > lenny   > squeeze  > debian|julia  > n/a   (NAME)
+		readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(uname -m) KERNEL=$(uname -r)
+	fi
 
 	##[ Create folders if not already created ]##
 	mkdir --parents tmp/
 	mkdir --parents logs/
 
-	##[ Install axel and apt-fast ]##
-	if ! which axel >/dev/null; then
-		$INSTALL axel lsb-release
-		download http://www.mattparnell.com/linux/apt-fast/apt-fast.sh
-		mv apt-fast.sh /usr/bin/apt-fast && chmod +x /usr/bin/apt-fast
-	fi
-
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
 	iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
-	if ! [[ ${iP} = *.*.* ]]; then
+	if ! [[ $iP = *.*.* ]]; then
 		error "Unable to find ip from outside"
 	fi
-
 	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
-	$UPDATE
-	echo -e "[${bldylw} done ${rst}]"
-	sleep 1
+
+fi
+	echo -e "[${bldylw} done ${rst}]" ; sleep 1
 }
 
 ##[ VARiABLE iNiT ]##
 CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLCERT=/usr/share/ssl-cert/ssleay.cnf
-REPO_PATH=/etc/apt/sources.list.d/
-UPDATE='apt-get update -qq'
-UPGRADE='apt-get upgrade --yes -qq'
-INSTALL='apt-get install --yes -qq'
 LOG='logs/installer.log'
 WEB='/var/www'
 

@@ -91,7 +91,7 @@ cat << "EOF"
 EOF
 echo -e " ${undred}_______________________${rst}"
 echo -e " Distro:${bldylw} $DISTRO $NAME $RELEASE ${rst}"
-echo -e " Arch  :${bldylw} $ARCH ${rst}"
+echo -e " Kernel:${bldylw} $KERNEL $ARCH ${rst}"
 
 echo -en "\n Continue? [y/n]: "
 	if ! yes; then  # Cleanup and die if no

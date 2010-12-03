@@ -431,7 +431,7 @@ if [[ $sabnzbd = 'y' ]]; then
 	# Install par2cmdline 0.4 with Intel Threading Building Blocks
 	if [[ $ARCH = 'x86_64' ]]; then download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20100203-lin64.tar.gz
 	else download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20090203-lin32.tar.gz
-	tar xzf par2cmdline-0.4*.tar.gz && cd par2cmdline-0.4*
+	fi ; tar xzf par2cmdline-0.4*.tar.gz && cd par2cmdline-0.4*
 	mv libtbb.so libtbb.so.2 par2 /usr/bin ; cd ..
 
 	#if [[ $NAME = 'lenny' ]]; then

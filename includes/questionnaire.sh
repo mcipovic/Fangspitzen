@@ -187,7 +187,7 @@ if [[ $sabnzbd = 'y' ]]; then
 	v1=$(aptitude show sabnzbdplus | grep Version)
 	v2=$(aptitude show sabnzbdplus | grep Package)
 	echo -e "${bldblu} $v2 : $v1 ${rst}"
-elif [[ $sabnzbd = @(none|no|[Nn] ]]; then
+elif [[ $sabnzbd = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} SABnzbd NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}---> ERROR iN SABnzbd iNPUT! ${rst}"; sabnzbd='n'
 fi

@@ -28,6 +28,7 @@ read -p " [VnStat WebUi]                              [y|n]: " vnstat
 if [[ $extras = true ]]; then
 read -p " [phpSysInfo]                                [y|n]: " phpsysinfo
 read -p " [SABnzbd]                                   [y|n]: " sabnzbd
+read -p " [iPBLOCK]                                   [y|n]: " ipblock
 fi
 
 
@@ -190,6 +191,16 @@ if [[ $sabnzbd = 'y' ]]; then
 elif [[ $sabnzbd = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} SABnzbd NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}---> ERROR iN SABnzbd iNPUT! ${rst}"; sabnzbd='n'
+fi
+
+##[ Check for iPLiST ]##
+if [[ $ipblock = 'y' ]]; then
+	v1=$(aptitude show iplist | grep Version)
+	v2=$(aptitude show iplist | grep Package)
+	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
+elif [[ $ipblock = @(none|no|[Nn]) ]]; then
+	echo -e "${bldylw} iPLiST NOT BEiNG iNSTALLED ${rst}"
+else echo -e "${bldred}---> ERROR iN iPLiST iNPUT! ${rst}"; ipblock='n'
 fi
 
 fi

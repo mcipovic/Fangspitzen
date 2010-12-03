@@ -453,10 +453,37 @@ if [[ $sabnzbd = 'y' ]]; then
 	fi
 
 	/etc/init.d/sabnzbdplus start  # Start 'er up
-	
+
 	log "SABnzbd Installation | Completed"
 	log "SABnzbd Started and Running at http://$iP:8080"
 	debug_wait "SABnzbd.installed"
+fi
+
+##[ iPLiST ]##
+cd $BASE/tmp
+if [[ $ipblock = 'y' ]]; then
+	notice "iNSTALLiNG iPLiST"
+	if [[ $NAME = 'lenny' ]]; then
+		apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1 2>> $LOG  # Install updated libraries for lenny support
+	fi
+	$INSTALL iplist 2>> $LOG
+	E_=$? ; debug_error "iPLiST failed to install"
+
+	PATH_iplist=/etc/ipblock.conf
+	filters='index.html?list=bt_level1'
+	sed -i "s:AUTOSTART=.*:AUTOSTART=\"Yes\":"         $PATH_iplist
+	sed -i "s:BLOCK_LIST=.*:BLOCK_LIST=\"$filters \":" $PATH_iplist
+	log "iPLiST Installation | Completed"
+debug_wait "iplist.installed"
+	echo -en "${bldred} Updating Block Lists....${rst}"
+	ipblock -u
+debug_wait "iplist.updated"
+	log "Block Lists Updated"
+	echo -e "${bldylw} done ${rst}"
+	echo -en "${bldred} Starting iPLiST....${rst}"
+	ipblock -r  # Start ipblock
+	iplist -b   # as a daemon
+debug_wait "iplist.started"
 fi
 
 if [[ $torrent = @(rtorrent|tranny|deluge) ]]; then

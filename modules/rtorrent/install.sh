@@ -31,7 +31,7 @@ cd $BASE/tmp
 		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz     # Grab rtorrent
 			debug_error "rTorrent Download Failed"
 		log "Lib|rTorrent | Downloaded" >> $LOG
-		tar xzf libtorrent-0.12.6.tar.gz && tar xzf rtorrent-0.8.6.tar.gz          # Unpack
+		extract libtorrent-0.12.6.tar.gz && extract rtorrent-0.8.6.tar.gz          # Unpack
 		mv libtorrent-0.12.6 libtorrent && mv rtorrent-0.8.6 rtorrent
 		log "Lib|rTorrent | Unpacked"
 	fi

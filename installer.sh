@@ -289,7 +289,7 @@ if [[ $bnc = 'znc' ]]; then
 	cd tmp/
 	download http://downloads.sourceforge.net/project/znc/znc/0.094/znc-0.094.tar.gz
 		debug_error "ZNC Download Failed"
-	tar -xzf znc-0.094.tar.gz && cd znc-0.094  # Unpack
+	extract znc-0.094.tar.gz && cd znc-0.094  # Unpack
 		log "ZNC | Downloaded + Unpacked"
 	notice "Be aware that compiling znc is a cpu intensive task and may take up to 10 min to complete"
 	sleep 3
@@ -332,7 +332,7 @@ elif [[ $bnc = 'psybnc' ]]; then
 	notice "iNSTALLiNG PsyBNC"
 	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz
 		debug_error "PsyBNC Download Failed"
-	tar xzf psyBNC-2.3.2-10.tar.gz
+	extract psyBNC-2.3.2-10.tar.gz
 	chown -R $USER:$USER psybnc
 		log "PsyBNC | Downloaded + Unpacked"
 
@@ -362,7 +362,7 @@ if [[ $vnstat = 'y' ]]; then
 	$INSTALL libgd2-xpm libgd2-xpm-dev 2>> $LOG
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
-	tar xzf vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
+	extract vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
 	compile
 		debug_error "VnStat Build Failed"
 		log "VnStat Compile | Completed in $compile_time seconds"
@@ -407,7 +407,7 @@ if [[ $phpsysinfo = 'y' ]]; then
 	notice "iNSTALLiNG phpSysInfo"
 	#checkout https://phpsysinfo.svn.sourceforge.net/svnroot/phpsysinfo/trunk phpsysinfo
 	download http://downloads.sourceforge.net/project/phpsysinfo/phpsysinfo/3.0.7/phpsysinfo-3.0.7.tar.gz
-	tar xzf phpsysinfo-3.0.7.tar.gz
+	extract phpsysinfo-3.0.7.tar.gz
 	cd phpsysinfo
 	rm ChangeLog COPYING README README_PLUGIN 
 	cp config.php.new config.php
@@ -431,7 +431,7 @@ if [[ $sabnzbd = 'y' ]]; then
 	# Install par2cmdline 0.4 with Intel Threading Building Blocks
 	if [[ $ARCH = 'x86_64' ]]; then download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20100203-lin64.tar.gz
 	else download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20090203-lin32.tar.gz
-	fi ; tar xzf par2cmdline-0.4*.tar.gz && cd par2cmdline-0.4*
+	fi ; extract par2cmdline-0.4*.tar.gz && cd par2cmdline-0.4*
 	mv libtbb.so libtbb.so.2 par2 /usr/bin ; cd ..
 
 	#if [[ $NAME = 'lenny' ]]; then

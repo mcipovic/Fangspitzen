@@ -27,6 +27,7 @@ read -p " [VnStat WebUi]                              [y|n]: " vnstat
 ##!=========================>> EXTRAS <<=========================!##
 if [[ $extras = true ]]; then
 read -p " [phpSysInfo]                                [y|n]: " phpsysinfo
+read -p " [SABnzbd]                                   [y|n]: " sabnzbd
 fi
 
 
@@ -171,14 +172,27 @@ elif [[ $vnstat = @(none|no|[Nn]) ]]; then
 else echo -e "${bldred}--> ERROR iN VNSTAT iNPUT! ${rst}"; vnstat='n'
 fi
 
-##[ Check for phpSysInfo ]##
 if [[ $extras = true ]]; then
+
+##[ Check for phpSysInfo ]##
 if [[ $phpsysinfo = 'y' ]]; then
 	echo -e "${bldblu} Package: phpSysInfo : Version: 3.1~svn ${rst}"
 elif [[ $phpsysinfo = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} phpSysInfo NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN phpSysInfo iNPUT! ${rst}"; phpsysinfo='n'
-fi;fi
+fi
+
+##[ Check for SABnzbd ]##
+if [[ $sabnzbd = 'y' ]]; then
+	v1=$(aptitude show sabnzbdplus | grep Version)
+	v2=$(aptitude show sabnzbdplus | grep Package)
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
+elif [[ $sabnzbd = @(none|no|[Nn] ]]; then
+	echo -e "${bldylw} SABnzbd NOT BEiNG iNSTALLED ${rst}"
+else echo -e "${bldred}---> ERROR iN SABnzbd iNPUT! ${rst}"; sabnzbd='n'
+fi
+
+fi
 
 ##[ CONFiRMATiON ]##
 echo -en "\n Is this correct? [y/n]: "

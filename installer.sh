@@ -401,6 +401,8 @@ if [[ $vnstat = 'y' ]]; then
 	debug_wait "vnstat-web.installed"
 fi
 
+##[ phpSysInfo ]##
+cd $BASE/tmp
 if [[ $phpsysinfo = 'y' ]]; then
 	notice "iNSTALLiNG phpSysInfo"
 	#checkout https://phpsysinfo.svn.sourceforge.net/svnroot/phpsysinfo/trunk phpsysinfo
@@ -417,6 +419,44 @@ if [[ $phpsysinfo = 'y' ]]; then
 	cd ..
 	mv phpsysinfo $WEB 
 	log "phpSysInfo Installation | Completed"
+fi
+
+##[ SABnzbd ]##
+cd $BASE/tmp
+if [[ $sabnzbd = 'y' ]]; then
+	notice "iNSTALLiNG SABnzbd"
+	$INSTALL sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl 2>> $LOG
+	E_=$? ; debug_error "Sabnzbd failed to install"
+
+	# Install par2cmdline 0.4 with Intel Threading Building Blocks
+	if [[ $ARCH = 'x86_64' ]]; then download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20100203-lin64.tar.gz
+	else download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20090203-lin32.tar.gz
+	tar xzf par2cmdline-0.4*.tar.gz && cd par2cmdline-0.4*
+	mv libtbb.so libtbb.so.2 par2 /usr/bin ; cd ..
+
+	#if [[ $NAME = 'lenny' ]]; then
+	#	libjs-mochikit >= 1.4
+	#fi
+
+	#read -p "  User Name that will run SABnzbd: " SABuser
+	sabnzbd_conf=/home/$USER/.sabnzbd/sabnzbd.ini
+	sabnzbd_init=/etc/default/sabnzbdplus
+
+	sed -i "s:USER.*:USER=$USER:"   $sabnzbd_init
+	sed -i "s:HOST.*:HOST=0.0.0.0:" $sabnzbd_init
+	sed -i "s:PORT.*:PORT=8080:"    $sabnzbd_init
+	/etc/init.d/sabnzbdplus start && /etc/init.d/sabnzbdplus stop  # Create config in user's home
+
+	sed -i "s:host .*:host = $iP:"  $sabnzbd_conf
+	if [[ $CORES < 2 ]]; then
+	sed -i "s:par2_multicore .*:par2_multicore = 0:" $sabnzbd_conf
+	fi
+
+	/etc/init.d/sabnzbdplus start  # Start 'er up
+	
+	log "SABnzbd Installation | Completed"
+	log "SABnzbd Started and Running at http://$iP:8080"
+	debug_wait "SABnzbd.installed"
 fi
 
 if [[ $torrent = @(rtorrent|tranny|deluge) ]]; then

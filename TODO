@@ -2,9 +2,8 @@ Legend:
          ? = unsure
          + = in progress
 
-[+] Test Transission
-[ ] Test Deluge
-[ ] Test iplist
+[+] Test Deluge
+[+] Test iplist
 
 [ ] uTorrent Server
 [ ] add request: irssi

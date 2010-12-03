@@ -172,12 +172,13 @@ else echo -e "${bldred}--> ERROR iN VNSTAT iNPUT! ${rst}"; vnstat='n'
 fi
 
 ##[ Check for phpSysInfo ]##
+if [[ $extras = true ]]; then
 if [[ $phpsysinfo = 'y' ]]; then
 	echo -e "${bldblu} Package: phpSysInfo : Version: 3.1~svn ${rst}"
 elif [[ $phpsysinfo = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} phpSysInfo NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN phpSysInfo iNPUT! ${rst}"; phpsysinfo='n'
-fi
+fi;fi
 
 ##[ CONFiRMATiON ]##
 echo -en "\n Is this correct? [y/n]: "

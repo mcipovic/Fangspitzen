@@ -125,7 +125,7 @@ cd $BASE
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
-	$INSTALL apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
+	$INSTALL apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
 	E_=$? ; debug_error "Apache2 failed to install"
 
 	cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
@@ -206,7 +206,7 @@ if [[ $ftpd = 'vsftp' ]]; then
 	echo "ssl_sslv2=NO"   >> /etc/vsftpd.conf
 	echo "ssl_sslv3=YES"  >> /etc/vsftpd.conf
 
-	echo ; read -p "Force SSL? [y/n]: " vsftpfssl
+	read -p "Force SSL? [y/n]: " vsftpfssl
 	if [[ $vsftpfssl = 'y' ]]; then
 		echo "force_local_logins_ssl=YES" >> /etc/vsftpd.conf
 		echo "force_local_data_ssl=YES"   >> /etc/vsftpd.conf
@@ -392,7 +392,7 @@ if [[ $vnstat = 'y' ]]; then
 	sed -i "s|\$iface_list = .*|\$iface_list = array('$iFACE');|" vnstat-web/config.php  # Edit web config
 
 	mv vnstat-web $WEB  # Copy VnStat-web to WebRoot
-		 log "Frontend Installed | http://${iP}/vnstat-web"
+		 log "Frontend Installed | http://$iP/vnstat-web"
 
 	if [[ ! $(pidof vnstatd) ]]; then
 		vnstat -u -i $iFACE  # Make interface database
@@ -410,14 +410,13 @@ if [[ $phpsysinfo = 'y' ]]; then
 	rm ChangeLog COPYING README README_PLUGIN 
 	cp config.php.new config.php
 
-	sed -i "s:define('PSI_PLUGINS'.*:define('PSI_PLUGINS', 'MDStatus,PS,PSStatus,Quotas,SMART');:"  config.php
+	sed -i "s:define('PSI_PLUGINS'.*:define('PSI_PLUGINS', 'PS,PSStatus,Quotas,SMART');:"  config.php
 	sed -i "s:define('PSI_TEMP_FORMAT'.*:define('PSI_TEMP_FORMAT', 'c-f');:"                        config.php
-	sed -i "s:define('PSI_HDD_TEMP'.*:define('PSI_HDD_TEMP', 'command');:"                          config.php
 	sed -i "s:define('PSI_DEFAULT_TEMPLATE',.*);:define('PSI_DEFAULT_TEMPLATE', 'nextgen');:"       config.php
 
 	cd ..
 	mv phpsysinfo $WEB 
-	log "phpSysInfo Installed"
+	log "phpSysInfo Installation | Completed"
 fi
 
 if [[ $torrent = @(rtorrent|tranny|deluge) ]]; then

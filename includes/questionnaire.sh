@@ -193,14 +193,14 @@ elif [[ $sabnzbd = @(none|no|[Nn]) ]]; then
 else echo -e "${bldred}---> ERROR iN SABnzbd iNPUT! ${rst}"; sabnzbd='n'
 fi
 
-##[ Check for iPLiST ]##
+##[ Check for iPBLOCK ]##
 if [[ $ipblock = 'y' ]]; then
 	v1=$(aptitude show iplist | grep Version)
 	v2=$(aptitude show iplist | grep Package)
 	echo -e "${bldblu} ${v2} : ${v1} ${rst}"
 elif [[ $ipblock = @(none|no|[Nn]) ]]; then
-	echo -e "${bldylw} iPLiST NOT BEiNG iNSTALLED ${rst}"
-else echo -e "${bldred}---> ERROR iN iPLiST iNPUT! ${rst}"; ipblock='n'
+	echo -e "${bldylw} iPBLOCK NOT BEiNG iNSTALLED ${rst}"
+else echo -e "${bldred}---> ERROR iN iPBLOCK iNPUT! ${rst}"; ipblock='n'
 fi
 
 fi

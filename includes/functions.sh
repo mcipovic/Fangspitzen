@@ -48,8 +48,7 @@ checkroot() {  # check if user is root
 cleanup() {  # remove tmp folder and restore permissions
 	cd $BASE ; rm --recursive --force tmp/
 	log "Cleaning up"
-	chown -R ${USER}:${USER} $BASE
-	chmod -R 755 $BASE
+	chown -R $USER:$USER $BASE
 }
 
 clear_logfile() {  # clear the logfile

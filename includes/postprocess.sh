@@ -1,6 +1,6 @@
 ##!===================>> Post Processing <<======================!##
 echo -e "\n*******************************"
-echo -e   "***${bldred} PROCESSiNG AND CLEANUP ${rst}****"
+echo -e   "******${bldred} POST PROCESSiNG ${rst}********"
 echo -e   "*******************************\n"
 
 if [[ -f /etc/ssh/sshd_config ]]; then

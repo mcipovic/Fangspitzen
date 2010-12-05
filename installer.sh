@@ -90,8 +90,8 @@ cat << "EOF"
   If your OS is not listed, this script will most likey explode.
 EOF
 echo -e " ${undred}_______________________${rst}"
-echo -e " Distro:${bldylw} $DISTRO $NAME $RELEASE ${rst}"
-echo -e " Kernel:${bldylw} $KERNEL $ARCH ${rst}"
+echo -e " Distro:${bldylw} $DISTRO $RELEASE/$NAME ${rst}"
+echo -e " Kernel:${bldylw} $KERNEL${rst}-${bldylw}$ARCH ${rst}"
 
 echo -en "\n Continue? [y/n]: "
 	if ! yes; then  # Cleanup and die if no
@@ -105,7 +105,7 @@ if [[ $DISTRO = 'Arch' ]]; then
 	exit
 fi
 
-if [[ ! -f ${REPO_PATH}/autoinstaller.list ]]; then
+if [[ ! -f $REPO_PATH/autoinstaller.list ]]; then
 	source includes/repositories.sh  # Add repositories if not already present
 else log "Repositories Already Present, skipping"
 fi
@@ -118,8 +118,8 @@ echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
 echo -e   "********************************\n"
 
-base_install
 mksslcert
+base_install
 
 cd $BASE
 ##[ APACHE ]##

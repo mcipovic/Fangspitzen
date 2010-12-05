@@ -75,7 +75,6 @@ debug_error() {  # call this to catch a bad return code and log the error
 		echo -e " Error:${bldred} $1 ${rst} ($E_)"
 		log "Error: $1 ($E_)"
 		cleanup
-		read -p "Press ENTER to exit" ENTER
 		exit 1
 	fi
 }

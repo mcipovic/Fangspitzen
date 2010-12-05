@@ -15,8 +15,8 @@ if [[ $DISTRO = 'Ubuntu' ]]; then
 	echo "deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu $NAME main"    >> $REPO_PATH/autoinstaller.list  # Transmission
 	echo "deb http://ppa.launchpad.net/ssakar/ppa/ubuntu $NAME main"            >> $REPO_PATH/autoinstaller.list  # iPList
 	echo "deb http://ppa.launchpad.net/jcfp/ppa/ubuntu $NAME main"              >> $REPO_PATH/autoinstaller.list  # SABnzbd
-	echo "deb http://ppa.launchpad.net/jcfp/ppa/ubuntu $NAME main"              >> $REPO_PATH/autoinstaller.list  # VirtualBox
-	echo "deb http://download.virtualbox.org/virtualbox/debian $NAME non-free"  >> $REPO_PATH/autoinstaller.list  # Webmin
+	echo "deb http://download.virtualbox.org/virtualbox/debian $NAME non-free"  >> $REPO_PATH/autoinstaller.list  # VirtualBox
+	echo "deb http://download.webmin.com/download/repository sarge contrib"     >> $REPO_PATH/autoinstaller.list  # Webmin
 	log "Repositories ADD | Success"
 
 elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
@@ -39,7 +39,7 @@ elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
 	echo "deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu karmic main"     >> $REPO_PATH/autoinstaller.list  # Transmission
 	echo "deb http://ppa.launchpad.net/ssakar/ppa/ubuntu karmic main"             >> $REPO_PATH/autoinstaller.list  # iPList
 	echo "deb http://ppa.launchpad.net/jcfp/ppa/ubuntu jaunty main"               >> $REPO_PATH/autoinstaller.list  # SABnzbd
-	echo "deb http://download.virtualbox.org/virtualbox/debian $NAME non-free"    >> $REPO_PATH/autoinstaller.list  # Webmin
+	echo "deb http://download.virtualbox.org/virtualbox/debian $NAME non-free"    >> $REPO_PATH/autoinstaller.list  # VirtualBox
 	echo "deb http://download.webmin.com/download/repository sarge contrib"       >> $REPO_PATH/autoinstaller.list  # Webmin
 	log "Repositories ADD | Success"
 

@@ -29,6 +29,7 @@ cd rutorrent
 cd plugins
 	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk pausewebui
 	checkout http://rutorrent-logoff.googlecode.com/svn/trunk/ logoff
+	checkout http://rutorrent-instantsearch.googlecode.com/svn/trunk instantsearch
 	debug_error "ruTorrent Extra Plugins Download Failed"
 	extract $BASE/modules/rutorrent/plugin-nfo.tar.gz
 	log "ruTorrent plugins | Downloaded"

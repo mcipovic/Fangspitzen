@@ -214,8 +214,8 @@ if [[ $ftpd = 'vsftp' ]]; then
 		log "vsftpd config already edited, skipping"
 	fi
 
-	echo -n "Force SSL? [y/n]: "  # allow toggling of forcing ssl
-	if yes; then
+	echo -n "Force SSL? [y/n]: "
+	if yes; then  # allow toggling of forcing ssl
 		sed -i 's:force_local_logins_ssl.*:force_local_logins_ssl=YES:' /etc/vsftpd.conf
 		sed -i 's:force_local_data_ssl.*:cforce_local_data_ssl=YES:'    /etc/vsftpd.conf
 	else
@@ -242,8 +242,13 @@ elif [[ $ftpd = 'pureftp' ]]; then
 	$INSTALL pure-ftpd pure-ftpd-common 2>> $LOG
 	E_=$? ; debug_error "PureFTP failed to install"
 
-	debug_wait "Creating PureFTP SSL Key"
-	echo 1 > /etc/pure-ftpd/conf/TLS  # Enable TLS+FTP (2 will allow TLS only, 0 disables it)
+	echo -n "Force SSL? [y/n]: "
+	if ! yes; then  # allow toggling of forcing ssl
+		echo 1 > /etc/pure-ftpd/conf/TLS  # Allow TLS+FTP
+	else
+		echo 2 > /etc/pure-ftpd/conf/TLS  # Force TLS
+	fi
+
 	if [[ ! -f /etc/ssl/private/pure-ftpd.pem ]]; then  # Create SSL Certificate
 		mkdir -p /etc/ssl/private && make-ssl-cert $SSLCERT /etc/ssl/private/pure-ftpd.pem
 		chmod 600 /etc/ssl/private/pure-ftpd.pem  # Read write permission for owner only

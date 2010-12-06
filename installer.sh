@@ -362,14 +362,14 @@ if [[ $vnstat = 'y' ]]; then
 	$INSTALL libgd2-xpm libgd2-xpm-dev 2>> $LOG
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
+
 	extract vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
 	compile
 		debug_error "VnStat Build Failed"
 		log "VnStat Compile | Completed in $compile_time seconds"
 		debug_wait "vnstat.compiled"
-	make install                                                          # Install
+	make install && cd ..                                                 # Install
 		log "VnStat Installation | Completed"
-	cd ..
 
 	if [[ ! -f /etc/init.d/vnstat ]]; then
 		cp vnstat-1.10/examples/init.d/debian/vnstat /etc/init.d/         # Copy init script if one doesnt exist
@@ -385,8 +385,8 @@ if [[ $vnstat = 'y' ]]; then
 	sed -i "s:SaveInterval 5:SaveInterval 10:"      /etc/vnstat.conf  # Less saves to disk
 	sed -i "s:UseLogging 2:UseLogging 1:"           /etc/vnstat.conf  # Log to file instead of syslog
 
-	rm -rf vnstat-web/themes/espresso vnstat-web/themes/light vnstat-web/themes/red  # Remove extra themes
-	rm -f vnstat-web/COPYING vnstat-web/vera_copyright.txt vnstat-web/config.php     # Remove extra files
+	rm -rf vnstat-web/themes/espresso vnstat-web/themes/light vnstat-web/themes/red                # Remove extra themes
+	rm -rf vnstat-web/COPYING vnstat-web/vera_copyright.txt vnstat-web/config.php vnstat-web/.git  # Remove extra files
 
 	cp ../modules/vnstat/config.php vnstat-web
 	sed -i "s|\$iface_list = .*|\$iface_list = array('$iFACE');|" vnstat-web/config.php  # Edit web config

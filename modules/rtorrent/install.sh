@@ -3,7 +3,7 @@ while [[ $compile_rtorrent = false ]]; do
 	if [[ ! -f /usr/bin/rtorrent ]]; then  # Compile rtorrent
 		compile_rtorrent='true'
 	else  # Ask to re-compile if rtorrent is already installed
-		echo -en "rTorrent Found.... re-compile? [y/n]: "
+		echo -en "rTorrent already installed.... RE-INSTALL? [y/n]: "
 		if  yes; then
 			compile_rtorrent='true'
 			break

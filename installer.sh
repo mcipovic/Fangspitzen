@@ -199,7 +199,7 @@ if [[ $ftpd = 'vsftp' ]]; then
 	sed -i 's:#nopriv_user.*:nopriv_user=ftp:'                   /etc/vsftpd.conf
 	sed -i 's:#chroot_local_user.*:chroot_local_user=YES:'       /etc/vsftpd.conf
 
-	cat /etc/vsftpd.conf | grep '# added by autoscript'
+	cat /etc/vsftpd.conf | grep '# added by autoscript' >/dev/null
 	if [[ $? = 1 ]]; then
 		echo "# added by autoscript"                                       >> /etc/vsftpd.conf
 		echo "rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem"          >> /etc/vsftpd.conf

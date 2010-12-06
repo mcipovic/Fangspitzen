@@ -167,7 +167,7 @@ yes() {  # user input for yes or no
 		;;
 		n|N|No|NO|no|nO) return 1
 		;;
-		*) echo -n " Please enter ${undrln}y${rst} or ${undrln}y${rst}: "
+		*) echo -en " Please enter ${undrln}y${rst} or ${undrln}y${rst}: "
 		;;
 	esac
 	done

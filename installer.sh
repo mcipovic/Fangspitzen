@@ -470,7 +470,7 @@ if [[ $ipblock = 'y' ]]; then
 	E_=$? ; debug_error "iPBLOCK failed to install"
 
 	PATH_iplist=/etc/ipblock.conf
-	filters='nipfilter.dat.gz'
+	filters='level1.gz'
 	sed -i "s:AUTOSTART=.*:AUTOSTART=\"Yes\":"        $PATH_iplist
 	sed -i "s:BLOCK_LIST=.*:BLOCK_LIST=\"$filters\":" $PATH_iplist
 

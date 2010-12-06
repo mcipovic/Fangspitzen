@@ -27,7 +27,7 @@ cd rutorrent
 
 	# Install extra plugins
 cd plugins
-	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/pausewebui
+	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk pausewebui
 	debug_error "ruTorrent Extra Plugins Download Failed"
 	extract $BASE/modules/rutorrent/plugin-nfo.tar.gz
 	log "ruTorrent plugins | Downloaded"

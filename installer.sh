@@ -106,12 +106,12 @@ if [[ $DISTRO = 'Arch' ]]; then
 fi
 
 if [[ ! -f $REPO_PATH/autoinstaller.list ]]; then
-	source includes/repositories.sh  # Add repositories if not already present
+	source $BASE/includes/repositories.sh  # Add repositories if not already present
 else log "Repositories Already Present, skipping"
 fi
 
 clear
-source includes/questionnaire.sh  # Load questionnaire
+source $BASE/includes/questionnaire.sh  # Load questionnaire
 
 #!=====================>> iNSTALLATiON <<=======================!#
 echo -e "\n********************************"
@@ -310,7 +310,7 @@ if [[ $extras = true ]]; then
 	source modules/extras.sh
 fi
 
-source includes/postprocess.sh
+source $BASE/includes/postprocess.sh
 
 echo -e "\n*******************************"
 echo -e   "******${bldred} SCRiPT COMPLETED! ${rst}******"

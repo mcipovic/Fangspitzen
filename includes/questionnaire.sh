@@ -1,16 +1,15 @@
 ##!=======================>> QUESTiONS <<========================!##
-while [[ $skip = false ]]; do
+while [[ $skip_ques = false ]]; do
 echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<---------------${rst}"
 
 read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: " http
-read -p " [PHP Cache]                     [xcache|apc|none]: " cache
-read -p "[ SQL SERVER  ]        [mysql|sqlite|postgre|none]: " sql
+if [[ $http = 'lighttpd' ]]; then $http='lighttp' ;fi
 read -p "[ FTP SERVER  ]        [vsftp|proftp|pureftp|none]: " ftpd
 read -p "[ Torrent App ]      [rtorrent|tranny|deluge|none]: " torrent
 
 if [[ $torrent = 'rtorrent' ]]; then
-read -p "[      compile from svn ? ]                  [y|n]: " rtorrent_svn
-read -p "[ compile with falloc() ? ]                  [y|n]: " alloc ;fi
+read -p "[ compile from svn? ]                        [y|n]: " rtorrent_svn
+read -p "[ compile with pre allocation? ]             [y|n]: " alloc ;fi
 
 read -p "[ ruTorrent WebUi ]                          [y|n]: " webui
 
@@ -18,23 +17,7 @@ if [[ ! -f /usr/local/bin/mktorrent && ! -f /usr/local/bin/buildtorrent ]]; then
 read -p "[ MkTorrent or BuildTorrent ]                [m|b]: " buildtorrent
 else buildtorrent='n' ;fi
 
-echo -e "\n       **** [ Extra Options ] ****"
-read -p " [iRC Bouncer]              [znc|psybnc|sbnc|none]: " bnc
-if [[ ! -d /usr/share/webmin ]]; then
-read -p " [WebMiN]                                    [y|n]: " webmin
-else webmin='n';fi
-read -p " [VnStat WebUi]                              [y|n]: " vnstat
-
-##!=========================>> EXTRAS <<=========================!##
-if [[ $extras = true ]]; then echo
-read -p " [phpSysInfo]                                [y|n]: " phpsysinfo
-read -p " [SABnzbd]                                   [y|n]: " sabnzbd
-read -p " [iPBLOCK]                                   [y|n]: " ipblock
-fi
-
-
 #!=====================>> CONFIRMATION <<=======================!#
-if [[ $http = 'lighttpd' ]]; then $http='lighttp' ;fi 
 echo -e "\n*******************************"
 echo -e   "**********${bldred} CONFiRM ${rst}************"
 echo -e   "*******************************\n"
@@ -56,38 +39,6 @@ elif [[ $http = 'cherokee' ]]; then
 elif [[ $http = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} WEB SERVER NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN HTTP iNPUT! ${rst}"; http='none'
-fi
-
-##[ Check for PHP Cache] ]##
-if [[ $cache = @(xcache|x) ]]; then
-	cacheP=$(aptitude show php5-xcache | grep Package)
-	cacheV=$(aptitude show php5-xcache | grep Version)
-	echo -e "${bldblu} $cacheP : $cacheV ${rst}"
-elif [[ $cache = 'apc' ]]; then
-	cacheP=$(aptitude show php-apc | grep Package)
-	cacheV=$(aptitude show php-apc | grep Version)
-	echo -e "${bldblu} $cacheP : $cacheV ${rst}"
-elif [[ $cache = @(none|no|[Nn]) ]]; then
-	echo -e "${bldylw} PHP CACHE NOT BEiNG iNSTALLED ${rst}"
-else echo -e "${bldred}--> ERROR iN PHP CACHE iNPUT! ${rst}"; cache='none'
-fi
-
-##[ Check for SQL ]##
-if [[ $sql = 'mysql' ]]; then
-	v1=$(aptitude show mysql-server | grep Version)
-	v2=$(aptitude show mysql-server | grep Package)
-	echo -e "${bldblu} $v2 : $v1 ${rst}"
-elif [[ $sql = 'sqlite' ]]; then
-	v1=$(aptitude show sqlite3 | grep Version)
-	v2=$(aptitude show sqlite3 | grep Package)
-	echo -e "${bldblu} $v2 : $v1 ${rst}"
-elif [[ $sql = 'postgre' ]]; then
-	v1=$(aptitude show postgresql | grep Version)
-	v2=$(aptitude show postgresql | grep Package)
-	echo -e "${bldblu} $v2 : $v1 ${rst}"
-elif [[ $sql = @(none|no|[Nn]) ]]; then
-	echo -e "${bldylw} SQL SERVER NOT BEiNG iNSTALLED ${rst}"
-else echo -e "${bldred}--> ERROR iN SQL iNPUT! ${rst}"; sql='none'
 fi
 
 ##[ Check for FTP ]##
@@ -120,7 +71,7 @@ if [[ $torrent = 'rtorrent' ]]; then
 		echo -e "${bldpur} See http://libtorrent.rakshasa.no/ticket/460 for more info and potential dangers. Do not use on ext3 ${rst}\n"
 	fi
 elif [[ $torrent = 'tranny' ]]; then
-	if [[ ${NAME} = 'lenny' ]]; then
+	if [[ $NAME = 'lenny' ]]; then
 		echo -e "${bldred} TODO! ${rst}"
 		torrent='none'
 	else
@@ -129,7 +80,7 @@ elif [[ $torrent = 'tranny' ]]; then
 		echo -e "${bldblu} $v2 : $v1 ${rst}"
 	fi
 elif [[ $torrent = 'deluge' ]]; then
-	if [[ ${NAME} = 'lenny' ]]; then
+	if [[ $NAME = 'lenny' ]]; then
 		echo -e "${bldred} TODO! ${rst}"
 		torrent='none'
 	else
@@ -158,6 +109,39 @@ elif [[ $webui = @(none|no|[Nn]) ]]; then
 else echo -e "${bldred}--> ERROR iN WEBUi iNPUT! ${rst}"; webui='n'
 fi
 
+if [[ $extras = true ]]; then
+##[ Check for PHP Cache] ]##
+if [[ $cache = @(xcache|x) ]]; then
+	cacheP=$(aptitude show php5-xcache | grep Package)
+	cacheV=$(aptitude show php5-xcache | grep Version)
+	echo -e "${bldblu} $cacheP : $cacheV ${rst}"
+elif [[ $cache = 'apc' ]]; then
+	cacheP=$(aptitude show php-apc | grep Package)
+	cacheV=$(aptitude show php-apc | grep Version)
+	echo -e "${bldblu} $cacheP : $cacheV ${rst}"
+elif [[ $cache = @(none|no|[Nn]) ]]; then
+	echo -e "${bldylw} PHP CACHE NOT BEiNG iNSTALLED ${rst}"
+else echo -e "${bldred}--> ERROR iN PHP CACHE iNPUT! ${rst}"; cache='none'
+fi
+
+##[ Check for SQL ]##
+if [[ $sql = 'mysql' ]]; then
+	v1=$(aptitude show mysql-server | grep Version)
+	v2=$(aptitude show mysql-server | grep Package)
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
+elif [[ $sql = 'sqlite' ]]; then
+	v1=$(aptitude show sqlite3 | grep Version)
+	v2=$(aptitude show sqlite3 | grep Package)
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
+elif [[ $sql = 'postgre' ]]; then
+	v1=$(aptitude show postgresql | grep Version)
+	v2=$(aptitude show postgresql | grep Package)
+	echo -e "${bldblu} $v2 : $v1 ${rst}"
+elif [[ $sql = @(none|no|[Nn]) ]]; then
+	echo -e "${bldylw} SQL SERVER NOT BEiNG iNSTALLED ${rst}"
+else echo -e "${bldred}--> ERROR iN SQL iNPUT! ${rst}"; sql='none'
+fi
+
 ##[ Check for BNC ]##
 if [[ $bnc = 'znc' ]]; then
 	echo -e "${bldblu} Package: ZNC : Version: 0.094 ${rst}"
@@ -168,6 +152,14 @@ elif [[ $bnc = 'sbnc' ]]; then
 elif [[ $bnc = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} BOUNCER NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN iRC BOUNCER iNPUT! ${rst}"; bnc='none'
+fi
+
+##[ Check for phpSysInfo ]##
+if [[ $phpsysinfo = 'y' ]]; then
+	echo -e "${bldblu} Package: phpSysInfo : Version: 3.1~svn ${rst}"
+elif [[ $phpsysinfo = @(none|no|[Nn]) ]]; then
+	echo -e "${bldylw} phpSysInfo NOT BEiNG iNSTALLED ${rst}"
+else echo -e "${bldred}--> ERROR iN phpSysInfo iNPUT! ${rst}"; phpsysinfo='n'
 fi
 
 ##[ Check for WEBMiN ]##
@@ -186,16 +178,6 @@ if [[ $vnstat = 'y' ]]; then
 elif [[ $vnstat = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} VNSTAT NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN VNSTAT iNPUT! ${rst}"; vnstat='n'
-fi
-
-if [[ $extras = true ]]; then
-
-##[ Check for phpSysInfo ]##
-if [[ $phpsysinfo = 'y' ]]; then
-	echo -e "${bldblu} Package: phpSysInfo : Version: 3.1~svn ${rst}"
-elif [[ $phpsysinfo = @(none|no|[Nn]) ]]; then
-	echo -e "${bldylw} phpSysInfo NOT BEiNG iNSTALLED ${rst}"
-else echo -e "${bldred}--> ERROR iN phpSysInfo iNPUT! ${rst}"; phpsysinfo='n'
 fi
 
 ##[ Check for SABnzbd ]##
@@ -217,8 +199,7 @@ elif [[ $ipblock = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} iPBLOCK NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}---> ERROR iN iPBLOCK iNPUT! ${rst}"; ipblock='n'
 fi
-
-fi
+fi  # end `if $extras`
 
 ##[ CONFiRMATiON ]##
 echo -en "\n Is this correct? [y/n]: "

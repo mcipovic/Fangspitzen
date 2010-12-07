@@ -38,22 +38,27 @@ fi
 
 #[ Add Some Useful Command Alias' ]#
 if [[ -f $HOME/.bashrc ]];then
+	cat $HOME/.bashrc | grep '# added by autoscript' >/dev/null
+if [[ $? != 0 ]]; then  # Check if this has already been added or not
 	sed -i 's:force_color_prompt=no:force_color_prompt=yes:' $HOME/.bashrc
+	echo "# added by autoscript"            >> $HOME/.bashrc
 	echo "alias wget='axel'"                >> $HOME/.bashrc
 	echo "alias apt-get='apt-fast'"         >> $HOME/.bashrc
 	echo "alias update='apt-fast update'"   >> $HOME/.bashrc
 	echo "alias install='apt-fast install'" >> $HOME/.bashrc
 	echo "alias upgrade='apt-fast upgrade'" >> $HOME/.bashrc
 	echo "alias remove='apt-fast remove'"   >> $HOME/.bashrc
-	if [[ ${torrent} = 'rtorrent' ]];then
+	if [[ $torrent = 'rtorrent' ]];then
 		echo "alias rtorrent-start='dtach -n .dtach/rtorrent rtorrent'" >> $HOME/.bashrc
 		echo "alias rtorrent-resume='dtach -a .dtach/rtorrent'"         >> $HOME/.bashrc
 	fi
+fi  # end `if $?`
 fi
 
 ##[ Configure Fail2Ban ]##
-if [[ -d /etc/fail2ban ]]; then
-	f2b_jail=/etc/fail2ban/jail.conf
+f2b_jail=/etc/fail2ban/jail.conf
+cat $f2b_jail | grep '# added by autoscript' >/dev/null
+if [[ $? != 0 ]]; then  # Check if this has already been added or not
 	sed -i 's:bantime .*:bantime = 86400:' $f2b_jail  # 24 hours
 	sed -i '/[ssh]/,/port	= ssh/ s:enabled .*:enabled = true:' $f2b_jail
 	if [[ $ftp = 'vsftp' ]]; then
@@ -89,14 +94,15 @@ logpath = /var/log/auth.log
 maxretry = 5
 EOF
 	fi
-	
+	echo "# added by autoscript" >> $f2b_jail
+
 	echo -n "Restarting fail2ban..."
 	killall -q -15 fail2ban-server ; sleep 2
 	if [[ -e /var/run/fail2ban/fail2ban.sock ]]; then
 		rm /var/run/fail2ban/fail2ban.sock
 	fi
 	/etc/init.d/fail2ban start && echo " done"
-fi
+fi  # end `if $?`
 
 if [[ $torrent = 'rtorrent' ]]; then
 echo ; read -p "Start rtorrent now? [y/n]: " start_rt

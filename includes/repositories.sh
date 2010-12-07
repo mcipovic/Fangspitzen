@@ -59,11 +59,9 @@ if [[ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]]; then
 	$addkey 365C5CA1
 	$addkey 108B243F
 	$addkey 4BB9F05F
-	cd $BASE/tmp
-	download http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | apt-key add -
-	download http://www.webmin.com/jcameron-key.asc -O- | apt-key add -
+	wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | apt-key add -
+	wget -q http://www.webmin.com/jcameron-key.asc -O- | apt-key add -
 fi
-
 	$UPDATE
 	log "Repositories Added and Updated"
 	debug_wait "repos.added"

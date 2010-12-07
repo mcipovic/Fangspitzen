@@ -1,6 +1,6 @@
 ##!===================>> Post Processing <<======================!##
 echo -e "\n*******************************"
-echo -e   "***${bldred} PROCESSiNG AND CLEANUP ${rst}****"
+echo -e   "******${bldred} POST PROCESSiNG ${rst}********"
 echo -e   "*******************************\n"
 
 if [[ -f /etc/ssh/sshd_config ]]; then
@@ -15,7 +15,10 @@ fi
 if [[ $http = 'apache' ]]; then
 	/etc/init.d/apache2 restart
 elif [[ $http = 'lighttp' ]]; then
+	mv $WEB/index.lighttpd.html $WEB/index.html
 	/etc/init.d/lighttpd restart
+elif [[ $http = 'cherokee' ]]; then
+	notice "Run sudo cherokee-admin -b to configure Cherokee."
 fi
 
 if [[ $sql = 'mysql' ]]; then
@@ -96,7 +99,7 @@ EOF
 fi
 
 if [[ $torrent = 'rtorrent' ]]; then
-echo ; read -p "Start rtorrent now? [y|n]: " start_rt
+echo ; read -p "Start rtorrent now? [y/n]: " start_rt
 	if [[ $start_rt = 'y' ]]; then
 		mkdir -p $HOME/.dtach ; rm -f $HOME/.dtach/rtorrent
 		chmod -R 755 $HOME/.dtach

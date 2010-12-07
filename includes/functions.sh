@@ -1,14 +1,14 @@
 ##!=======================>> FUNCTiONS <<=======================!##
-base_install() {  #[TODO] find a better way to do this
+base_install() {  # install dependencies
 
-STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gamin gcc git-core gzip hddtemp htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion unrar unzip zip"
+STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gamin gcc git-core gzip htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion unrar unzip zip"
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libexpat1 libncurses5 libncurses5-dev libsigc++-2.0-dev libxml2"
 if [[ $http != 'none' ]]; then
 PHP="php5 php5-cgi php5-cli php5-common php5-curl php5-gd php5-dev php5-mcrypt php5-mhash php5-mysql php5-suhosin php5-xmlrpc"
 fi
 	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 	if [[ $DISTRO = 'Ubuntu' ]]; then
-		if [[ $NAME = 'karmic' || $NAME = 'lucid' ]]; then
+		if [[ $NAME = @(karmic|lucid) ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'jaunty' ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar2 2>> $LOG ; E_=$?
@@ -16,12 +16,14 @@ fi
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar6 2>> $LOG ; E_=$?
 		fi
 
-	elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
-		if [[ $NAME = 'squeeze' || $NAME = 'debian' ]]; then
+	elif [[ $DISTRO = @(Debian|LinuxMint) ]]; then
+		if [[ $NAME = @(squeeze|debian) ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'lenny' ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar0 2>> $LOG ; E_=$?
 		fi
+	elif [[ $DISTRO = 'Arch' ]]; then
+			$INSTALL base-devel fakeroot yaourt php 2>> $LOG ; E_=$?
 	fi
 
 	debug_error "Required system packages failed to install"
@@ -44,10 +46,9 @@ checkroot() {  # check if user is root
 }
 
 cleanup() {  # remove tmp folder and restore permissions
-	cd $BASE ; rm --recursive --force tmp/
-	log "Cleaning up"
-	chown -R ${USER}:${USER} $BASE
-	chmod -R 755 $BASE
+	cd $BASE && rm --recursive --force tmp
+	chown -R $USER:$USER $BASE
+	log "Removed tmp/ folder"
 }
 
 clear_logfile() {  # clear the logfile
@@ -73,7 +74,6 @@ debug_error() {  # call this to catch a bad return code and log the error
 		echo -e " Error:${bldred} $1 ${rst} ($E_)"
 		log "Error: $1 ($E_)"
 		cleanup
-		read -p "Press ENTER to exit" ENTER
 		exit 1
 	fi
 }
@@ -95,6 +95,22 @@ download() {  # show progress bars if debug is on
 error() {  # call this when you know there will be an error
 	echo -e " Error:${bldred} $1 ${rst} \n"
 	exit
+}
+
+extract() {  # find type of compression and extract accordingly
+	case $1 in
+		*.tar.bz2)  tar xjf $1    ;;
+		*.tbz2)     tar xjf $1    ;;
+		*.tar.gz)   tar xzf $1    ;;
+		*.tgz)      tar xzf $1    ;;
+		*.tar)      tar xf $1     ;;
+		*.gz)       gunzip -q $1  ;;
+		*.bz2)      bunzip2 -q $1 ;;
+		*.rar)      unrar x $1    ;;
+		*.zip)      unzip $1      ;;
+		*.Z)        uncompress $1 ;;
+		*.7z)       7z x $1       ;;
+	esac
 }
 
 log() {  # send to the logfile
@@ -151,7 +167,7 @@ yes() {  # user input for yes or no
 		;;
 		n|N|No|NO|no|nO) return 1
 		;;
-		*) echo -n " Please enter ${undrln}y${rst} or ${undrln}y${rst}: "
+		*) echo -en " Please enter ${undrln}y${rst} or ${undrln}y${rst}: "
 		;;
 	esac
 	done
@@ -160,42 +176,67 @@ yes() {  # user input for yes or no
 init() {
 	clear
 	echo -n ">>> iNiTiALiZiNG......"
+	OS=$(uname -s)
 
-	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(arch)
-	# Distributor -i  > Ubuntu  > Debian  > Debian  > LinuxMint  > Arch  (DISTRO)
-	# Release     -r  > 10.04   > 5.0.6   > testing > 1          > n/a   (RELASE)
-	# Codename    -c  > lucid   > lenny   > squeeze > debian     > n/a   (NAME)
+##[ Determine OS ]##
+if [ $OS = "SunOS" ] ; then
+	OS='Solaris'
+	ARCH=$(uname -p)
+	error "Solaris is not supported"
+
+elif [ $OS = "Linux" ] ; then
+	# TODO
+	if [ -f /etc/redhat-release ]; then  # check this first, some non rpm distro's include it
+		error "TODO - REDHAT"
+	elif [ -f /etc/arch-release ]; then
+		#error "See ARCH folder"
+		REPO_PATH=/etc/pacman.conf
+		UPDATE='pacman --sync --refresh --noconfirm'
+		UPGRADE='pacman --sync --refresh --sysupgrade --noconfirm'
+		INSTALL='pacman --sync --noconfirm'
+	elif [ -f /etc/etc/fedora-release ]; then
+		error "TODO - Fedora"
+	elif [ -f /etc/gentoo-release ]; then
+		error "TODO - Gentoo"
+	elif [ -f /etc/slackware-version ]; then
+		error "TODO - Slackware"
+	elif [ -f /etc/SuSE-release ]; then
+		error "TODO - OpenSUSE"
+
+	else  # we are going to assume a deb based system
+		REPO_PATH=/etc/apt/sources.list.d/
+		UPDATE='apt-get update -qq'
+		UPGRADE='apt-get upgrade --yes -qq'
+		INSTALL='apt-get install --yes -qq'
+
+		if ! which axel >/dev/null; then  # install axel and lsb-release (debian doesnt package it)
+			$INSTALL axel lsb-release
+		fi
+		# Distributor -i > Ubuntu  > Debian  > Debian   > LinuxMint     > Arch  (DISTRO)
+		# Release     -r > 10.04   > 5.0.6   > testing  > 1|10          > n/a   (RELASE)
+		# Codename    -c > lucid   > lenny   > squeeze  > debian|julia  > n/a   (NAME)
+		readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(uname -m) KERNEL=$(uname -r)
+	fi
 
 	##[ Create folders if not already created ]##
 	mkdir --parents tmp/
 	mkdir --parents logs/
 
-	##[ Install axel and apt-fast ]##
-	if ! which axel >/dev/null; then
-		$INSTALL axel lsb-release
-		download http://www.mattparnell.com/linux/apt-fast/apt-fast.sh
-		mv apt-fast.sh /usr/bin/apt-fast && chmod +x /usr/bin/apt-fast
-	fi
-
 	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
 	iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
-	if ! [[ ${iP} = *.*.* ]]; then
+	if ! [[ $iP = *.*.* ]]; then
 		error "Unable to find ip from outside"
 	fi
-
 	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
-	$UPDATE
-	echo -e "[${bldylw} done ${rst}]"
-	sleep 1
+
+fi
+	$UPDATE  # refresh our package list
+	echo -e "[${bldylw} done ${rst}]" ; sleep 1
 }
 
 ##[ VARiABLE iNiT ]##
 CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLCERT=/usr/share/ssl-cert/ssleay.cnf
-REPO_PATH=/etc/apt/sources.list.d/
-UPDATE='apt-get update -qq'
-UPGRADE='apt-get upgrade --yes -qq'
-INSTALL='apt-get install --yes -qq'
 LOG='logs/installer.log'
 WEB='/var/www'
 

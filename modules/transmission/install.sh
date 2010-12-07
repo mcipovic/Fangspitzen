@@ -23,5 +23,5 @@ cd ${BASE}/tmp
 
 	sudo -u $USER transmission-daemon  # Start transmission
 	log "Transmission Installation | Completed"
-	log "WebUI is active on http://$HOSTNAME:9091"
+	log "WebUI is active on http://$IP:9091"
 	debug_wait "transmission.installed"

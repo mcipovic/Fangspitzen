@@ -27,9 +27,11 @@ cd rutorrent
 
 	# Install extra plugins
 cd plugins
-	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/pausewebui
+	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk pausewebui
+	checkout http://rutorrent-logoff.googlecode.com/svn/trunk/ logoff
+	checkout http://rutorrent-instantsearch.googlecode.com/svn/trunk instantsearch
 	debug_error "ruTorrent Extra Plugins Download Failed"
-	tar xzf $BASE/modules/rutorrent/plugin-nfo.tar.gz
+	extract $BASE/modules/rutorrent/plugin-nfo.tar.gz
 	log "ruTorrent plugins | Downloaded"
 
 cd $BASE/tmp
@@ -58,6 +60,5 @@ cd $BASE/tmp
 	cp -R rutorrent $WEB  # Move rutorrent to webroot
 	chmod -R 755 $WEB
 	chown -R www-data:www-data $WEB
-	log "ruTorrent Installation | Completed"
-	debug_wait "rutorrent.installed"
+	log "ruTorrent Installation | Completed" ; debug_wait "rutorrent.installed"
 fi

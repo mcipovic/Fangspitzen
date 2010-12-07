@@ -3,7 +3,7 @@ while [[ $compile_rtorrent = false ]]; do
 	if [[ ! -f /usr/bin/rtorrent ]]; then  # Compile rtorrent
 		compile_rtorrent='true'
 	else  # Ask to re-compile if rtorrent is already installed
-		echo -en "rTorrent Found.... re-compile? [y/n]: "
+		echo -en "rTorrent already installed.... RE-INSTALL? [y/n]: "
 		if  yes; then
 			compile_rtorrent='true'
 			break
@@ -31,7 +31,7 @@ cd $BASE/tmp
 		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz     # Grab rtorrent
 			debug_error "rTorrent Download Failed"
 		log "Lib|rTorrent | Downloaded" >> $LOG
-		tar xzf libtorrent-0.12.6.tar.gz && tar xzf rtorrent-0.8.6.tar.gz          # Unpack
+		extract libtorrent-0.12.6.tar.gz && extract rtorrent-0.8.6.tar.gz          # Unpack
 		mv libtorrent-0.12.6 libtorrent && mv rtorrent-0.8.6 rtorrent
 		log "Lib|rTorrent | Unpacked"
 	fi
@@ -44,8 +44,7 @@ cd $BASE/tmp
 		debug_error "XMLRPC Build Failed"
 		log "XMLRPC Compile | Completed in $compile_time seconds"
 	make install
-		log "XMLRPC Installation | Completed"
-		debug_wait "xmlrpc.installed"
+		log "XMLRPC Installation | Completed" ; debug_wait "xmlrpc.installed"
 
 	notice "COMPiLiNG... LiBTORRENT"
 #-->[ Compile libtorrent ]
@@ -62,8 +61,7 @@ cd $BASE/tmp
 		debug_error "LibTorrent Build Failed"
 		log "LibTorrent Compile | Completed in $compile_time seconds"
 	make install
-		log "LibTorrent Installation | Completed"
-		debug_wait "libtorrent.installed"
+		log "LibTorrent Installation | Completed" ; debug_wait "libtorrent.installed"
 
 	notice "COMPiLiNG... rTORRENT"
 #-->[ Compile rtorrent ]
@@ -119,8 +117,7 @@ elif [[ -d /etc/lighttpd || -d /etc/cherokee ]]; then
 else
 	debug_wait "No httpd found: Make sure to add sgci mounts to .rtorrent.rc"
 fi
-log "rTorrent Config | Created"
-log "rTorrent listening on port: $NUMBER"
+log "rTorrent Config | Created" ; log "rTorrent listening on port: $NUMBER"
 
 if [[ ! -f /etc/init.d/rtorrent ]]; then  # Copy init script
 	cp modules/rtorrent/rtorrent-init /etc/init.d/rtorrent

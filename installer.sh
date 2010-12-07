@@ -18,7 +18,7 @@ trap ctrl_c SIGINT
 
 ##################################################################
 VERSION='0.9.9~svn'                                              #
-DATE='Oct 22 2010'                                               #
+DATE='Dec 01 2010'                                               #
 ##################################################################
 source includes/functions.sh  # Source in our functions
 source includes/dialog.sh
@@ -91,8 +91,8 @@ cat << "EOF"
   If your OS is not listed, this script will most likey explode.
 EOF
 echo -e " ${undred}_______________________${rst}"
-echo -e " Distro:${bldylw} $DISTRO $NAME $RELEASE ${rst}"
-echo -e " Arch  :${bldylw} $ARCH ${rst}"
+echo -e " Distro:${bldylw} $DISTRO $RELEASE/$NAME ${rst}"
+echo -e " Kernel:${bldylw} $KERNEL${rst}-${bldylw}$ARCH ${rst}"
 
 echo -en "\n Continue? [y/n]: "
 	if ! yes; then  # Cleanup and die if no
@@ -106,7 +106,7 @@ if [[ $DISTRO = 'Arch' ]]; then
 	exit
 fi
 
-if [[ ! -f ${REPO_PATH}/autoinstaller.list ]]; then
+if [[ ! -f $REPO_PATH/autoinstaller.list ]]; then
 	source includes/repositories.sh  # Add repositories if not already present
 else log "Repositories Already Present, skipping"
 fi
@@ -119,14 +119,14 @@ echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
 echo -e   "********************************\n"
 
-base_install
 mksslcert
+base_install
 
 cd $BASE
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
-	$INSTALL apache2 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
+	$INSTALL apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
 	E_=$? ; debug_error "Apache2 failed to install"
 
 	cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
@@ -143,8 +143,7 @@ if [[ $http = 'apache' ]]; then
 	echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
 
 	PHPini=/etc/php5/apache/php.ini
-	log "Apache Installation | Completed"
-	debug_wait "apache.installed"
+	log "Apache Installation | Completed" ; debug_wait "apache.installed"
 
 ##[ LiGHTTPd ]##
 elif [[ $http = 'lighttp' ]]; then
@@ -162,8 +161,7 @@ elif [[ $http = 'lighttp' ]]; then
 	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable modules
 
 	PHPini=/etc/php5/cgi/php.ini
-	log "Lighttp Installation | Completed"
-	debug_wait "lighttpd.installed"
+	log "Lighttp Installation | Completed" ; debug_wait "lighttpd.installed"
 
 ##[ Cherokee ]##
 elif [[ $http = 'cherokee' ]]; then
@@ -175,8 +173,7 @@ elif [[ $http = 'cherokee' ]]; then
 		E_=$? ; debug_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini
-	log "Cherokee Installation | Completed"
-	debug_wait "cherokee.installed"
+	log "Cherokee Installation | Completed" ; debug_wait "cherokee.installed"
 
 elif [[ $http != @(none|no|[Nn]) ]]; then  # Edit php config
 	sed -i 's:memory_limit .*:memory_limit = 128M:'                                    $PHPini
@@ -187,11 +184,41 @@ elif [[ $http != @(none|no|[Nn]) ]]; then  # Edit php config
 	sed -i 's:;error_log .*:error_log = /var/log/php-error.log:'                       $PHPini
 fi
 
+##[ XCache ]##
+if [[ $cache = 'xcache' ]]; then
+	notice "iNSTALLiNG X-CACHE"
+	$INSTALL php5-xcache 2>> $LOG
+	E_=$? ; debug_error "X-Cache failed to install"
+
+	echo -e "\n${bldylw} Generate a User Name and Password for XCache-Admin"
+	echo -e " You can use www.trilug.org/~jeremy/md5.php to generate the password ${rst}\n"
+	read -p "   Login Name: " xUser  # Get UserName and Password
+	read -p " MD5 Password: " xPass  # For XCache-Admin
+
+	PATH_xcache="/etc/php5/conf.d/xcache.ini"
+	sed -i "s:; xcache.admin.user .*:xcache.admin.user = $xUser:" $PATH_xcache
+	sed -i "s:; xcache.admin.pass .*:xcache.admin.pass = $xPass:" $PATH_xcache
+	sed -i 's:xcache.size  .*:xcache.size  = 48M:'                $PATH_xcache  # Increase cache size
+	sed -i "s:xcache.count .*:xcache.count = $CORES:" 	          $PATH_xcache  # Specify CPU Core count
+	sed -i 's:xcache.var_size  .*:xcache.var_size  = 8M:'         $PATH_xcache
+	sed -i 's:xcache.optimizer .*:xcache.optimizer = On:'         $PATH_xcache
+	cp -a /usr/share/xcache/admin $WEB/xcache-admin/  # Copy Admin folder to webroot
+
+	log "XCache Installation | Completed" ; debug_wait "xcache.installed"
+
+##[ APC ]##
+elif [[ $cache = 'apc' ]]; then
+	notice "iNSTALLiNG APC"
+	$INSTALL php-apc 2>> $LOG
+	E_=$? ; debug_error "PHP-APC failed to install"
+	log "APC Installation | Completed" ; debug_wait "apc.installed"
+fi
+
 ##[ vsFTP ]##
 if [[ $ftpd = 'vsftp' ]]; then
 	notice "iNSTALLiNG vsFTPd"
 	$INSTALL vsftpd 2>> $LOG
-		E_=$? ; debug_error "vsFTPd failed to install"
+	E_=$? ; debug_error "vsFTPd failed to install"
 	sed -i 's:anonymous_enable.*:anonymous_enable=NO:'           /etc/vsftpd.conf
 	sed -i 's:#local_enable.*:local_enable=YES:'                 /etc/vsftpd.conf
 	sed -i 's:#write_enable.*:write_enable=YES:'                 /etc/vsftpd.conf
@@ -200,20 +227,31 @@ if [[ $ftpd = 'vsftp' ]]; then
 	sed -i 's:#nopriv_user.*:nopriv_user=ftp:'                   /etc/vsftpd.conf
 	sed -i 's:#chroot_local_user.*:chroot_local_user=YES:'       /etc/vsftpd.conf
 
-	echo "rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem"          >> /etc/vsftpd.conf
-	echo "rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key" >> /etc/vsftpd.conf
-	echo "ssl_enable=YES" >> /etc/vsftpd.conf
-	echo "ssl_tlsv1=YES"  >> /etc/vsftpd.conf
-	echo "ssl_sslv2=NO"   >> /etc/vsftpd.conf
-	echo "ssl_sslv3=YES"  >> /etc/vsftpd.conf
-
-	echo ; read -p "Force SSL? [y/n]: " vsftpfssl
-	if [[ $vsftpfssl = 'y' ]]; then
-		echo "force_local_logins_ssl=YES" >> /etc/vsftpd.conf
-		echo "force_local_data_ssl=YES"   >> /etc/vsftpd.conf
+	cat /etc/vsftpd.conf | grep '# added by autoscript' >/dev/null
+	if [[ $? != 0 ]]; then  # Check if this has already been added or not
+		echo "# added by autoscript"                                       >> /etc/vsftpd.conf
+		echo "rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem"          >> /etc/vsftpd.conf
+		echo "rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key" >> /etc/vsftpd.conf
+		echo "force_local_logins_ssl=NO" >> /etc/vsftpd.conf
+		echo "force_local_data_ssl=NO"   >> /etc/vsftpd.conf
+		echo "ssl_enable=YES" >> /etc/vsftpd.conf
+		echo "ssl_tlsv1=YES"  >> /etc/vsftpd.conf
+		echo "ssl_sslv2=NO"   >> /etc/vsftpd.conf
+		echo "ssl_sslv3=YES"  >> /etc/vsftpd.conf
+	else
+		log "vsftpd config already edited, skipping"
 	fi
-	log "vsFTP Installation | Completed"
-	debug_wait "vsftpd.installed"
+
+	echo -n "Force SSL? [y/n]: "
+	if yes; then  # allow toggling of forcing ssl
+		sed -i 's:force_local_logins_ssl.*:force_local_logins_ssl=YES:' /etc/vsftpd.conf
+		sed -i 's:force_local_data_ssl.*:cforce_local_data_ssl=YES:'    /etc/vsftpd.conf
+	else
+		sed -i 's:force_local_logins_ssl.*:force_local_logins_ssl=NO:'  /etc/vsftpd.conf
+		sed -i 's:force_local_data_ssl.*:cforce_local_data_ssl=NO:'     /etc/vsftpd.conf
+	fi
+
+	log "vsFTP Installation | Completed" ; debug_wait "vsftpd.installed"
 
 ##[ proFTP ]##
 elif [[ $ftpd = 'proftp' ]]; then
@@ -222,8 +260,7 @@ elif [[ $ftpd = 'proftp' ]]; then
 		E_=$? ; debug_error "ProFTPd failed to install"
 	sed -i 's:#DefaultRoot .*:DefaultRoot ~:' /etc/proftpd/proftpd.conf
 
-	log "ProFTP Installation | Completed"
-	debug_wait "proftpd.installed"
+	log "ProFTP Installation | Completed" ; debug_wait "proftpd.installed"
 
 ##[ pureFTP ]##
 elif [[ $ftpd = 'pureftp' ]]; then
@@ -231,8 +268,13 @@ elif [[ $ftpd = 'pureftp' ]]; then
 	$INSTALL pure-ftpd pure-ftpd-common 2>> $LOG
 	E_=$? ; debug_error "PureFTP failed to install"
 
-	debug_wait "Creating PureFTP SSL Key"
-	echo 1 > /etc/pure-ftpd/conf/TLS  # Enable TLS+FTP (2 will allow TLS only, 0 disables it)
+	echo -n "Force SSL? [y/n]: "
+	if ! yes; then  # allow toggling of forcing ssl
+		echo 1 > /etc/pure-ftpd/conf/TLS  # Allow TLS+FTP
+	else
+		echo 2 > /etc/pure-ftpd/conf/TLS  # Force TLS
+	fi
+
 	if [[ ! -f /etc/ssl/private/pure-ftpd.pem ]]; then  # Create SSL Certificate
 		mkdir -p /etc/ssl/private && make-ssl-cert $SSLCERT /etc/ssl/private/pure-ftpd.pem
 		chmod 600 /etc/ssl/private/pure-ftpd.pem  # Read write permission for owner only
@@ -241,40 +283,36 @@ elif [[ $ftpd = 'pureftp' ]]; then
 	sed -i 's:STANDALONE_OR_INETD=.*:STANDALONE_OR_INETD=standalone:' /etc/default/pure-ftpd-common
 	/etc/init.d/pure-ftpd restart
 
-	log "PureFTP Installation | Completed"
-	debug_wait "pureftp.installed"
+	log "PureFTP Installation | Completed" ; debug_wait "pureftp.installed"
 fi
 
 ##[ mySQL ]##
 if [[ $sql = 'mysql' ]]; then
 	notice "iNSTALLiNG MySQL"
 	if [[ $DISTRO = 'Ubuntu' && $NAME != 'hardy' ]]; then
-		$INSTALL mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> $LOG && E_=$?
+		$INSTALL mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> $LOG ; E_=$?
 	elif [[ $DISTRO = 'Debian' || $NAME = 'hardy' ]]; then
-		$INSTALL mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> $LOG && E_=$?
+		$INSTALL mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> $LOG ; E_=$?
 	fi
+	debug_error "MySQL failed to install"
 
 	sed -ie 's:query_cache_limit .*:query_cache_limit = 2M\nquery_cache_type = 1:' /etc/mysql/my.cnf
 
-	debug_error "MySQL failed to install"
-	log "MySQL Installation | Completed"
-	debug_wait "mysql.installed"
+	log "MySQL Installation | Completed" ; debug_wait "mysql.installed"
 
 ##[ SQLiTE ]##
 elif [[ $sql = 'sqlite' ]]; then
 	notice "iNSTALLiNG SQLite"
 	$INSTALL sqlite3 php5-sqlite 2>> $LOG
 	E_=$? ; debug_error "SQLite failed to install"
-	log "SQLite Installation | Completed"
-	debug_wait "sqlite.installed"
+	log "SQLite Installation | Completed" ; debug_wait "sqlite.installed"
 
 ##[ PostGreSQL ]##
 elif [[ $sql = 'postgre' ]]; then
 	notice "iNSTALLiNG PostgreSQL"
 	$INSTALL postgresql postgresql-client-common postgresql-common 2>> $LOG
 	E_=$? ; debug_error "PostgreSQL failed to install"
-	log "PostgreSQL Installation | Completed"
-	debug_wait "postgresql.installed"
+	log "PostgreSQL Installation | Completed" ; debug_wait "postgresql.installed"
 fi
 
 ##[ Bouncers ]##
@@ -290,7 +328,7 @@ if [[ $bnc = 'znc' ]]; then
 	cd tmp/
 	download http://downloads.sourceforge.net/project/znc/znc/0.094/znc-0.094.tar.gz
 		debug_error "ZNC Download Failed"
-	tar -xzf znc-0.094.tar.gz && cd znc-0.094  # Unpack
+	extract znc-0.094.tar.gz && cd znc-0.094  # Unpack
 		log "ZNC | Downloaded + Unpacked"
 	notice "Be aware that compiling znc is a cpu intensive task and may take up to 10 min to complete"
 	sleep 3
@@ -333,7 +371,7 @@ elif [[ $bnc = 'psybnc' ]]; then
 	notice "iNSTALLiNG PsyBNC"
 	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz
 		debug_error "PsyBNC Download Failed"
-	tar xzf psyBNC-2.3.2-10.tar.gz
+	extract psyBNC-2.3.2-10.tar.gz
 	chown -R $USER:$USER psybnc
 		log "PsyBNC | Downloaded + Unpacked"
 
@@ -352,8 +390,7 @@ if [[ $webmin = 'y' ]]; then
 	notice "iNSTALLiNG WEBMiN"
 	$INSTALL webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> $LOG
 	E_=$? ; debug_error "Webmin failed to install"
-		log "WebMin Installation | Completed"
-		debug_wait "webmin.installed"
+	log "WebMin Installation | Completed" ; debug_wait "webmin.installed"
 fi
 
 ##[ vnStat ]##
@@ -363,14 +400,13 @@ if [[ $vnstat = 'y' ]]; then
 	$INSTALL libgd2-xpm libgd2-xpm-dev 2>> $LOG
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
-	tar xzf vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
+
+	extract vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
 	compile
 		debug_error "VnStat Build Failed"
-		log "VnStat Compile | Completed in $compile_time seconds"
-		debug_wait "vnstat.compiled"
-	make install                                                          # Install
+		log "VnStat Compile | Completed in $compile_time seconds" ; debug_wait "vnstat.compiled"
+	make install && cd ..                                                 # Install
 		log "VnStat Installation | Completed"
-	cd ..
 
 	if [[ ! -f /etc/init.d/vnstat ]]; then
 		cp vnstat-1.10/examples/init.d/debian/vnstat /etc/init.d/         # Copy init script if one doesnt exist
@@ -386,14 +422,14 @@ if [[ $vnstat = 'y' ]]; then
 	sed -i "s:SaveInterval 5:SaveInterval 10:"      /etc/vnstat.conf  # Less saves to disk
 	sed -i "s:UseLogging 2:UseLogging 1:"           /etc/vnstat.conf  # Log to file instead of syslog
 
-	rm -rf vnstat-web/themes/espresso vnstat-web/themes/light vnstat-web/themes/red  # Remove extra themes
-	rm -f vnstat-web/COPYING vnstat-web/vera_copyright.txt vnstat-web/config.php     # Remove extra files
+	rm -rf vnstat-web/themes/espresso vnstat-web/themes/light vnstat-web/themes/red                # Remove extra themes
+	rm -rf vnstat-web/COPYING vnstat-web/vera_copyright.txt vnstat-web/config.php vnstat-web/.git  # Remove extra files
 
 	cp ../modules/vnstat/config.php vnstat-web
 	sed -i "s|\$iface_list = .*|\$iface_list = array('$iFACE');|" vnstat-web/config.php  # Edit web config
 
 	mv vnstat-web $WEB  # Copy VnStat-web to WebRoot
-		 log "Frontend Installed | http://${iP}/vnstat-web"
+		 log "Frontend Installed | http://$iP/vnstat-web"
 
 	if [[ ! $(pidof vnstatd) ]]; then
 		vnstat -u -i $iFACE  # Make interface database
@@ -402,23 +438,83 @@ if [[ $vnstat = 'y' ]]; then
 	debug_wait "vnstat-web.installed"
 fi
 
+##[ phpSysInfo ]##
+cd $BASE/tmp
 if [[ $phpsysinfo = 'y' ]]; then
 	notice "iNSTALLiNG phpSysInfo"
 	#checkout https://phpsysinfo.svn.sourceforge.net/svnroot/phpsysinfo/trunk phpsysinfo
 	download http://downloads.sourceforge.net/project/phpsysinfo/phpsysinfo/3.0.7/phpsysinfo-3.0.7.tar.gz
-	tar xzf phpsysinfo-3.0.7.tar.gz
+	extract phpsysinfo-3.0.7.tar.gz
 	cd phpsysinfo
 	rm ChangeLog COPYING README README_PLUGIN 
 	cp config.php.new config.php
 
-	sed -i "s:define('PSI_PLUGINS'.*:define('PSI_PLUGINS', 'MDStatus,PS,PSStatus,Quotas,SMART');:"  config.php
+	sed -i "s:define('PSI_PLUGINS'.*:define('PSI_PLUGINS', 'PS,PSStatus,Quotas,SMART');:"  config.php
 	sed -i "s:define('PSI_TEMP_FORMAT'.*:define('PSI_TEMP_FORMAT', 'c-f');:"                        config.php
-	sed -i "s:define('PSI_HDD_TEMP'.*:define('PSI_HDD_TEMP', 'command');:"                          config.php
 	sed -i "s:define('PSI_DEFAULT_TEMPLATE',.*);:define('PSI_DEFAULT_TEMPLATE', 'nextgen');:"       config.php
 
 	cd ..
 	mv phpsysinfo $WEB 
-	log "phpSysInfo Installed"
+	log "phpSysInfo Installation | Completed"
+fi
+
+##[ SABnzbd ]##
+cd $BASE/tmp
+if [[ $sabnzbd = 'y' ]]; then
+	notice "iNSTALLiNG SABnzbd"
+	$INSTALL sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl 2>> $LOG
+	E_=$? ; debug_error "Sabnzbd failed to install"
+
+	# Install par2cmdline 0.4 with Intel Threading Building Blocks
+	if [[ $ARCH = 'x86_64' ]]; then download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20100203-lin64.tar.gz
+	else download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20090203-lin32.tar.gz
+	fi ; extract par2cmdline-0.4*.tar.gz && cd par2cmdline-0.4*
+	mv libtbb.so libtbb.so.2 par2 /usr/bin ; cd ..
+
+	#if [[ $NAME = 'lenny' ]]; then
+	#	libjs-mochikit >= 1.4
+	#fi
+
+	#read -p "  User Name that will run SABnzbd: " SABuser
+	sabnzbd_conf=/home/$USER/.sabnzbd/sabnzbd.ini
+	sabnzbd_init=/etc/default/sabnzbdplus
+
+	sed -i "s:USER.*:USER=$USER:"   $sabnzbd_init
+	sed -i "s:HOST.*:HOST=0.0.0.0:" $sabnzbd_init
+	sed -i "s:PORT.*:PORT=8080:"    $sabnzbd_init
+	/etc/init.d/sabnzbdplus start && /etc/init.d/sabnzbdplus stop  # Create config in user's home
+
+	sed -i "s:host .*:host = $iP:"  $sabnzbd_conf
+	if [[ $CORES < 2 ]]; then
+	sed -i "s:par2_multicore .*:par2_multicore = 0:" $sabnzbd_conf
+	fi
+
+	/etc/init.d/sabnzbdplus start  # Start 'er up
+
+	log "SABnzbd Installation | Completed"
+	log "SABnzbd Started and Running at http://$iP:8080" ; debug_wait "SABnzbd.installed"
+fi
+
+##[ iPLiST ]##
+cd $BASE/tmp
+if [[ $ipblock = 'y' ]]; then
+	notice "iNSTALLiNG iPBLOCK"
+	if [[ $NAME = 'lenny' ]]; then
+		apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1 2>> $LOG  # Install updated libraries for lenny support
+	fi
+	$INSTALL iplist 2>> $LOG
+	E_=$? ; debug_error "iPBLOCK failed to install"
+
+	PATH_iplist=/etc/ipblock.conf
+	filters='level1.gz'
+	sed -i "s:AUTOSTART=.*:AUTOSTART=\"Yes\":"        $PATH_iplist
+	sed -i "s:BLOCK_LIST=.*:BLOCK_LIST=\"$filters\":" $PATH_iplist
+
+	echo -en "${bldred} Updating block lists...${rst}"
+	ipblock -u && echo -e "${bldylw} done ${rst}"
+	/etc/init.d/ipblock start
+
+	log "iPBLOCK Installation | Completed" ; debug_wait "ipblock.installed"
 fi
 
 if [[ $torrent = @(rtorrent|tranny|deluge) ]]; then
@@ -433,8 +529,7 @@ if [[ $buildtorrent = 'b' ]]; then
 	notice "iNSTALLiNG BuildTorrent"
 	if [[ ! -d buildtorrent ]]; then  # Checkout latest BuildTorrent source
 		git clone -q git://gitorious.org/buildtorrent/buildtorrent.git ; E_=$?
-		debug_error "BuildTorrent Download Failed"
-		log "BuildTorrent | Downloaded"
+		debug_error "BuildTorrent Download Failed" ; log "BuildTorrent | Downloaded"
 	fi
 
 	cd buildtorrent
@@ -443,11 +538,10 @@ if [[ $buildtorrent = 'b' ]]; then
 	autoheader
 	automake -a -c
 	sh configure
-	make install ; E=$?
+	make install
 
-	debug_error "BuildTorrent Build Failed"
-	log "BuildTorrent Installation | Completed"
-	debug_wait "buildtorrent.installed"
+	E=$? ; debug_error "BuildTorrent Build Failed"
+	log "BuildTorrent Installation | Completed" ; debug_wait "buildtorrent.installed"
 
 elif [[ $buildtorrent != 'n' ]]; then
 #-->##[ mkTorrent ]##
@@ -460,11 +554,10 @@ if [[ ! -f /usr/local/bin/mktorrent || $buildtorrent = 'm' ]]; then
 	fi
 
 	cd mktorrent
-	make install ; E_=$?
+	make install
 
-	debug_error "MkTorrent Build Failed"
-	log "MkTorrent Installation | Completed"
-	debug_wait "mktorrent.installed"
+	E_=$? ; debug_error "MkTorrent Build Failed"
+	log "MkTorrent Installation | Completed" ; debug_wait "mktorrent.installed"
 fi
 fi
 

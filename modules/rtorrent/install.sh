@@ -44,8 +44,7 @@ cd $BASE/tmp
 		debug_error "XMLRPC Build Failed"
 		log "XMLRPC Compile | Completed in $compile_time seconds"
 	make install
-		log "XMLRPC Installation | Completed"
-		debug_wait "xmlrpc.installed"
+		log "XMLRPC Installation | Completed" ; debug_wait "xmlrpc.installed"
 
 	notice "COMPiLiNG... LiBTORRENT"
 #-->[ Compile libtorrent ]
@@ -62,8 +61,7 @@ cd $BASE/tmp
 		debug_error "LibTorrent Build Failed"
 		log "LibTorrent Compile | Completed in $compile_time seconds"
 	make install
-		log "LibTorrent Installation | Completed"
-		debug_wait "libtorrent.installed"
+		log "LibTorrent Installation | Completed" ; debug_wait "libtorrent.installed"
 
 	notice "COMPiLiNG... rTORRENT"
 #-->[ Compile rtorrent ]
@@ -119,8 +117,7 @@ elif [[ -d /etc/lighttpd || -d /etc/cherokee ]]; then
 else
 	debug_wait "No httpd found: Make sure to add sgci mounts to .rtorrent.rc"
 fi
-log "rTorrent Config | Created"
-log "rTorrent listening on port: $NUMBER"
+log "rTorrent Config | Created" ; log "rTorrent listening on port: $NUMBER"
 
 if [[ ! -f /etc/init.d/rtorrent ]]; then  # Copy init script
 	cp modules/rtorrent/rtorrent-init /etc/init.d/rtorrent

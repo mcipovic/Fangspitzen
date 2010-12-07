@@ -142,8 +142,7 @@ if [[ $http = 'apache' ]]; then
 	echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
 
 	PHPini=/etc/php5/apache/php.ini
-	log "Apache Installation | Completed"
-	debug_wait "apache.installed"
+	log "Apache Installation | Completed" ; debug_wait "apache.installed"
 
 ##[ LiGHTTPd ]##
 elif [[ $http = 'lighttp' ]]; then
@@ -161,8 +160,7 @@ elif [[ $http = 'lighttp' ]]; then
 	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable modules
 
 	PHPini=/etc/php5/cgi/php.ini
-	log "Lighttp Installation | Completed"
-	debug_wait "lighttpd.installed"
+	log "Lighttp Installation | Completed" ; debug_wait "lighttpd.installed"
 
 ##[ Cherokee ]##
 elif [[ $http = 'cherokee' ]]; then
@@ -174,8 +172,7 @@ elif [[ $http = 'cherokee' ]]; then
 		E_=$? ; debug_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini
-	log "Cherokee Installation | Completed"
-	debug_wait "cherokee.installed"
+	log "Cherokee Installation | Completed" ; debug_wait "cherokee.installed"
 
 elif [[ $http != @(none|no|[Nn]) ]]; then  # Edit php config
 	sed -i 's:memory_limit .*:memory_limit = 128M:'                                    $PHPini
@@ -186,11 +183,41 @@ elif [[ $http != @(none|no|[Nn]) ]]; then  # Edit php config
 	sed -i 's:;error_log .*:error_log = /var/log/php-error.log:'                       $PHPini
 fi
 
+##[ XCache ]##
+if [[ $cache = 'xcache' ]]; then
+	notice "iNSTALLiNG X-CACHE"
+	$INSTALL php5-xcache 2>> $LOG
+	E_=$? ; debug_error "X-Cache failed to install"
+
+	echo -e "\n${bldylw} Generate a User Name and Password for XCache-Admin"
+	echo -e " You can use www.trilug.org/~jeremy/md5.php to generate the password ${rst}\n"
+	read -p "   Login Name: " xUser  # Get UserName and Password
+	read -p " MD5 Password: " xPass  # For XCache-Admin
+
+	PATH_xcache="/etc/php5/conf.d/xcache.ini"
+	sed -i "s:; xcache.admin.user .*:xcache.admin.user = $xUser:" $PATH_xcache
+	sed -i "s:; xcache.admin.pass .*:xcache.admin.pass = $xPass:" $PATH_xcache
+	sed -i 's:xcache.size  .*:xcache.size  = 48M:'                $PATH_xcache  # Increase cache size
+	sed -i "s:xcache.count .*:xcache.count = $CORES:" 	          $PATH_xcache  # Specify CPU Core count
+	sed -i 's:xcache.var_size  .*:xcache.var_size  = 8M:'         $PATH_xcache
+	sed -i 's:xcache.optimizer .*:xcache.optimizer = On:'         $PATH_xcache
+	cp -a /usr/share/xcache/admin $WEB/xcache-admin/  # Copy Admin folder to webroot
+
+	log "XCache Installation | Completed" ; debug_wait "xcache.installed"
+
+##[ APC ]##
+elif [[ $cache = 'apc' ]]; then
+	notice "iNSTALLiNG APC"
+	$INSTALL php-apc 2>> $LOG
+	E_=$? ; debug_error "PHP-APC failed to install"
+	log "APC Installation | Completed" ; debug_wait "apc.installed"
+fi
+
 ##[ vsFTP ]##
 if [[ $ftpd = 'vsftp' ]]; then
 	notice "iNSTALLiNG vsFTPd"
 	$INSTALL vsftpd 2>> $LOG
-		E_=$? ; debug_error "vsFTPd failed to install"
+	E_=$? ; debug_error "vsFTPd failed to install"
 	sed -i 's:anonymous_enable.*:anonymous_enable=NO:'           /etc/vsftpd.conf
 	sed -i 's:#local_enable.*:local_enable=YES:'                 /etc/vsftpd.conf
 	sed -i 's:#write_enable.*:write_enable=YES:'                 /etc/vsftpd.conf
@@ -200,7 +227,7 @@ if [[ $ftpd = 'vsftp' ]]; then
 	sed -i 's:#chroot_local_user.*:chroot_local_user=YES:'       /etc/vsftpd.conf
 
 	cat /etc/vsftpd.conf | grep '# added by autoscript' >/dev/null
-	if [[ $? = 1 ]]; then
+	if [[ $? != 0 ]]; then  # Check if this has already been added or not
 		echo "# added by autoscript"                                       >> /etc/vsftpd.conf
 		echo "rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem"          >> /etc/vsftpd.conf
 		echo "rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key" >> /etc/vsftpd.conf
@@ -223,8 +250,7 @@ if [[ $ftpd = 'vsftp' ]]; then
 		sed -i 's:force_local_data_ssl.*:cforce_local_data_ssl=NO:'     /etc/vsftpd.conf
 	fi
 
-	log "vsFTP Installation | Completed"
-	debug_wait "vsftpd.installed"
+	log "vsFTP Installation | Completed" ; debug_wait "vsftpd.installed"
 
 ##[ proFTP ]##
 elif [[ $ftpd = 'proftp' ]]; then
@@ -233,8 +259,7 @@ elif [[ $ftpd = 'proftp' ]]; then
 		E_=$? ; debug_error "ProFTPd failed to install"
 	sed -i 's:#DefaultRoot .*:DefaultRoot ~:' /etc/proftpd/proftpd.conf
 
-	log "ProFTP Installation | Completed"
-	debug_wait "proftpd.installed"
+	log "ProFTP Installation | Completed" ; debug_wait "proftpd.installed"
 
 ##[ pureFTP ]##
 elif [[ $ftpd = 'pureftp' ]]; then
@@ -257,40 +282,36 @@ elif [[ $ftpd = 'pureftp' ]]; then
 	sed -i 's:STANDALONE_OR_INETD=.*:STANDALONE_OR_INETD=standalone:' /etc/default/pure-ftpd-common
 	/etc/init.d/pure-ftpd restart
 
-	log "PureFTP Installation | Completed"
-	debug_wait "pureftp.installed"
+	log "PureFTP Installation | Completed" ; debug_wait "pureftp.installed"
 fi
 
 ##[ mySQL ]##
 if [[ $sql = 'mysql' ]]; then
 	notice "iNSTALLiNG MySQL"
 	if [[ $DISTRO = 'Ubuntu' && $NAME != 'hardy' ]]; then
-		$INSTALL mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> $LOG && E_=$?
+		$INSTALL mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> $LOG ; E_=$?
 	elif [[ $DISTRO = 'Debian' || $NAME = 'hardy' ]]; then
-		$INSTALL mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> $LOG && E_=$?
+		$INSTALL mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> $LOG ; E_=$?
 	fi
+	debug_error "MySQL failed to install"
 
 	sed -ie 's:query_cache_limit .*:query_cache_limit = 2M\nquery_cache_type = 1:' /etc/mysql/my.cnf
 
-	debug_error "MySQL failed to install"
-	log "MySQL Installation | Completed"
-	debug_wait "mysql.installed"
+	log "MySQL Installation | Completed" ; debug_wait "mysql.installed"
 
 ##[ SQLiTE ]##
 elif [[ $sql = 'sqlite' ]]; then
 	notice "iNSTALLiNG SQLite"
 	$INSTALL sqlite3 php5-sqlite 2>> $LOG
 	E_=$? ; debug_error "SQLite failed to install"
-	log "SQLite Installation | Completed"
-	debug_wait "sqlite.installed"
+	log "SQLite Installation | Completed" ; debug_wait "sqlite.installed"
 
 ##[ PostGreSQL ]##
 elif [[ $sql = 'postgre' ]]; then
 	notice "iNSTALLiNG PostgreSQL"
 	$INSTALL postgresql postgresql-client-common postgresql-common 2>> $LOG
 	E_=$? ; debug_error "PostgreSQL failed to install"
-	log "PostgreSQL Installation | Completed"
-	debug_wait "postgresql.installed"
+	log "PostgreSQL Installation | Completed" ; debug_wait "postgresql.installed"
 fi
 
 ##[ Bouncers ]##
@@ -368,8 +389,7 @@ if [[ $webmin = 'y' ]]; then
 	notice "iNSTALLiNG WEBMiN"
 	$INSTALL webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> $LOG
 	E_=$? ; debug_error "Webmin failed to install"
-		log "WebMin Installation | Completed"
-		debug_wait "webmin.installed"
+	log "WebMin Installation | Completed" ; debug_wait "webmin.installed"
 fi
 
 ##[ vnStat ]##
@@ -383,8 +403,7 @@ if [[ $vnstat = 'y' ]]; then
 	extract vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
 	compile
 		debug_error "VnStat Build Failed"
-		log "VnStat Compile | Completed in $compile_time seconds"
-		debug_wait "vnstat.compiled"
+		log "VnStat Compile | Completed in $compile_time seconds" ; debug_wait "vnstat.compiled"
 	make install && cd ..                                                 # Install
 		log "VnStat Installation | Completed"
 
@@ -472,8 +491,7 @@ if [[ $sabnzbd = 'y' ]]; then
 	/etc/init.d/sabnzbdplus start  # Start 'er up
 
 	log "SABnzbd Installation | Completed"
-	log "SABnzbd Started and Running at http://$iP:8080"
-	debug_wait "SABnzbd.installed"
+	log "SABnzbd Started and Running at http://$iP:8080" ; debug_wait "SABnzbd.installed"
 fi
 
 ##[ iPLiST ]##
@@ -495,8 +513,7 @@ if [[ $ipblock = 'y' ]]; then
 	ipblock -u && echo -e "${bldylw} done ${rst}"
 	/etc/init.d/ipblock start
 
-	log "iPBLOCK Installation | Completed"
-	debug_wait "ipblock.installed"
+	log "iPBLOCK Installation | Completed" ; debug_wait "ipblock.installed"
 fi
 
 if [[ $torrent = @(rtorrent|tranny|deluge) ]]; then
@@ -511,8 +528,7 @@ if [[ $buildtorrent = 'b' ]]; then
 	notice "iNSTALLiNG BuildTorrent"
 	if [[ ! -d buildtorrent ]]; then  # Checkout latest BuildTorrent source
 		git clone -q git://gitorious.org/buildtorrent/buildtorrent.git ; E_=$?
-		debug_error "BuildTorrent Download Failed"
-		log "BuildTorrent | Downloaded"
+		debug_error "BuildTorrent Download Failed" ; log "BuildTorrent | Downloaded"
 	fi
 
 	cd buildtorrent
@@ -521,11 +537,10 @@ if [[ $buildtorrent = 'b' ]]; then
 	autoheader
 	automake -a -c
 	sh configure
-	make install ; E=$?
+	make install
 
-	debug_error "BuildTorrent Build Failed"
-	log "BuildTorrent Installation | Completed"
-	debug_wait "buildtorrent.installed"
+	E=$? ; debug_error "BuildTorrent Build Failed"
+	log "BuildTorrent Installation | Completed" ; debug_wait "buildtorrent.installed"
 
 elif [[ $buildtorrent != 'n' ]]; then
 #-->##[ mkTorrent ]##
@@ -538,11 +553,10 @@ if [[ ! -f /usr/local/bin/mktorrent || $buildtorrent = 'm' ]]; then
 	fi
 
 	cd mktorrent
-	make install ; E_=$?
+	make install
 
-	debug_error "MkTorrent Build Failed"
-	log "MkTorrent Installation | Completed"
-	debug_wait "mktorrent.installed"
+	E_=$? ; debug_error "MkTorrent Build Failed"
+	log "MkTorrent Installation | Completed" ; debug_wait "mktorrent.installed"
 fi
 fi
 

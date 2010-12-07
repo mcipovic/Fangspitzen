@@ -19,7 +19,7 @@ if [[ $DISTRO = 'Ubuntu' ]]; then
 	echo "deb http://download.webmin.com/download/repository sarge contrib"     >> $REPO_PATH/autoinstaller.list  # Webmin
 	log "Repositories ADD | Success"
 
-elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
+elif [[ $DISTRO = @(Debian|LinuxMint) ]]; then
 	if [[ $NAME = 'lenny' ]]; then  # Bascially updates to squeeze since packages are so old on lenny
 #		touch /etc/apt/apt.conf
 #		echo 'APT::Default-Release "stable";' >> /etc/apt/apt.conf  # Make lenny the default for package installation
@@ -28,7 +28,7 @@ elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
 		echo "deb http://ftp.debian.org/debian/ squeeze main non-free contrib"       >> /etc/apt/sources.list
 		echo "deb http://security.debian.org/ squeeze/updates main non-free contrib" >> /etc/apt/sources.list
 		echo "deb http://ppa.launchpad.net/stbuehler/ppa/ubuntu jaunty main"         >> $REPO_PATH/autoinstaller.list  # Lighttp
-	#elif [[ $NAME = 'squeeze' || $NAME = 'debian' ]]; then  # 'debian' is used for mint debian releases
+	#elif [[ $NAME = @(squeeze|debian) ]]; then  # 'debian' is used for mint debian releases
 	else
 		echo "deb http://ftp.debian.org/debian/ squeeze non-free contrib"            >> /etc/apt/sources.list
 		echo "deb http://security.debian.org/ squeeze/updates non-free contrib"      >> /etc/apt/sources.list
@@ -51,7 +51,7 @@ else
 fi
 
 ##!=====================>> PUBLiC KEYS <<========================!##
-if [[ $DISTRO = 'Ubuntu' || $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
+if [[ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]]; then
 	addkey='apt-key adv --keyserver keyserver.ubuntu.com --recv-keys'  # Add signing keys
 	$addkey EBA7BD49
 	$addkey 5A43ED73

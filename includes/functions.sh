@@ -8,7 +8,7 @@ PHP="php5 php5-cgi php5-cli php5-common php5-curl php5-gd php5-dev php5-mcrypt p
 fi
 	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 	if [[ $DISTRO = 'Ubuntu' ]]; then
-		if [[ $NAME = 'karmic' || $NAME = 'lucid' ]]; then
+		if [[ $NAME = @(karmic|lucid) ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'jaunty' ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar2 2>> $LOG ; E_=$?
@@ -16,8 +16,8 @@ fi
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar6 2>> $LOG ; E_=$?
 		fi
 
-	elif [[ $DISTRO = 'Debian' || $DISTRO = 'LinuxMint' ]]; then
-		if [[ $NAME = 'squeeze' || $NAME = 'debian' ]]; then
+	elif [[ $DISTRO = @(Debian|LinuxMint) ]]; then
+		if [[ $NAME = @(squeeze|debian) ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'lenny' ]]; then
 			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar0 2>> $LOG ; E_=$?
@@ -46,9 +46,9 @@ checkroot() {  # check if user is root
 }
 
 cleanup() {  # remove tmp folder and restore permissions
-	cd $BASE ; rm --recursive --force tmp/
-	log "Cleaning up"
+	cd $BASE && rm --recursive --force tmp
 	chown -R $USER:$USER $BASE
+	log "Removed tmp/ folder"
 }
 
 clear_logfile() {  # clear the logfile

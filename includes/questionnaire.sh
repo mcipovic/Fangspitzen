@@ -3,6 +3,7 @@ while [[ $skip = false ]]; do
 echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<---------------${rst}"
 
 read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: " http
+read -p " [PHP Cache]                     [xcache|apc|none]: " cache
 read -p "[ SQL SERVER  ]        [mysql|sqlite|postgre|none]: " sql
 read -p "[ FTP SERVER  ]        [vsftp|proftp|pureftp|none]: " ftpd
 read -p "[ Torrent App ]      [rtorrent|tranny|deluge|none]: " torrent
@@ -25,7 +26,7 @@ else webmin='n';fi
 read -p " [VnStat WebUi]                              [y|n]: " vnstat
 
 ##!=========================>> EXTRAS <<=========================!##
-if [[ $extras = true ]]; then
+if [[ $extras = true ]]; then echo
 read -p " [phpSysInfo]                                [y|n]: " phpsysinfo
 read -p " [SABnzbd]                                   [y|n]: " sabnzbd
 read -p " [iPBLOCK]                                   [y|n]: " ipblock
@@ -55,6 +56,20 @@ elif [[ $http = 'cherokee' ]]; then
 elif [[ $http = @(none|no|[Nn]) ]]; then
 	echo -e "${bldylw} WEB SERVER NOT BEiNG iNSTALLED ${rst}"
 else echo -e "${bldred}--> ERROR iN HTTP iNPUT! ${rst}"; http='none'
+fi
+
+##[ Check for PHP Cache] ]##
+if [[ $cache = @(xcache|x) ]]; then
+	cacheP=$(aptitude show php5-xcache | grep Package)
+	cacheV=$(aptitude show php5-xcache | grep Version)
+	echo -e "${bldblu} $cacheP : $cacheV ${rst}"
+elif [[ $cache = 'apc' ]]; then
+	cacheP=$(aptitude show php-apc | grep Package)
+	cacheV=$(aptitude show php-apc | grep Version)
+	echo -e "${bldblu} $cacheP : $cacheV ${rst}"
+elif [[ $cache = @(none|no|[Nn]) ]]; then
+	echo -e "${bldylw} PHP CACHE NOT BEiNG iNSTALLED ${rst}"
+else echo -e "${bldred}--> ERROR iN PHP CACHE iNPUT! ${rst}"; cache='none'
 fi
 
 ##[ Check for SQL ]##

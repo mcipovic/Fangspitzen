@@ -1,5 +1,5 @@
 ##!=======================>> QUESTiONS <<========================!##
-while [[ $skip_ques = false ]]; do
+while [[ $skip_ques = 'n' ]]; do
 echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<---------------${rst}"
 
 read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: " http
@@ -204,7 +204,7 @@ fi  # end `if $extras`
 ##[ CONFiRMATiON ]##
 echo -en "\n Is this correct? [y/n]: "
 	if yes; then
-		skip=true
+		skip_ques='y'
 		break
 	fi
 done  # Answer was no, so we loop back and do it again

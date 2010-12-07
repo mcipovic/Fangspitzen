@@ -9,18 +9,18 @@ fi
 	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 	if [[ $DISTRO = 'Ubuntu' ]]; then
 		if [[ $NAME = @(karmic|lucid) ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG ; E_=$?
+			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'jaunty' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar2 2>> $LOG ; E_=$?
+			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar2 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'maverick' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar6 2>> $LOG ; E_=$?
+			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar6 2>> $LOG ; E_=$?
 		fi
 
 	elif [[ $DISTRO = @(Debian|LinuxMint) ]]; then
 		if [[ $NAME = @(squeeze|debian) ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar5 2>> $LOG ; E_=$?
+			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'lenny' ]]; then
-			$INSTALL $STABLE $DYNAMIC $PHP libtorrent-rasterbar0 2>> $LOG ; E_=$?
+			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar0 2>> $LOG ; E_=$?
 		fi
 	elif [[ $DISTRO = 'Arch' ]]; then
 			$INSTALL base-devel fakeroot yaourt php 2>> $LOG ; E_=$?

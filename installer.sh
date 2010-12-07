@@ -125,7 +125,7 @@ cd $BASE
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
-	$INSTALL apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
+	$INSTALL $PHP apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
 	E_=$? ; debug_error "Apache2 failed to install"
 
 	cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
@@ -147,7 +147,7 @@ if [[ $http = 'apache' ]]; then
 ##[ LiGHTTPd ]##
 elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
-	$INSTALL lighttpd apache2-utils 2>> $LOG
+	$INSTALL $PHP lighttpd apache2-utils 2>> $LOG
 	E_=$? ; debug_error "Lighttpd failed to install"
 
 	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
@@ -168,7 +168,7 @@ elif [[ $http = 'cherokee' ]]; then
 	#if [[ $NAME = 'lenny' ]]; then
 	#	$INSTALL cherokee spawn-fcgi 2>> $LOG
 	#else
-		$INSTALL cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> $LOG
+		$INSTALL $PHP cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> $LOG
 		E_=$? ; debug_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini

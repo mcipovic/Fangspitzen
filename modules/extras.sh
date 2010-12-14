@@ -160,10 +160,20 @@ cd $BASE/tmp
 if [[ $vnstat = 'y' ]]; then
 	notice "iNSTALLiNG VNSTAT"
 	$INSTALL libgd2-xpm libgd2-xpm-dev 2>> $LOG
-	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
 
+	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
 	extract vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
+
+	##[ Alternative - JSvnStat ]##
+	# download http://www.rakudave.ch/userfiles/javascript/jsvnstat/jsvnstat.zip
+	# mkdir -p jsvnstat && mv jsvnstat.zip jsvnstat && cd jsvnstat
+	# unzip jsvnstat.zip
+	# rm README
+	# sed -i "s|\$interface =.*|\$interface = \"$iFACE\";|" settings.php
+	# cd ..
+	# mv jsvnstat $WEB
+
 	compile
 		debug_error "VnStat Build Failed"
 		log "VnStat Compile | Completed in $compile_time seconds" ; debug_wait "vnstat.compiled"
@@ -190,8 +200,9 @@ if [[ $vnstat = 'y' ]]; then
 	cp ../modules/vnstat/config.php vnstat-web
 	sed -i "s|\$iface_list = .*|\$iface_list = array('$iFACE');|" vnstat-web/config.php  # Edit web config
 
+
 	mv vnstat-web $WEB  # Copy VnStat-web to WebRoot
-		 log "Frontend Installed | http://$iP/vnstat-web"
+	log "Frontend Installed | http://$iP/vnstat-web"
 
 	if [[ ! $(pidof vnstatd) ]]; then
 		vnstat -u -i $iFACE  # Make interface database

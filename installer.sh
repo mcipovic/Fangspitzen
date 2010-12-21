@@ -20,7 +20,7 @@ trap ctrl_c SIGINT
 VERSION='0.9.9~git'                                              #
 DATE='Dec 08 2010'                                               #
 ##################################################################
-source includes/functions.sh  # Source in our functions
+source includes/functions.sh || error "while loading functions.sh"  # Source in our functions
 
 ##[ Check command line switches ]##
 while [ $# -gt 0 ]; do
@@ -42,13 +42,11 @@ checkroot
 
 ##[ Find Config and Load it ]##
 if [[ -f config.ini ]]; then
-	source config.ini ; E_=$?
-	if [[ $E_ != 0 ]]; then 
-		error "config.ini found but not readable!"
-	elif [[ $iDiDNTEDiTMYCONFiG ]]; then  # Die if it hasnt been edited
+	source config.ini || error "while loading config.ini"
+	if [[ $iDiDNTEDiTMYCONFiG ]]; then  # Die if it hasnt been edited
 		error "PLEASE EDiT THE CONFiG"
-	elif [[ $PWD != $BASE ]]; then  # Check if the user declared BASE correctly in the config
-		echo "Wrong Directory Detected..."
+	elif [[ $PWD != "$BASE" ]]; then  # Check if the user declared BASE correctly in the config
+		echo  "Wrong Directory Detected..."
 		error "Does not match $BASE"
 	fi
 else error "config.ini not found!"  # Cant continue without a config so produce an error and exit
@@ -58,7 +56,7 @@ init
 
 #!=======================>> DiSCLAiMER <<=======================!#
 if [[ ! -f $LOG ]]; then  # only show for first run
-cat << "EOF"
+echo -e "
                       ______
                    .-"      "-.
                   /            \\
@@ -80,15 +78,15 @@ cat << "EOF"
   not likely. If you do run into problems, please let us know so we can
   fix it.
 
-  You can update your system along with installing those "must have"
+  You can update your system along with installing those \"must have\"
   programs by simply running this script with the --dry option.
 
   The systems currently supported are:
      Ubuntu [ 9.04 -> 10.10 ]
      Debian [ 5.0  ->  6.0  ]
 
-  If your OS is not listed, this script will most likey explode.
-EOF
+  If your OS is not listed, this script will most likey explode. \n"
+
 echo -e " ${undred}_______________________${rst}"
 echo -e " Distro:${bldylw} $DISTRO $RELEASE/$NAME ${rst}"
 echo -e " Kernel:${bldylw} $KERNEL${rst}-${bldylw}$ARCH ${rst}"
@@ -111,12 +109,12 @@ if [[ $DISTRO = 'SUSE Linux' ]]; then
 fi
 
 if [[ ! -f $REPO_PATH/autoinstaller.list ]]; then
-	source $BASE/includes/repositories.sh  # Add repositories if not already present
+	source $BASE/includes/repositories.sh || error "while loading repositories.sh"  # Add repositories if not already present
 else log "Repositories Already Present, skipping"
 fi
 
 clear
-source $BASE/includes/questionnaire.sh  # Load questionnaire
+source $BASE/includes/questionnaire.sh || error "while loading questionnaire.sh"  # Load questionnaire
 
 #!=====================>> iNSTALLATiON <<=======================!#
 echo -e "\n********************************"

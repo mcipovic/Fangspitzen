@@ -92,7 +92,7 @@ sudo -u $USER mkdir -p downloads
 
 cd $BASE
 PATH_rt=$HOME/.rtorrent.rc
-cp modules/rtorrent/rtorrent.rc $PATH_rt
+cp modules/rtorrent/rtorrent.rc "$PATH_rt"
 
 NUMBER=$[($RANDOM % 65534) + 20000]  # Generate a random number from 20000-65534
 echo "port_range = $NUMBER-$NUMBER"       >> $PATH_rt
@@ -121,7 +121,7 @@ log "rTorrent Config | Created" ; log "rTorrent listening on port: $NUMBER"
 
 if [[ ! -f /etc/init.d/rtorrent ]]; then  # Copy init script
 	cp modules/rtorrent/rtorrent-init /etc/init.d/rtorrent
-	cp modules/rtorrent/rtorrent-init-conf $HOME/.rtorrent.init.conf
+	cp modules/rtorrent/rtorrent-init-conf "$HOME"/.rtorrent.init.conf
 
 	# Write init configuration
 	sed -i "s:user=:user=\"$USER\":"                      $HOME/.rtorrent.init.conf

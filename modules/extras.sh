@@ -16,7 +16,7 @@ if [[ $cache = 'xcache' ]]; then
 	sed -i "s:xcache.count .*:xcache.count = $CORES:" 	          $PATH_xcache  # Specify CPU Core count
 	sed -i 's:xcache.var_size  .*:xcache.var_size  = 8M:'         $PATH_xcache
 	sed -i 's:xcache.optimizer .*:xcache.optimizer = On:'         $PATH_xcache
-	cp -a /usr/share/xcache/admin $WEB/xcache-admin/  # Copy Admin folder to webroot
+	cp -a /usr/share/xcache/admin "$WEB"/xcache-admin/  # Copy Admin folder to webroot
 
 	log "XCache Installation | Completed" ; debug_wait "xcache.installed"
 
@@ -204,7 +204,7 @@ if [[ $vnstat = 'y' ]]; then
 	mv vnstat-web $WEB  # Copy VnStat-web to WebRoot
 	log "Frontend Installed | http://$iP/vnstat-web"
 
-	if [[ ! $(pidof vnstatd) ]]; then
+	if [[ ! $(pgrep vnstatd) ]]; then
 		vnstat -u -i $iFACE  # Make interface database
 		vnstatd -d           # Start daemon
 	fi

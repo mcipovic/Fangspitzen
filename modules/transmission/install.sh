@@ -6,7 +6,7 @@ cd ${BASE}/tmp
 	/etc/init.d/transmission-daemon stop
 
 	sudo -u $USER transmission-daemon && sleep 2  # Create our users config folder below
-	kill -15 $(pidof transmission-daemon) && sleep 2
+	kill -15 $(pgrep transmission-daemon) && sleep 2
 	echo
 	read -p " WEBUi User Name: " tUser
 	read -p " WEBUi Password : " tPass

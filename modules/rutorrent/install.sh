@@ -18,8 +18,8 @@ cd $BASE/tmp
 
 cd rutorrent
 	rm -R plugins conf/plugins.ini favicon.ico
-	cp $BASE/modules/rutorrent/plugins.ini conf/plugins.ini
-	cp $BASE/modules/rutorrent/favicon.ico favicon.ico
+	cp "$BASE"/modules/rutorrent/plugins.ini conf/plugins.ini
+	cp "$BASE"/modules/rutorrent/favicon.ico favicon.ico
 
 	notice "iNSTALLiNG Plugins"
 	checkout http://rutorrent.googlecode.com/svn/trunk/plugins  # Checkout plugins-svn
@@ -41,10 +41,10 @@ cd $BASE/tmp
 	sed -i "s:\$defaultTheme .*:\$defaultTheme = \"Oblivion\";:"                  rutorrent/plugins/theme/conf.php
 
 	echo
-	if [[ $(pidof apache2) ]]; then  # Apache
+	if [[ $(pgrep apache2) ]]; then  # Apache
 		htdigest -c /etc/apache2/.htpasswd "ruTorrent" $USER  # Create user authentication
 		cp ../modules/apache/htaccess rutorrent/.htaccess
-	elif [[ $(pidof lighttpd) ]]; then  # Lighttp
+	elif [[ $(pgrep lighttpd) ]]; then  # Lighttp
 		htdigest -c /etc/lighttpd/.htpasswd "ruTorrent" $USER  # Create user authentication
 	fi
 
@@ -57,7 +57,7 @@ cd $BASE/tmp
 	fi
 	log "ruTorrent Config | Created"
 
-	cp -R rutorrent $WEB  # Move rutorrent to webroot
+	cp -R rutorrent "$WEB"  # Move rutorrent to webroot
 	chmod -R 755 $WEB
 	chown -R www-data:www-data $WEB
 	log "ruTorrent Installation | Completed" ; debug_wait "rutorrent.installed"

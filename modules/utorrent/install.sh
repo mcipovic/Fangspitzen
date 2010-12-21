@@ -1,6 +1,6 @@
 cd ${HOME}
 download http://download.utorrent.com/linux/utorrent-server-3.0-21886.tar.gz
-	E_=$? && debug_error "uTorrent Download Failed"
+	E_=$? && if_error "uTorrent Download Failed"
 tar xzf utorrent-server-3.0-21886.tar.gz
 cd bittorrent-server-v3_0
 # echo 'some_settings'       > utserver.conf

@@ -47,7 +47,7 @@ elif [[ $DISTRO = 'Arch' ]]; then
 	echo '[archlinuxfr]'                           >> $REPO_PATH
 	echo 'Server = http://repo.archlinux.fr/$arch' >> $REPO_PATH
 else
-	debug_error "${txtred} Failed to add repositories to unknown distro ($DISTRO) ...exiting ${rst}"
+	error "Failed to add repositories to unknown distro... exiting ($DISTRO)"
 fi
 
 ##!=====================>> PUBLiC KEYS <<========================!##

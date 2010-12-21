@@ -9,24 +9,24 @@ fi
 	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 	if [[ $DISTRO = 'Ubuntu' ]]; then
 		if [[ $NAME = @(karmic|lucid) ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar5 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar5
 		elif [[ $NAME = 'jaunty' ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar2 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar2
 		elif [[ $NAME = 'maverick' ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar6 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar6
 		fi
 
 	elif [[ $DISTRO = @(Debian|LinuxMint) ]]; then
 		if [[ $NAME = @(squeeze|debian) ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar5 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar5
 		elif [[ $NAME = 'lenny' ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar0 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar0
 		fi
 	elif [[ $DISTRO = 'Arch' ]]; then
-			packages install base-devel fakeroot yaourt php 2>> $LOG ; E_=$?
+			packages install base-devel fakeroot yaourt php
 	fi
 
-	debug_error "Required system packages failed to install"
+	if_error "Required system packages failed to install"
 	log "Base Installation | Completed"
 	echo -e "${bldylw} done${rst}"
 }
@@ -69,15 +69,6 @@ ctrl_c() {  # interrupt trap
 	exit 0
 }
 
-debug_error() {  # call this to catch a bad return code and log the error
-	if [[ $E_ != 0 ]]; then
-		echo -e " Error:${bldred} $1 ${rst} ($E_)"
-		log "Error: $1 ($E_)"
-		cleanup
-		exit 1
-	fi
-}
-
 debug_wait() {  # prints a message and wait for user before continuing
 	if [[ $DEBUG = '1' ]]; then
 		echo -e "${bldpur} DEBUG: $1"
@@ -114,6 +105,15 @@ extract() {  # find type of compression and extract accordingly
 	esac
 }
 
+if_error() {  # call this to catch a bad return code and log the error
+	if [[ $E_ != 0 ]]; then
+		echo -e " Error:${bldred} $1 ${rst} ($E_)"
+		log "Error: $1 ($E_)"
+		cleanup
+		exit 1
+	fi
+}
+
 log() {  # send to the logfile
 	echo -e "$1" >> $LOG
 }
@@ -140,42 +140,42 @@ notice() {  # echo status or general info to stdout
 packages() {
 	if [ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]; then
 		case $1 in
+			install) shift; apt-get install --yes -qq $@ 2>> $LOG ; E_=$? ;;
 			update ) apt-get update -qq              ;;
 			upgrade) apt-get upgrade --yes -qq       ;;
-			install) apt-get install --yes -qq       ;;
 			version) dpkg-query -p $2 | grep Version ;;
 			clean  ) apt-get -qq autoclean           ;;
 		esac
 	elif [ $DISTRO = 'Arch' ]; then
 		case $1 in
+			install) shift; pacman --sync --noconfirm $@ 2>> $LOG ; E_=$? ;;
 			update ) pacman --sync --refresh --noconfirm              ;;
 			upgrade) pacman --sync --refresh --sysupgrade --noconfirm ;;
-			install) pacman --sync --noconfirm                        ;;
 			version) pacman -Qi $2 | grep Version                     ;;
 			clean  ) pacman --sync --clean -c --noconfirm             ;;
 		esac
 	elif [ $DISTRO = 'SUSE LINUX' ]; then
 		case $1 in
+			install) shift; zypper --quiet --non-interactive install $@ 2>> $LOG ; E_=$? ;;
 			update ) zypper --quiet refresh                   ;;
 			upgrade) zypper --quiet --non-interactive upgrade ;;
-			install) zypper --quiet --non-interactive install ;;
 			version) zypper info                              ;;
 		esac
 
 	#elif [ $DISTRO = "Fedora" ]; then
 	#	case $1 in
+	#		install) shift; yum install $@ 2>> $LOG ; E_=$? ;;
 	#		update ) yum check-update ;;
 	#		upgrade) yum update       ;;
-	#		install) yum install      ;;
 	#		version) yum info         ;;
 	#		clean  ) yum clean        ;;
 	#	esac
 	
 	#elif [ $DISTRO = "Gentoo" ]; then
 	#	case $1 in
+	#		install) shift; emerge $@ 2>> $LOG ; E_=$? ;;
 	#		update ) layman -f               ;;
 	#		upgrade) emerge -u world         ;;
-	#		install) emerge                  ;;
 	#		version) emerge -S or emerge -pv ;;
 	#		clean  ) emerge --depclean       ;;
 	#	esac

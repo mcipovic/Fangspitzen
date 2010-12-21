@@ -17,19 +17,19 @@ if [[ $compile_rtorrent = 'true' ]]; then
 cd $BASE/tmp
 	notice "DOWNLOADiNG SOURCES"
 	checkout http://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced xmlrpc  # Checkout xmlrpc ~advanced
-	debug_error "XMLRPC Download Failed"
+	if_error "XMLRPC Download Failed"
 	log "XMLRPC | Downloaded" >> $LOG
 
 	if [[ $rtorrent_svn = 'y' ]]; then
 		checkout -r 1180 svn://rakshasa.no/libtorrent/trunk
-		debug_error "Lib|rTorrent Download Failed"
+		if_error "Lib|rTorrent Download Failed"
 		mv trunk/libtorrent libtorrent && mv trunk/rtorrent rtorrent && rm -r trunk
 		log "Lib|rTorrent | Downloaded" >> $LOG
 	else
 		download http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.6.tar.gz  # Grab libtorrent
-			debug_error "LibTorrent Download Failed"
+			if_error "LibTorrent Download Failed"
 		download http://libtorrent.rakshasa.no/downloads/rtorrent-0.8.6.tar.gz     # Grab rtorrent
-			debug_error "rTorrent Download Failed"
+			if_error "rTorrent Download Failed"
 		log "Lib|rTorrent | Downloaded" >> $LOG
 		extract libtorrent-0.12.6.tar.gz && extract rtorrent-0.8.6.tar.gz          # Unpack
 		mv libtorrent-0.12.6 libtorrent && mv rtorrent-0.8.6 rtorrent
@@ -41,7 +41,7 @@ cd $BASE/tmp
 	cd xmlrpc
 	sh configure --prefix=/usr --disable-cplusplus
 	compile
-		debug_error "XMLRPC Build Failed"
+		if_error "XMLRPC Build Failed"
 		log "XMLRPC Compile | Completed in $compile_time seconds"
 	make install
 		log "XMLRPC Installation | Completed" ; debug_wait "xmlrpc.installed"
@@ -58,7 +58,7 @@ cd $BASE/tmp
 	else sh configure --prefix=/usr
 	fi
 	compile
-		debug_error "LibTorrent Build Failed"
+		if_error "LibTorrent Build Failed"
 		log "LibTorrent Compile | Completed in $compile_time seconds"
 	make install
 		log "LibTorrent Installation | Completed" ; debug_wait "libtorrent.installed"
@@ -72,7 +72,7 @@ cd $BASE/tmp
 	sh autogen.sh
 	sh configure --prefix=/usr --with-xmlrpc-c
 	compile
-		debug_error "rTorrent Build Failed"
+		if_error "rTorrent Build Failed"
 		log "rTorrent Compile | Completed in $compile_time seconds"
 	make install
 		log "rTorrent Installation | Completed"

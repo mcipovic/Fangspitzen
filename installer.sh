@@ -130,8 +130,8 @@ cd $BASE
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
-	packages install $PHP apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
-	E_=$? ; debug_error "Apache2 failed to install"
+	packages install $PHP apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop
+	if_error "Apache2 failed to install"
 
 	cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
 
@@ -152,8 +152,8 @@ if [[ $http = 'apache' ]]; then
 ##[ LiGHTTPd ]##
 elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
-	packages install $PHP lighttpd apache2-utils 2>> $LOG
-	E_=$? ; debug_error "Lighttpd failed to install"
+	packages install $PHP lighttpd apache2-utils
+	if_error "Lighttpd failed to install"
 
 	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
 		make-ssl-cert $SSLCERT /etc/lighttpd/server.pem
@@ -171,10 +171,10 @@ elif [[ $http = 'lighttp' ]]; then
 elif [[ $http = 'cherokee' ]]; then
 	notice "iNSTALLiNG CHEROKEE"
 	#if [[ $NAME = 'lenny' ]]; then
-	#	packages install cherokee spawn-fcgi 2>> $LOG
+	#	packages install cherokee spawn-fcgi
 	#else
-		packages install $PHP cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> $LOG
-		E_=$? ; debug_error "Cherokee failed to install"
+		packages install $PHP cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi
+		if_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini
 	log "Cherokee Installation | Completed" ; debug_wait "cherokee.installed"
@@ -192,8 +192,8 @@ fi
 ##[ vsFTP ]##
 if [[ $ftpd = 'vsftp' ]]; then
 	notice "iNSTALLiNG vsFTPd"
-	packages install vsftpd 2>> $LOG
-	E_=$? ; debug_error "vsFTPd failed to install"
+	packages install vsftpd
+	if_error "vsFTPd failed to install"
 	sed -i 's:anonymous_enable.*:anonymous_enable=NO:'           /etc/vsftpd.conf
 	sed -i 's:#local_enable.*:local_enable=YES:'                 /etc/vsftpd.conf
 	sed -i 's:#write_enable.*:write_enable=YES:'                 /etc/vsftpd.conf
@@ -231,17 +231,16 @@ if [[ $ftpd = 'vsftp' ]]; then
 ##[ proFTP ]##
 elif [[ $ftpd = 'proftp' ]]; then
 	notice "iNSTALLiNG proFTPd"
-	packages install proftpd-basic 2>> $LOG
-		E_=$? ; debug_error "ProFTPd failed to install"
+	packages install proftpd-basic
+	if_error "ProFTPd failed to install"
 	sed -i 's:#DefaultRoot .*:DefaultRoot ~:' /etc/proftpd/proftpd.conf
-
 	log "ProFTP Installation | Completed" ; debug_wait "proftpd.installed"
 
 ##[ pureFTP ]##
 elif [[ $ftpd = 'pureftp' ]]; then
 	notice "iNSTALLiNG Pure-FTPd"
-	packages install pure-ftpd pure-ftpd-common 2>> $LOG
-	E_=$? ; debug_error "PureFTP failed to install"
+	packages install pure-ftpd pure-ftpd-common
+	if_error "PureFTP failed to install"
 
 	echo -n "Force SSL? [y/n]: "
 	if ! yes; then  # allow toggling of forcing ssl
@@ -267,7 +266,7 @@ cd $BASE/tmp
 	notice "iNSTALLiNG BuildTorrent"
 	if [[ ! -d buildtorrent ]]; then  # Checkout latest BuildTorrent source
 		git clone -q git://gitorious.org/buildtorrent/buildtorrent.git ; E_=$?
-		debug_error "BuildTorrent Download Failed" ; log "BuildTorrent | Downloaded"
+		if_error "BuildTorrent Download Failed" ; log "BuildTorrent | Downloaded"
 	fi
 
 	cd buildtorrent
@@ -278,7 +277,7 @@ cd $BASE/tmp
 	sh configure
 	make install
 
-	E=$? ; debug_error "BuildTorrent Build Failed"
+	E=$? ; if_error "BuildTorrent Build Failed"
 	log "BuildTorrent Installation | Completed" ; debug_wait "buildtorrent.installed"
 
 elif [[ $buildtorrent != 'n' ]]; then
@@ -287,14 +286,14 @@ if [[ ! -f /usr/local/bin/mktorrent || $buildtorrent = 'm' ]]; then
 	notice "iNSTALLiNG MkTorrent"
 	if [[ ! -d mktorrent ]]; then  # Checkout latest mktorrent source
 		git clone -q git://github.com/esmil/mktorrent.git
-		E_=$? ; debug_error "MkTorrent Download Failed"
+		E_=$? ; if_error "MkTorrent Download Failed"
 		log "MkTorrent | Downloaded"
 	fi
 
 	cd mktorrent
 	make install
 
-	E_=$? ; debug_error "MkTorrent Build Failed"
+	E_=$? ; if_error "MkTorrent Build Failed"
 	log "MkTorrent Installation | Completed" ; debug_wait "mktorrent.installed"
 fi
 fi  # end `if $buildtorrent`

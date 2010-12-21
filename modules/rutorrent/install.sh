@@ -13,7 +13,7 @@ if [[ $install_rutorrent = 'true' ]]; then
 cd $BASE/tmp
 	notice "iNSTALLiNG ruTorrent"
 	checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent  # Checkout ruTorrent
-	debug_error "ruTorrent Download Failed"
+	if_error "ruTorrent Download Failed"
 	log "ruTorrent | Downloaded"
 
 cd rutorrent
@@ -23,14 +23,14 @@ cd rutorrent
 
 	notice "iNSTALLiNG Plugins"
 	checkout http://rutorrent.googlecode.com/svn/trunk/plugins  # Checkout plugins-svn
-	debug_error "ruTorrent Plugins Download Failed"
+	if_error "ruTorrent Plugins Download Failed"
 
 	# Install extra plugins
 cd plugins
 	checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk pausewebui
 	checkout http://rutorrent-logoff.googlecode.com/svn/trunk/ logoff
 	checkout http://rutorrent-instantsearch.googlecode.com/svn/trunk instantsearch
-	debug_error "ruTorrent Extra Plugins Download Failed"
+	if_error "ruTorrent Extra Plugins Download Failed"
 	extract $BASE/modules/rutorrent/plugin-nfo.tar.gz
 	log "ruTorrent plugins | Downloaded"
 

@@ -1,8 +1,8 @@
 ##[ XCache ]##
 if [[ $cache = 'xcache' ]]; then
 	notice "iNSTALLiNG X-CACHE"
-	packages install php5-xcache 2>> $LOG
-	E_=$? ; debug_error "X-Cache failed to install"
+	packages install php5-xcache
+	if_error "X-Cache failed to install"
 
 	echo -e "\n${bldylw} Generate a User Name and Password for XCache-Admin"
 	echo -e " You can use www.trilug.org/~jeremy/md5.php to generate the password ${rst}\n"
@@ -23,8 +23,8 @@ if [[ $cache = 'xcache' ]]; then
 ##[ APC ]##
 elif [[ $cache = 'apc' ]]; then
 	notice "iNSTALLiNG APC"
-	packages install php-apc 2>> $LOG
-	E_=$? ; debug_error "PHP-APC failed to install"
+	packages install php-apc
+	if_error "PHP-APC failed to install"
 	log "APC Installation | Completed" ; debug_wait "apc.installed"
 fi
 
@@ -32,11 +32,11 @@ fi
 if [[ $sql = 'mysql' ]]; then
 	notice "iNSTALLiNG MySQL"
 	if [[ $DISTRO = 'Ubuntu' && $NAME != 'hardy' ]]; then
-		packages install mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> $LOG ; E_=$?
+		packages install mysql-server mysql-client libmysqlclient16-dev mysql-common mytop
 	elif [[ $DISTRO = 'Debian' || $NAME = 'hardy' ]]; then
-		packages install mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> $LOG ; E_=$?
+		packages install mysql-server mysql-client libmysqlclient15-dev mysql-common mytop
 	fi
-	debug_error "MySQL failed to install"
+	if_error "MySQL failed to install"
 
 	sed -ie 's:query_cache_limit .*:query_cache_limit = 2M\nquery_cache_type = 1:' /etc/mysql/my.cnf
 
@@ -45,23 +45,23 @@ if [[ $sql = 'mysql' ]]; then
 ##[ SQLiTE ]##
 elif [[ $sql = 'sqlite' ]]; then
 	notice "iNSTALLiNG SQLite"
-	packages install sqlite3 php5-sqlite 2>> $LOG
-	E_=$? ; debug_error "SQLite failed to install"
+	packages install sqlite3 php5-sqlite
+	if_error "SQLite failed to install"
 	log "SQLite Installation | Completed" ; debug_wait "sqlite.installed"
 
 ##[ PostGreSQL ]##
 elif [[ $sql = 'postgre' ]]; then
 	notice "iNSTALLiNG PostgreSQL"
-	packages install postgresql postgresql-client-common postgresql-common 2>> $LOG
-	E_=$? ; debug_error "PostgreSQL failed to install"
+	packages install postgresql postgresql-client-common postgresql-common
+	if_error "PostgreSQL failed to install"
 	log "PostgreSQL Installation | Completed" ; debug_wait "postgresql.installed"
 fi
 
 ##[ Bouncers ]##
 cd $BASE
 if [[ $bnc != @(none|no|[Nn]) ]]; then
-	packages install libc-ares-dev tcl tcl-dev 2>> $LOG
-	E_=$? ; debug_error "Required packages failed to install"
+	packages install libc-ares-dev tcl tcl-dev
+	if_error "Required packages failed to install"
 fi
 
 ##[ ZNC ]##
@@ -69,14 +69,14 @@ if [[ $bnc = 'znc' ]]; then
 	notice "iNSTALLiNG ZNC"
 	cd tmp/
 	download http://downloads.sourceforge.net/project/znc/znc/0.094/znc-0.094.tar.gz
-		debug_error "ZNC Download Failed"
+		if_error "ZNC Download Failed"
 	extract znc-0.094.tar.gz && cd znc-0.094  # Unpack
 		log "ZNC | Downloaded + Unpacked"
 	notice "Be aware that compiling znc is a cpu intensive task and may take up to 10 min to complete"
 	sleep 3
 	sh configure --enable-extra
 	compile
-		debug_error "ZNC Build Failed"
+		if_error "ZNC Build Failed"
 		log "ZNC Compile | Completed in $compile_time seconds"
 		debug_wait "znc.compiled"
 	make install
@@ -89,7 +89,7 @@ if [[ $bnc = 'znc' ]]; then
 elif [[ $bnc = 'sbnc' ]]; then
 	cd tmp
 	notice "iNSTALLiNG ShroudBNC"
-	packages install swig 2>> $LOG
+	packages install swig
 	git clone -q http://github.com/gunnarbeutner/shroudbnc.git
 	git clone -q http://github.com/gunnarbeutner/sBNC-Webinterface.git
 	chown -R $USER:$USER shroudbnc sBNC-Webinterface
@@ -98,7 +98,7 @@ elif [[ $bnc = 'sbnc' ]]; then
 	sudo -u $USER sh autogen.sh
 	sudo -u $USER sh configure
 	sudo -u $USER make -j$CORES
-		debug_error "ShroudBNC Build Failed"
+		if_error "ShroudBNC Build Failed"
 		log "ShroudBNC Compile | Completed in $compile_time seconds"
 	sudo -u $USER make install
 
@@ -112,7 +112,7 @@ elif [[ $bnc = 'psybnc' ]]; then
 	cd $HOME
 	notice "iNSTALLiNG PsyBNC"
 	download http://psybnc.org.uk/psyBNC-2.3.2-10.tar.gz
-		debug_error "PsyBNC Download Failed"
+		if_error "PsyBNC Download Failed"
 	extract psyBNC-2.3.2-10.tar.gz
 	chown -R $USER:$USER psybnc
 		log "PsyBNC | Downloaded + Unpacked"
@@ -120,7 +120,7 @@ elif [[ $bnc = 'psybnc' ]]; then
 	cd psybnc
 	sudo -u $USER make menuconfig
 	sudo -u $USER make -j$CORES
-		debug_error "PsyBNC Build Failed"
+		if_error "PsyBNC Build Failed"
 		log "PsyBNC Compile | Completed in $compile_time seconds"
 	log "PsyBNC Installation | Completed"
 	notice "Installed to ~/psybnc"
@@ -150,8 +150,8 @@ fi
 cd $BASE
 if [[ $webmin = 'y' ]]; then
 	notice "iNSTALLiNG WEBMiN"
-	packages install webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> $LOG
-	E_=$? ; debug_error "Webmin failed to install"
+	packages install webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime
+	if_error "Webmin failed to install"
 	log "WebMin Installation | Completed" ; debug_wait "webmin.installed"
 fi
 
@@ -159,7 +159,7 @@ fi
 cd $BASE/tmp
 if [[ $vnstat = 'y' ]]; then
 	notice "iNSTALLiNG VNSTAT"
-	packages install libgd2-xpm libgd2-xpm-dev 2>> $LOG
+	packages install libgd2-xpm libgd2-xpm-dev
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
 
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
@@ -175,7 +175,7 @@ if [[ $vnstat = 'y' ]]; then
 	# mv jsvnstat $WEB
 
 	compile
-		debug_error "VnStat Build Failed"
+		if_error "VnStat Build Failed"
 		log "VnStat Compile | Completed in $compile_time seconds" ; debug_wait "vnstat.compiled"
 	make install && cd ..                                                 # Install
 		log "VnStat Installation | Completed"
@@ -215,8 +215,8 @@ fi
 cd $BASE/tmp
 if [[ $sabnzbd = 'y' ]]; then
 	notice "iNSTALLiNG SABnzbd"
-	packages install sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl 2>> $LOG
-	E_=$? ; debug_error "Sabnzbd failed to install"
+	packages install sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl
+	if_error "Sabnzbd failed to install"
 
 	# Install par2cmdline 0.4 with Intel Threading Building Blocks
 	if [[ $ARCH = 'x86_64' ]]; then download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20100203-lin64.tar.gz
@@ -255,8 +255,8 @@ if [[ $ipblock = 'y' ]]; then
 	if [[ $NAME = 'lenny' ]]; then
 		apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1 2>> $LOG  # Install updated libraries for lenny support
 	fi
-	packages install iplist 2>> $LOG
-	E_=$? ; debug_error "iPBLOCK failed to install"
+	packages install iplist
+	if_error "iPBLOCK failed to install"
 
 	PATH_iplist=/etc/ipblock.conf
 	filters='level1.gz'

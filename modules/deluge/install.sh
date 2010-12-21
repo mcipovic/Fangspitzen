@@ -1,7 +1,7 @@
 cd $BASE/tmp
 	notice "iNSTALLiNG DELUGE"
-	packages install deluge-common deluge-console deluge-web deluged 2>> ${LOG}
-		E_=$? && debug_error "Deluge failed to install"
+	packages install deluge-common deluge-console deluge-web deluged
+	if_error "Deluge failed to install"
 
 	sudo -u $USER deluged && sleep 1
 	sudo -u $USER killall deluged

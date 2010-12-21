@@ -1,6 +1,6 @@
 cd ${BASE}/tmp
 	notice "iNSTALLiNG TRANSMiSSiON"
-	${INSTALL} transmission-daemon transmission-common transmission-cli 2>> ${LOG}
+	packages install transmission-daemon transmission-common transmission-cli 2>> ${LOG}
 		E_=$? && debug_error "Transmission failed to install"
 
 	/etc/init.d/transmission-daemon stop

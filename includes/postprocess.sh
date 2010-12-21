@@ -124,8 +124,6 @@ ldconfig
 log "Linking Shared Libaries | Completed"
 
 echo -en "\n${bldred} Cleaning up...${rst}"
-apt-get -qq autoremove # remove uneeded and 
-apt-get -qq autoclean  #+cached deb packages
+packages clean  # remove uneeded and cached packages
 cleanup
 echo -e "${bldylw} done${rst}"
-sudo -K  # forget our password

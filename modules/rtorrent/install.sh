@@ -99,13 +99,13 @@ echo "port_range = $NUMBER-$NUMBER"       >> $PATH_rt
 echo "directory = /home/$USER/downloads"  >> $PATH_rt
 echo "session = /home/$USER/.session"     >> $PATH_rt
 
-if [[ ${rtorrent_svn} != 'y' ]]; then
+if [[ $rtorrent_svn != 'y' ]]; then
 	echo "max_open_files = 256"    >> $PATH_rt
 	echo "max_memory_usage = 800M" >> $PATH_rt
 	echo "preload_type = 1"        >> $PATH_rt
 fi
 
-if [[ ${alloc} = 'y' ]]; then
+if [[ $alloc = 'y' ]]; then
 	echo "system.file_allocate.set = yes" >> $PATH_rt  # Enable file pre-allocation
 fi
 

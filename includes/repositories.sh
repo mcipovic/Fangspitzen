@@ -62,7 +62,7 @@ if [[ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]]; then
 	wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | apt-key add -
 	wget -q http://www.webmin.com/jcameron-key.asc -O- | apt-key add -
 fi
-	$UPDATE
+	packages update
 	log "Repositories Added and Updated"
 	debug_wait "repos.added"
 clear

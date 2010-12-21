@@ -105,6 +105,11 @@ if [[ $DISTRO = 'Arch' ]]; then
 	exit
 fi
 
+if [[ $DISTRO = 'SUSE Linux' ]]; then
+#	source suse.installer.sh
+	exit
+fi
+
 if [[ ! -f $REPO_PATH/autoinstaller.list ]]; then
 	source $BASE/includes/repositories.sh  # Add repositories if not already present
 else log "Repositories Already Present, skipping"
@@ -125,7 +130,7 @@ cd $BASE
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
-	$INSTALL $PHP apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
+	packages install $PHP apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop 2>> $LOG
 	E_=$? ; debug_error "Apache2 failed to install"
 
 	cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
@@ -147,7 +152,7 @@ if [[ $http = 'apache' ]]; then
 ##[ LiGHTTPd ]##
 elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
-	$INSTALL $PHP lighttpd apache2-utils 2>> $LOG
+	packages install $PHP lighttpd apache2-utils 2>> $LOG
 	E_=$? ; debug_error "Lighttpd failed to install"
 
 	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
@@ -166,9 +171,9 @@ elif [[ $http = 'lighttp' ]]; then
 elif [[ $http = 'cherokee' ]]; then
 	notice "iNSTALLiNG CHEROKEE"
 	#if [[ $NAME = 'lenny' ]]; then
-	#	$INSTALL cherokee spawn-fcgi 2>> $LOG
+	#	packages install cherokee spawn-fcgi 2>> $LOG
 	#else
-		$INSTALL $PHP cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> $LOG
+		packages install $PHP cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi 2>> $LOG
 		E_=$? ; debug_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini
@@ -187,7 +192,7 @@ fi
 ##[ vsFTP ]##
 if [[ $ftpd = 'vsftp' ]]; then
 	notice "iNSTALLiNG vsFTPd"
-	$INSTALL vsftpd 2>> $LOG
+	packages install vsftpd 2>> $LOG
 	E_=$? ; debug_error "vsFTPd failed to install"
 	sed -i 's:anonymous_enable.*:anonymous_enable=NO:'           /etc/vsftpd.conf
 	sed -i 's:#local_enable.*:local_enable=YES:'                 /etc/vsftpd.conf
@@ -226,7 +231,7 @@ if [[ $ftpd = 'vsftp' ]]; then
 ##[ proFTP ]##
 elif [[ $ftpd = 'proftp' ]]; then
 	notice "iNSTALLiNG proFTPd"
-	$INSTALL proftpd-basic 2>> $LOG
+	packages install proftpd-basic 2>> $LOG
 		E_=$? ; debug_error "ProFTPd failed to install"
 	sed -i 's:#DefaultRoot .*:DefaultRoot ~:' /etc/proftpd/proftpd.conf
 
@@ -235,7 +240,7 @@ elif [[ $ftpd = 'proftp' ]]; then
 ##[ pureFTP ]##
 elif [[ $ftpd = 'pureftp' ]]; then
 	notice "iNSTALLiNG Pure-FTPd"
-	$INSTALL pure-ftpd pure-ftpd-common 2>> $LOG
+	packages install pure-ftpd pure-ftpd-common 2>> $LOG
 	E_=$? ; debug_error "PureFTP failed to install"
 
 	echo -n "Force SSL? [y/n]: "

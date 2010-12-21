@@ -1,7 +1,7 @@
 ##[ XCache ]##
 if [[ $cache = 'xcache' ]]; then
 	notice "iNSTALLiNG X-CACHE"
-	$INSTALL php5-xcache 2>> $LOG
+	packages install php5-xcache 2>> $LOG
 	E_=$? ; debug_error "X-Cache failed to install"
 
 	echo -e "\n${bldylw} Generate a User Name and Password for XCache-Admin"
@@ -23,7 +23,7 @@ if [[ $cache = 'xcache' ]]; then
 ##[ APC ]##
 elif [[ $cache = 'apc' ]]; then
 	notice "iNSTALLiNG APC"
-	$INSTALL php-apc 2>> $LOG
+	packages install php-apc 2>> $LOG
 	E_=$? ; debug_error "PHP-APC failed to install"
 	log "APC Installation | Completed" ; debug_wait "apc.installed"
 fi
@@ -32,9 +32,9 @@ fi
 if [[ $sql = 'mysql' ]]; then
 	notice "iNSTALLiNG MySQL"
 	if [[ $DISTRO = 'Ubuntu' && $NAME != 'hardy' ]]; then
-		$INSTALL mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> $LOG ; E_=$?
+		packages install mysql-server mysql-client libmysqlclient16-dev mysql-common mytop 2>> $LOG ; E_=$?
 	elif [[ $DISTRO = 'Debian' || $NAME = 'hardy' ]]; then
-		$INSTALL mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> $LOG ; E_=$?
+		packages install mysql-server mysql-client libmysqlclient15-dev mysql-common mytop 2>> $LOG ; E_=$?
 	fi
 	debug_error "MySQL failed to install"
 
@@ -45,14 +45,14 @@ if [[ $sql = 'mysql' ]]; then
 ##[ SQLiTE ]##
 elif [[ $sql = 'sqlite' ]]; then
 	notice "iNSTALLiNG SQLite"
-	$INSTALL sqlite3 php5-sqlite 2>> $LOG
+	packages install sqlite3 php5-sqlite 2>> $LOG
 	E_=$? ; debug_error "SQLite failed to install"
 	log "SQLite Installation | Completed" ; debug_wait "sqlite.installed"
 
 ##[ PostGreSQL ]##
 elif [[ $sql = 'postgre' ]]; then
 	notice "iNSTALLiNG PostgreSQL"
-	$INSTALL postgresql postgresql-client-common postgresql-common 2>> $LOG
+	packages install postgresql postgresql-client-common postgresql-common 2>> $LOG
 	E_=$? ; debug_error "PostgreSQL failed to install"
 	log "PostgreSQL Installation | Completed" ; debug_wait "postgresql.installed"
 fi
@@ -60,7 +60,7 @@ fi
 ##[ Bouncers ]##
 cd $BASE
 if [[ $bnc != @(none|no|[Nn]) ]]; then
-	$INSTALL libc-ares-dev tcl tcl-dev 2>> $LOG
+	packages install libc-ares-dev tcl tcl-dev 2>> $LOG
 	E_=$? ; debug_error "Required packages failed to install"
 fi
 
@@ -89,7 +89,7 @@ if [[ $bnc = 'znc' ]]; then
 elif [[ $bnc = 'sbnc' ]]; then
 	cd tmp
 	notice "iNSTALLiNG ShroudBNC"
-	$INSTALL swig 2>> $LOG
+	packages install swig 2>> $LOG
 	git clone -q http://github.com/gunnarbeutner/shroudbnc.git
 	git clone -q http://github.com/gunnarbeutner/sBNC-Webinterface.git
 	chown -R $USER:$USER shroudbnc sBNC-Webinterface
@@ -150,7 +150,7 @@ fi
 cd $BASE
 if [[ $webmin = 'y' ]]; then
 	notice "iNSTALLiNG WEBMiN"
-	$INSTALL webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> $LOG
+	packages install webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime 2>> $LOG
 	E_=$? ; debug_error "Webmin failed to install"
 	log "WebMin Installation | Completed" ; debug_wait "webmin.installed"
 fi
@@ -159,7 +159,7 @@ fi
 cd $BASE/tmp
 if [[ $vnstat = 'y' ]]; then
 	notice "iNSTALLiNG VNSTAT"
-	$INSTALL libgd2-xpm libgd2-xpm-dev 2>> $LOG
+	packages install libgd2-xpm libgd2-xpm-dev 2>> $LOG
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
 
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
@@ -215,7 +215,7 @@ fi
 cd $BASE/tmp
 if [[ $sabnzbd = 'y' ]]; then
 	notice "iNSTALLiNG SABnzbd"
-	$INSTALL sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl 2>> $LOG
+	packages install sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl 2>> $LOG
 	E_=$? ; debug_error "Sabnzbd failed to install"
 
 	# Install par2cmdline 0.4 with Intel Threading Building Blocks
@@ -255,7 +255,7 @@ if [[ $ipblock = 'y' ]]; then
 	if [[ $NAME = 'lenny' ]]; then
 		apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1 2>> $LOG  # Install updated libraries for lenny support
 	fi
-	$INSTALL iplist 2>> $LOG
+	packages install iplist 2>> $LOG
 	E_=$? ; debug_error "iPBLOCK failed to install"
 
 	PATH_iplist=/etc/ipblock.conf
@@ -263,7 +263,7 @@ if [[ $ipblock = 'y' ]]; then
 	sed -i "s:AUTOSTART=.*:AUTOSTART=\"Yes\":"        $PATH_iplist
 	sed -i "s:BLOCK_LIST=.*:BLOCK_LIST=\"$filters\":" $PATH_iplist
 
-	echo -en "${bldred} Updating block lists...${rst}"
+	echo -en "${bldred} Updating block lists... ${rst}"
 	ipblock -u && echo -e "${bldylw} done ${rst}"
 	/etc/init.d/ipblock start
 

@@ -1,7 +1,7 @@
 ##!=======================>> FUNCTiONS <<=======================!##
 base_install() {  # install dependencies
 
-STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gamin gcc git-core gzip htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion unrar unzip zip"
+STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gamin gcc git-core gzip htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion sudo unrar unzip zip"
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libexpat1 libncurses5 libncurses5-dev libsigc++-2.0-dev libxml2"
 if [[ $http != 'none' ]]; then
 PHP="php5 php5-cgi php5-cli php5-common php5-curl php5-gd php5-dev php5-mcrypt php5-mhash php5-mysql php5-suhosin php5-xmlrpc"
@@ -9,21 +9,21 @@ fi
 	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 	if [[ $DISTRO = 'Ubuntu' ]]; then
 		if [[ $NAME = @(karmic|lucid) ]]; then
-			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar5 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'jaunty' ]]; then
-			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar2 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar2 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'maverick' ]]; then
-			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar6 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar6 2>> $LOG ; E_=$?
 		fi
 
 	elif [[ $DISTRO = @(Debian|LinuxMint) ]]; then
 		if [[ $NAME = @(squeeze|debian) ]]; then
-			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar5 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar5 2>> $LOG ; E_=$?
 		elif [[ $NAME = 'lenny' ]]; then
-			$INSTALL $STABLE $DYNAMIC libtorrent-rasterbar0 2>> $LOG ; E_=$?
+			packages install $STABLE $DYNAMIC libtorrent-rasterbar0 2>> $LOG ; E_=$?
 		fi
 	elif [[ $DISTRO = 'Arch' ]]; then
-			$INSTALL base-devel fakeroot yaourt php 2>> $LOG ; E_=$?
+			packages install base-devel fakeroot yaourt php 2>> $LOG ; E_=$?
 	fi
 
 	debug_error "Required system packages failed to install"
@@ -87,8 +87,9 @@ debug_wait() {  # prints a message and wait for user before continuing
 }
 
 download() {  # show progress bars if debug is on
-	if [[ $DEBUG = 1 ]]; then axel --alternate $1 ; E_=$?
-	else axel --quiet $1 ; E_=$?
+	if [[ $DEBUG = 1 ]]; then
+		 wget --no-verbose $1 ; E_=$?
+	else wget --quiet $1      ; E_=$?
 	fi
 }
 
@@ -99,17 +100,17 @@ error() {  # call this when you know there will be an error
 
 extract() {  # find type of compression and extract accordingly
 	case $1 in
-		*.tar.bz2)  tar xjf $1    ;;
-		*.tbz2)     tar xjf $1    ;;
-		*.tar.gz)   tar xzf $1    ;;
-		*.tgz)      tar xzf $1    ;;
-		*.tar)      tar xf $1     ;;
-		*.gz)       gunzip -q $1  ;;
-		*.bz2)      bunzip2 -q $1 ;;
-		*.rar)      unrar x $1    ;;
-		*.zip)      unzip $1      ;;
-		*.Z)        uncompress $1 ;;
-		*.7z)       7z x $1       ;;
+		*.tar.bz2) tar xjf $1    ;;
+		*.tbz2)    tar xjf $1    ;;
+		*.tar.gz)  tar xzf $1    ;;
+		*.tgz)     tar xzf $1    ;;
+		*.tar)     tar xf $1     ;;
+		*.gz)      gunzip -q $1  ;;
+		*.bz2)     bunzip2 -q $1 ;;
+		*.rar)     unrar x $1    ;;
+		*.zip)     unzip $1      ;;
+		*.Z)       uncompress $1 ;;
+		*.7z)      7z x $1       ;;
 	esac
 }
 
@@ -136,20 +137,49 @@ notice() {  # echo status or general info to stdout
 	echo -en "\n${bldred} $1... ${rst}\n"
 }
 
-show_paths() {  # might be useful?
-	echo
-	echo "The following is a list of all default paths "
-	echo
-	echo "	1 - $SBIN"
-	echo "	2 - $ETC"
-	echo "	3 - $INIT"
-	echo "	4 - $LIB"
-	echo "	5 - $DOC"
-	echo "	6 - $WEB"
-	echo "	7 - $CGIBIN"
-	echo "	8 - $MAN"
-	echo
-	# read ENTER
+packages() {
+	if [ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]; then
+		case $1 in
+			update ) apt-get update -qq              ;;
+			upgrade) apt-get upgrade --yes -qq       ;;
+			install) apt-get install --yes -qq       ;;
+			version) dpkg-query -p $2 | grep Version ;;
+			clean  ) apt-get -qq autoclean           ;;
+		esac
+	elif [ $DISTRO = 'Arch' ]; then
+		case $1 in
+			update ) pacman --sync --refresh --noconfirm              ;;
+			upgrade) pacman --sync --refresh --sysupgrade --noconfirm ;;
+			install) pacman --sync --noconfirm                        ;;
+			version) pacman -Qi $2 | grep Version                     ;;
+			clean  ) pacman --sync --clean -c --noconfirm             ;;
+		esac
+	elif [ $DISTRO = 'SUSE LINUX' ]; then
+		case $1 in
+			update ) zypper --quiet refresh                   ;;
+			upgrade) zypper --quiet --non-interactive upgrade ;;
+			install) zypper --quiet --non-interactive install ;;
+			version) zypper info                              ;;
+		esac
+
+	#elif [ $DISTRO = "Fedora" ]; then
+	#	case $1 in
+	#		update ) yum check-update ;;
+	#		upgrade) yum update       ;;
+	#		install) yum install      ;;
+	#		version) yum info         ;;
+	#		clean  ) yum clean        ;;
+	#	esac
+	
+	#elif [ $DISTRO = "Gentoo" ]; then
+	#	case $1 in
+	#		update ) layman -f               ;;
+	#		upgrade) emerge -u world         ;;
+	#		install) emerge                  ;;
+	#		version) emerge -S or emerge -pv ;;
+	#		clean  ) emerge --depclean       ;;
+	#	esac
+	fi
 }
 
 usage() {  # help screen
@@ -179,21 +209,12 @@ init() {
 	OS=$(uname -s)
 
 ##[ Determine OS ]##
-if [ $OS = "SunOS" ] ; then
-	OS='Solaris'
-	ARCH=$(uname -p)
-	error "Solaris is not supported"
-
-elif [ $OS = "Linux" ] ; then
-	# TODO
+if [ $OS = "Linux" ] ; then
+#[ TODO ]#
 	if [ -f /etc/redhat-release ]; then  # check this first, some non rpm distro's include it
 		error "TODO - REDHAT"
 	elif [ -f /etc/arch-release ]; then
-		#error "See ARCH folder"
 		REPO_PATH=/etc/pacman.conf
-		UPDATE='pacman --sync --refresh --noconfirm'
-		UPGRADE='pacman --sync --refresh --sysupgrade --noconfirm'
-		INSTALL='pacman --sync --noconfirm'
 	elif [ -f /etc/etc/fedora-release ]; then
 		error "TODO - Fedora"
 	elif [ -f /etc/gentoo-release ]; then
@@ -201,22 +222,19 @@ elif [ $OS = "Linux" ] ; then
 	elif [ -f /etc/slackware-version ]; then
 		error "TODO - Slackware"
 	elif [ -f /etc/SuSE-release ]; then
-		error "TODO - OpenSUSE"
+		REPO_PATH=/etc/zypp/repos.d/
 
 	else  # we are going to assume a deb based system
 		REPO_PATH=/etc/apt/sources.list.d/
-		UPDATE='apt-get update -qq'
-		UPGRADE='apt-get upgrade --yes -qq'
-		INSTALL='apt-get install --yes -qq'
-
-		if ! which axel >/dev/null; then  # install axel and lsb-release (debian doesnt package it)
-			$INSTALL axel lsb-release
-		fi
-		# Distributor -i > Ubuntu  > Debian  > Debian   > LinuxMint     > Arch  (DISTRO)
-		# Release     -r > 10.04   > 5.0.6   > testing  > 1|10          > n/a   (RELASE)
-		# Codename    -c > lucid   > lenny   > squeeze  > debian|julia  > n/a   (NAME)
-		readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(uname -m) KERNEL=$(uname -r)
 	fi
+	
+	if ! which lsb-release >/dev/null; then  # install lsb-release (debian stable doesnt package it)
+		packages install lsb-release
+	fi
+	# Distributor -i > Ubuntu  > Debian  > Debian   > LinuxMint     > Arch  > SUSE LINUX  (DISTRO)
+	# Release     -r > 10.04   > 5.0.6   > testing  > 1|10          > n/a   > 11.4        (RELASE)
+	# Codename    -c > lucid   > lenny   > squeeze  > debian|julia  > n/a   > Celadon     (NAME)
+	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(uname -m) KERNEL=$(uname -r)
 
 	##[ Create folders if not already created ]##
 	mkdir --parents tmp/
@@ -229,8 +247,9 @@ elif [ $OS = "Linux" ] ; then
 	fi
 	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
 
+else error "Unsupported OS"
 fi
-	$UPDATE  # refresh our package list
+	packages update  # refresh our package list
 	echo -e "[${bldylw} done ${rst}]" ; sleep 1
 }
 

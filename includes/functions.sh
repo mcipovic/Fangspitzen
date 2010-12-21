@@ -138,31 +138,32 @@ notice() {  # echo status or general info to stdout
 }
 
 packages() {
-	if [ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]; then
+	if [[ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]]; then
 		case $1 in
 			install) shift; apt-get install --yes -qq $@ 2>> $LOG ; E_=$? ;;
-			update ) apt-get update -qq              ;;
-			upgrade) apt-get upgrade --yes -qq       ;;
-			version) dpkg-query -p $2 | grep Version ;;
-			clean  ) apt-get -qq autoclean           ;;
+			update ) apt-get update -qq                                   ;;
+			upgrade) apt-get upgrade --yes -qq                            ;;
+			version) dpkg-query -p $2 | grep Version:                     ;;
+			clean  ) apt-get -qq autoclean                                ;;
 		esac
-	elif [ $DISTRO = 'Arch' ]; then
+	elif [[ $DISTRO = 'Arch' ]]; then
 		case $1 in
 			install) shift; pacman --sync --noconfirm $@ 2>> $LOG ; E_=$? ;;
-			update ) pacman --sync --refresh --noconfirm              ;;
-			upgrade) pacman --sync --refresh --sysupgrade --noconfirm ;;
-			version) pacman -Qi $2 | grep Version                     ;;
-			clean  ) pacman --sync --clean -c --noconfirm             ;;
+			update ) pacman --sync --refresh --noconfirm                  ;;
+			upgrade) pacman --sync --refresh --sysupgrade --noconfirm     ;;
+			version) pacman -Qi $2 | grep Version:                        ;;
+			clean  ) pacman --sync --clean -c --noconfirm                 ;;
 		esac
-	elif [ $DISTRO = 'SUSE LINUX' ]; then
+	elif [[ $DISTRO = 'SUSE LINUX' ]]; then
 		case $1 in
 			install) shift; zypper --quiet --non-interactive install $@ 2>> $LOG ; E_=$? ;;
-			update ) zypper --quiet refresh                   ;;
-			upgrade) zypper --quiet --non-interactive upgrade ;;
-			version) zypper info                              ;;
+			update ) zypper --quiet refresh                                              ;;
+			upgrade) zypper --quiet --non-interactive update --auto-agree-with-licenses  ;;
+			version) zypper info $2 | grep Version:                                      ;;
+			clean  ) zypper --quiet clean                                                ;;
 		esac
 
-	#elif [ $DISTRO = "Fedora" ]; then
+	#elif [[ $DISTRO = "Fedora" ]]; then
 	#	case $1 in
 	#		install) shift; yum install $@ 2>> $LOG ; E_=$? ;;
 	#		update ) yum check-update ;;
@@ -171,7 +172,7 @@ packages() {
 	#		clean  ) yum clean        ;;
 	#	esac
 	
-	#elif [ $DISTRO = "Gentoo" ]; then
+	#elif [[ $DISTRO = "Gentoo" ]]; then
 	#	case $1 in
 	#		install) shift; emerge $@ 2>> $LOG ; E_=$? ;;
 	#		update ) layman -f               ;;
@@ -193,35 +194,31 @@ usage() {  # help screen
 yes() {  # user input for yes or no
 	while read line; do
 	case $line in
-		y|Y|Yes|YES|yes|yES|yEs|YeS|yeS) return 0
-		;;
-		n|N|No|NO|no|nO) return 1
-		;;
-		*) echo -en " Please enter ${undrln}y${rst} or ${undrln}y${rst}: "
-		;;
+		y|Y|Yes|YES|yes) return 0 ;;
+		n|N|No|NO|no) return 1 ;;
+		*) echo -en " Please enter ${undrln}y${rst} or ${undrln}y${rst}: " ;;
 	esac
 	done
 }
 
 init() {
-	clear
-	echo -n ">>> iNiTiALiZiNG......"
+	clear ; echo -n ">>> iNiTiALiZiNG......"
 	OS=$(uname -s)
 
 ##[ Determine OS ]##
-if [ $OS = "Linux" ] ; then
+if [[ $OS = "Linux" ]] ; then
 #[ TODO ]#
-	if [ -f /etc/redhat-release ]; then  # check this first, some non rpm distro's include it
+	if [[ -f /etc/redhat-release ]]; then  # check this first, some non rpm distro's include it
 		error "TODO - REDHAT"
-	elif [ -f /etc/arch-release ]; then
+	elif [[ -f /etc/arch-release ]]; then
 		REPO_PATH=/etc/pacman.conf
-	elif [ -f /etc/etc/fedora-release ]; then
+	elif [[ -f /etc/etc/fedora-release ]]; then
 		error "TODO - Fedora"
-	elif [ -f /etc/gentoo-release ]; then
+	elif [[ -f /etc/gentoo-release ]]; then
 		error "TODO - Gentoo"
-	elif [ -f /etc/slackware-version ]; then
+	elif [[ -f /etc/slackware-version ]]; then
 		error "TODO - Slackware"
-	elif [ -f /etc/SuSE-release ]; then
+	elif [[ -f /etc/SuSE-release ]]; then
 		REPO_PATH=/etc/zypp/repos.d/
 
 	else  # we are going to assume a deb based system
@@ -245,7 +242,7 @@ if [ $OS = "Linux" ] ; then
 	if ! [[ $iP = *.*.* ]]; then
 		error "Unable to find ip from outside"
 	fi
-	readonly iFACE iP USER CORES BASE WEB HOME=/home/${USER} LOG=$BASE/$LOG # make sure these variables aren't overwritten
+	readonly iFACE iP USER CORES BASE WEB HOME=/home/$USER LOG=$BASE/$LOG # make sure these variables aren't overwritten
 
 else error "Unsupported OS"
 fi
@@ -256,8 +253,8 @@ fi
 ##[ VARiABLE iNiT ]##
 CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLCERT=/usr/share/ssl-cert/ssleay.cnf
-LOG='logs/installer.log'
-WEB='/var/www'
+LOG=logs/installer.log
+WEB=/var/www
 
 #!=====================>> COLOR CONTROL <<=====================!#
 ##[ echo -e "${txtblu}test ${rst}" ]##

@@ -119,7 +119,7 @@ log() {  # send to the logfile
 }
 
 mkpass() {  # generate a random password of user defined length
-	newPass=$(cat /dev/urandom | tr --complement --delete '[:alnum:]' | head -c ${1:-${opt}})
+	newPass=$(tr -cd '[:alnum:]' < /dev/urandom | head -c ${1:-${opt}})
 	notice "$newPass"
 	exit 0
 }

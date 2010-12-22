@@ -32,9 +32,14 @@ fi
 if [[ $sql = 'mysql' ]]; then
 	notice "iNSTALLiNG MySQL"
 	if [[ $DISTRO = 'Ubuntu' && $NAME != 'hardy' ]]; then
-		packages install mysql-server mysql-client libmysqlclient16-dev mysql-common mytop
-	elif [[ $DISTRO = 'Debian' || $NAME = 'hardy' ]]; then
-		packages install mysql-server mysql-client libmysqlclient15-dev mysql-common mytop
+		packages install libmysqlclient16-dev mysql-client mysql-server mytop
+	elif [[ $DISTRO = [Dd]ebian || $NAME = 'hardy' ]]; then
+		packages install libmysqlclient15-dev mysql-client mysql-server mytop
+	elif [[ $DISTRO = *@(SUSE|[Ss]use); then
+		packages install libmysqlclient-devel mysql-community-server mytop
+		chkconfig --add mysql
+		/etc/init.d/mysql start
+		mysql_secure_installation
 	fi
 	if_error "MySQL failed to install"
 

@@ -16,7 +16,7 @@ fi
 			packages install $STABLE $DYNAMIC libtorrent-rasterbar6
 		fi
 
-	elif [[ $DISTRO = @(Debian|LinuxMint) ]]; then
+	elif [[ $DISTRO = @([Dd]ebian|*Mint) ]]; then
 		if [[ $NAME = @(squeeze|debian) ]]; then
 			packages install $STABLE $DYNAMIC libtorrent-rasterbar5
 		elif [[ $NAME = 'lenny' ]]; then
@@ -125,12 +125,23 @@ mkpass() {  # generate a random password of user defined length
 }
 
 mksslcert() {  # use 2048 bit certs, use sha256, and regenerate
-	echo -en "${bldred} Generating SSL Certificate...${rst}"
-	sed -i 's:default_bits .*:default_bits = 2048:' /usr/share/ssl-cert/ssleay.cnf
-	sed -i 's:default_bits .*:default_bits = 2048:' /etc/ssl/openssl.cnf
-	sed -i 's:default_md .*:default_md = sha256:'   /etc/ssl/openssl.cnf
-	make-ssl-cert generate-default-snakeoil --force-overwrite
-	echo -e "${bldylw} done${rst}"
+	if [[ $1 = 'generate-default-snakeoil'
+		sed -i 's:default_bits .*:default_bits = 2048:' /etc/ssl/openssl.cnf
+		sed -i 's:default_md .*:default_md = sha256:'   /etc/ssl/openssl.cnf
+		if which make-ssl-cert >/dev/null; then
+			echo -en "${bldred} Generating SSL Certificate...${rst}"
+			sed -i 's:default_bits .*:default_bits = 2048:' $SSLCERT
+			make-ssl-cert $1 --force-overwrite
+			echo -e "${bldylw} done${rst}"
+		fi
+	else
+		if which make-ssl-cert >/dev/null; then
+			make-ssl-cert $SSLCERT $1
+		elif which openssl >/dev/null; then  # use openssl if ssl-cert isnt available
+			openssl req -newkey rsa:2048 -x509 -days 365 -nodes -out $1 -keyout $2
+		fi
+		chmod 600 $@  # Read write permission for owner only
+	fi
 }
 
 notice() {  # echo status or general info to stdout
@@ -138,29 +149,74 @@ notice() {  # echo status or general info to stdout
 }
 
 packages() {
-	if [[ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]]; then
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		case $1 in
-			install) shift; apt-get install --yes -qq $@ 2>> $LOG ; E_=$? ;;
-			update ) apt-get update -qq                                   ;;
-			upgrade) apt-get upgrade --yes -qq                            ;;
-			version) dpkg-query -p $2 | grep Version:                     ;;
-			clean  ) apt-get -qq autoclean                                ;;
+			clean  )
+					apt-get -qq autoclean
+					alias_autoclean="apt-get autoremove && apt-get autoclean";;
+			install) shift  # forget $1
+					apt-get install --yes -qq $@ 2>> $LOG; E_=$?
+					alias_install="apt-get install"    ;;
+			remove ) shift
+					apt-get autoremove --yes -qq $@ 2>> $LOG; E_=$?
+					alias_remove="apt-get autoremove"  ;;
+			update )
+					apt-get update -qq
+					alias_update="apt-get update"      ;;
+			upgrade) 
+					apt-get upgrade --yes -qq
+					alias_upgrade="apt-get upgrade"    ;;
+			version)
+					dpkg-query -p $2 | grep Version:   ;;
+			setvars)
+					REPO_PATH=/etc/apt/sources.list.d
+					WEB=/var/www ;;
 		esac
-	elif [[ $DISTRO = 'Arch' ]]; then
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		case $1 in
-			install) shift; pacman --sync --noconfirm $@ 2>> $LOG ; E_=$? ;;
-			update ) pacman --sync --refresh --noconfirm                  ;;
-			upgrade) pacman --sync --refresh --sysupgrade --noconfirm     ;;
-			version) pacman -Qi $2 | grep Version:                        ;;
-			clean  ) pacman --sync --clean -c --noconfirm                 ;;
+			clean  )
+					pacman --sync --clean -c --noconfirm
+					alias_autoclean="pacman -Scc" ;;
+			install) shift  # forget $1
+					pacman --sync --noconfirm $@ 2>> $LOG; E_=$?
+					alias_install="pacman -S"     ;;
+			remove ) shift
+					pacman --remove $@ 2>> $LOG; E_=$?
+					alias_remove="pacman -R"      ;;
+			update )
+					pacman --sync --refresh --noconfirm
+					alias_update="pacman -Sy"     ;;
+			upgrade)
+					pacman --sync --refresh --sysupgrade --noconfirm
+					alias_upgrade="pacman -Syu"   ;;
+			version)
+					pacman -Qi $2 | grep Version: ;;
+			setvars)
+					REPO_PATH=/etc/pacman.conf
+					WEB=/srv/httpd ;;
 		esac
-	elif [[ $DISTRO = 'SUSE LINUX' ]]; then
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
 		case $1 in
-			install) shift; zypper --quiet --non-interactive install $@ 2>> $LOG ; E_=$? ;;
-			update ) zypper --quiet refresh                                              ;;
-			upgrade) zypper --quiet --non-interactive update --auto-agree-with-licenses  ;;
-			version) zypper info $2 | grep Version:                                      ;;
-			clean  ) zypper --quiet clean                                                ;;
+			clean  )
+					zypper --quiet clean
+					alias_autoclean="zypper clean" ;;
+			install) shift  # forget $1
+					zypper --quiet --non-interactive install $@ 2>> $LOG; E_=$?
+					alias_install="zypper install" ;;
+			remove ) shift
+					zypper --quiet remove $@ 2>> $LOG; E_=$?
+					alias_remove="zypper remove"   ;;
+			update )
+					zypper --quiet refresh
+					alias_update="zypper refresh"  ;;
+			upgrade)
+					zypper --quiet --non-interactive update --auto-agree-with-licenses
+					alias_upgrade="zypper update"  ;;
+			version)
+					zypper info $2 | grep Version: ;;
+			setvars)
+					REPO_PATH=/etc/zypp/repos.d
+					WEB=/var/www ;;			
 		esac
 
 	#elif [[ $DISTRO = "Fedora" ]]; then
@@ -207,23 +263,13 @@ init() {
 
 ##[ Determine OS ]##
 if [[ $OS = "Linux" ]] ; then
-#[ TODO ]#
-	if [[ -f /etc/redhat-release ]]; then  # check this first, some non rpm distro's include it
-		error "TODO - REDHAT"
-	elif [[ -f /etc/arch-release ]]; then
-		REPO_PATH=/etc/pacman.conf
-	elif [[ -f /etc/etc/fedora-release ]]; then
+	if [[ -f /etc/etc/fedora-release ]]; then
 		error "TODO - Fedora"
 	elif [[ -f /etc/gentoo-release ]]; then
 		error "TODO - Gentoo"
-	elif [[ -f /etc/slackware-version ]]; then
-		error "TODO - Slackware"
-	elif [[ -f /etc/SuSE-release ]]; then
-		REPO_PATH=/etc/zypp/repos.d/
-
-	else  # we are going to assume a deb based system
-		REPO_PATH=/etc/apt/sources.list.d/
 	fi
+	
+	packages setvars
 	
 	if ! which lsb-release >/dev/null; then  # install lsb-release (debian stable doesnt package it)
 		packages install lsb-release
@@ -237,12 +283,11 @@ if [[ $OS = "Linux" ]] ; then
 	mkdir --parents tmp/
 	mkdir --parents logs/
 
-	iFACE=$(ip route ls | awk '{print $3}' | sed -e '2d')
 	iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
 	if ! [[ $iP = *.*.* ]]; then
 		error "Unable to find ip from outside"
 	fi
-	readonly iFACE iP USER CORES BASE WEB HOME=/home/$USER LOG=$BASE/$LOG # make sure these variables aren't overwritten
+	readonly iP USER CORES BASE WEB HOME=/home/$USER LOG=$BASE/$LOG # make sure these variables aren't overwritten
 
 else error "Unsupported OS"
 fi
@@ -254,7 +299,7 @@ fi
 CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLCERT=/usr/share/ssl-cert/ssleay.cnf
 LOG=logs/installer.log
-WEB=/var/www
+iFACE=eth0
 
 #!=====================>> COLOR CONTROL <<=====================!#
 ##[ echo -e "${txtblu}test ${rst}" ]##

@@ -30,10 +30,10 @@ if [[ $sql = 'postgre' ]]; then  # This needs to change per version
 	if [[ $NAME = 'lenny' ]]; then
 		post_ver=8.3
 	fi
-	post_conf=/etc/postgresql/${post_ver}/main/postgresql.conf
+	post_conf=/etc/postgresql/$post_ver/main/postgresql.conf
 	sed -i "s:#autovacuum .*:autovacuum = on:"     $post_conf
 	sed -i "s:#track_counts .*:track_counts = on:" $post_conf
-	/etc/init.d/postgresql-${post_ver} restart
+	/etc/init.d/postgresql-$post_ver restart
 fi
 
 #[ Add Some Useful Command Alias' ]#
@@ -41,13 +41,13 @@ if [[ -f $HOME/.bashrc ]];then
 	cat $HOME/.bashrc | grep '# added by autoscript' >/dev/null
 if [[ $? != 0 ]]; then  # Check if this has already been added or not
 	sed -i 's:force_color_prompt=no:force_color_prompt=yes:' $HOME/.bashrc
-	echo "# added by autoscript"            >> $HOME/.bashrc
-	echo "alias wget='axel'"                >> $HOME/.bashrc
-	echo "alias apt-get='apt-fast'"         >> $HOME/.bashrc
-	echo "alias update='apt-fast update'"   >> $HOME/.bashrc
-	echo "alias install='apt-fast install'" >> $HOME/.bashrc
-	echo "alias upgrade='apt-fast upgrade'" >> $HOME/.bashrc
-	echo "alias remove='apt-fast remove'"   >> $HOME/.bashrc
+	echo "# added by autoscript">> $HOME/.bashrc
+	echo "$alias_install"       >> $HOME/.bashrc
+	echo "$alias_remove"        >> $HOME/.bashrc
+	echo "$alias_update"        >> $HOME/.bashrc
+	echo "$alias_upgrade"       >> $HOME/.bashrc
+	echo "$alias_autoclean"     >> $HOME/.bashrc
+	
 	if [[ $torrent = 'rtorrent' ]];then
 		echo "alias rtorrent-start='dtach -n .dtach/rtorrent rtorrent'" >> $HOME/.bashrc
 		echo "alias rtorrent-resume='dtach -a .dtach/rtorrent'"         >> $HOME/.bashrc

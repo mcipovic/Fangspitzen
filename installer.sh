@@ -121,7 +121,7 @@ echo -e "\n********************************"
 echo -e   "****${bldred} BEGiNiNG iNSTALLATiON ${rst}*****"
 echo -e   "********************************\n"
 
-mksslcert
+mksslcert generate-default-snakeoil
 base_install
 
 cd $BASE
@@ -154,7 +154,7 @@ elif [[ $http = 'lighttp' ]]; then
 	if_error "Lighttpd failed to install"
 
 	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
-		make-ssl-cert $SSLCERT /etc/lighttpd/server.pem
+		mksslcert "/etc/lighttpd/server.pem" "/etc/lighttpd/server.key"
 	fi
 
 	cp modules/lighttp/scgi.conf /etc/lighttpd/conf-available/20-scgi.conf        # Add mountpoint and secure it with auth
@@ -223,7 +223,8 @@ if [[ $ftpd = 'vsftp' ]]; then
 		sed -i 's:force_local_logins_ssl.*:force_local_logins_ssl=NO:'  /etc/vsftpd.conf
 		sed -i 's:force_local_data_ssl.*:cforce_local_data_ssl=NO:'     /etc/vsftpd.conf
 	fi
-
+	
+	/etc/init.d/vsftpd restart
 	log "vsFTP Installation | Completed" ; debug_wait "vsftpd.installed"
 
 ##[ proFTP ]##
@@ -231,7 +232,37 @@ elif [[ $ftpd = 'proftp' ]]; then
 	notice "iNSTALLiNG proFTPd"
 	packages install proftpd-basic
 	if_error "ProFTPd failed to install"
-	sed -i 's:#DefaultRoot .*:DefaultRoot ~:' /etc/proftpd/proftpd.conf
+
+	if [[ ! -f /etc/proftpd/ssl/proftpd.cert.pem ]]; then  # Create SSL cert and conf
+		mkdir -p /etc/proftpd/ssl
+		mksslcert "/etc/proftpd/ssl/proftpd.cert.pem" "/etc/proftpd/ssl/proftpd.key.pem"
+		log "PureFTP SSL Key created"
+		cat >> /etc/proftpd/proftpd.conf << "EOF"
+<IfModule mod_tls.c>
+TLSEngine                  on
+TLSLog                     /var/log/proftpd/tls.log
+TLSProtocol                SSLv23
+TLSOptions                 NoCertRequest
+TLSRSACertificateFile      /etc/proftpd/ssl/proftpd.cert.pem
+TLSRSACertificateKeyFile   /etc/proftpd/ssl/proftpd.key.pem
+TLSVerifyClient            off
+TLSRequired                off
+</IfModule>
+EOF
+	fi
+	sed -i 's:#DefaultRoot .*:DefaultRoot ~:'      /etc/proftpd/proftpd.conf
+	sed -i 's:UseIPv6 .*:UseIPv6 off:'             /etc/proftpd/proftpd.conf
+	sed -i 's:IdentLookups .*:IdentLookups off:'   /etc/proftpd/proftpd.conf
+	sed -i 's:ServerIdent .*:ServerIdent on "FTP Server ready.":' /etc/proftpd/proftpd.conf
+
+	echo -n "Force SSL? [y/n]: "
+	if yes; then  # allow toggling of forcing ssl
+		sed -i 's:TLSRequired .*:TLSRequired on:'  /etc/proftpd/proftpd.conf
+	else
+		sed -i 's:TLSRequired .*:TLSRequired off:' /etc/proftpd/proftpd.conf
+	fi
+	
+	/etc/init.d/proftpd restart
 	log "ProFTP Installation | Completed" ; debug_wait "proftpd.installed"
 
 ##[ pureFTP ]##
@@ -239,6 +270,13 @@ elif [[ $ftpd = 'pureftp' ]]; then
 	notice "iNSTALLiNG Pure-FTPd"
 	packages install pure-ftpd pure-ftpd-common
 	if_error "PureFTP failed to install"
+	
+	if [[ ! -f /etc/ssl/private/pure-ftpd.pem ]]; then  # Create SSL Certificate
+		mkdir -p /etc/ssl/private
+		mksslcert "/etc/ssl/private/pure-ftpd.pem"
+		log "PureFTP SSL Key created"
+	fi
+	sed -i 's:STANDALONE_OR_INETD=.*:STANDALONE_OR_INETD=standalone:' /etc/default/pure-ftpd-common
 
 	echo -n "Force SSL? [y/n]: "
 	if ! yes; then  # allow toggling of forcing ssl
@@ -247,14 +285,7 @@ elif [[ $ftpd = 'pureftp' ]]; then
 		echo 2 > /etc/pure-ftpd/conf/TLS  # Force TLS
 	fi
 
-	if [[ ! -f /etc/ssl/private/pure-ftpd.pem ]]; then  # Create SSL Certificate
-		mkdir -p /etc/ssl/private && make-ssl-cert $SSLCERT /etc/ssl/private/pure-ftpd.pem
-		chmod 600 /etc/ssl/private/pure-ftpd.pem  # Read write permission for owner only
-		log "PureFTP SSL Key created"
-	fi
-	sed -i 's:STANDALONE_OR_INETD=.*:STANDALONE_OR_INETD=standalone:' /etc/default/pure-ftpd-common
 	/etc/init.d/pure-ftpd restart
-
 	log "PureFTP Installation | Completed" ; debug_wait "pureftp.installed"
 fi
 

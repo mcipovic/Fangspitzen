@@ -42,11 +42,11 @@ if [[ -f $HOME/.bashrc ]];then
 if [[ $? != 0 ]]; then  # Check if this has already been added or not
 	sed -i 's:force_color_prompt=no:force_color_prompt=yes:' $HOME/.bashrc
 	echo "# added by autoscript">> $HOME/.bashrc
-	echo "$alias_install"       >> $HOME/.bashrc
-	echo "$alias_remove"        >> $HOME/.bashrc
-	echo "$alias_update"        >> $HOME/.bashrc
-	echo "$alias_upgrade"       >> $HOME/.bashrc
-	echo "$alias_autoclean"     >> $HOME/.bashrc
+	echo "alias install='$alias_install'"     >> $HOME/.bashrc
+	echo "alias remove='$alias_remove'"       >> $HOME/.bashrc
+	echo "alias update='$alias_update'"       >> $HOME/.bashrc
+	echo "alias upgrade='$alias_upgrade'"     >> $HOME/.bashrc
+	echo "alias autoclean='$alias_autoclean'" >> $HOME/.bashrc
 	
 	if [[ $torrent = 'rtorrent' ]];then
 		echo "alias rtorrent-start='dtach -n .dtach/rtorrent rtorrent'" >> $HOME/.bashrc

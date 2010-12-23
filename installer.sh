@@ -18,13 +18,13 @@ trap ctrl_c SIGINT
 
 ##################################################################
 VERSION='0.9.9~git'                                              #
-DATE='Dec 08 2010'                                               #
+DATE='Dec 24 2010'                                               #
 ##################################################################
 source includes/functions.sh || error "while loading functions.sh"  # Source in our functions
 
 ##[ Check command line switches ]##
 while [ $# -gt 0 ]; do
-  	case $1 in
+  	case "$1" in
 		-p|--pass)  # Generate strong random 'user defined length' passwords
 			if [[ $2 ]]; then opt=$2
 			else error "Specify Length --pass x ";fi
@@ -81,9 +81,9 @@ echo -e "
   You can update your system along with installing those \"must have\"
   programs by simply running this script with the --dry option.
 
-  The systems currently supported are:
-     Ubuntu [ 9.04 -> 10.10 ]
-     Debian [ 5.0  ->  6.0  ]
+    Supported:                InProgress:
+      Ubuntu 9.04 -> 10.10      OpenSUSE 11.x
+      Debian 5.0  ->  6.0       ArchLinux
 
   If your OS is not listed, this script will most likey explode. \n"
 
@@ -128,7 +128,13 @@ cd $BASE
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
-	packages install $PHP apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		packages install $PHP_DEBIAN apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		packages install $PHP_SUSE apache2 apache2-mod_php5 apache2-mod_scgi apache2-prefork suphp
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
 	if_error "Apache2 failed to install"
 
 	cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
@@ -150,7 +156,13 @@ if [[ $http = 'apache' ]]; then
 ##[ LiGHTTPd ]##
 elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
-	packages install $PHP lighttpd apache2-utils
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		packages install $PHP_DEBIAN lighttpd
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		packages install $PHP_SUSE lighttpd
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
 	if_error "Lighttpd failed to install"
 
 	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
@@ -171,8 +183,14 @@ elif [[ $http = 'cherokee' ]]; then
 	#if [[ $NAME = 'lenny' ]]; then
 	#	packages install cherokee spawn-fcgi
 	#else
-		packages install $PHP cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi
-		if_error "Cherokee failed to install"
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		packages install $PHP_DEBIAN cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		# packages install $PHP_SUSE TODO
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
+	if_error "Cherokee failed to install"
 	#fi
 	PHPini=/etc/php5/cgi/php.ini
 	log "Cherokee Installation | Completed" ; debug_wait "cherokee.installed"
@@ -230,7 +248,13 @@ if [[ $ftpd = 'vsftp' ]]; then
 ##[ proFTP ]##
 elif [[ $ftpd = 'proftp' ]]; then
 	notice "iNSTALLiNG proFTPd"
-	packages install proftpd-basic
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		packages install proftpd-basic
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		packages install proftpd
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
 	if_error "ProFTPd failed to install"
 
 	if [[ ! -f /etc/proftpd/ssl/proftpd.cert.pem ]]; then  # Create SSL cert and conf
@@ -268,7 +292,7 @@ EOF
 ##[ pureFTP ]##
 elif [[ $ftpd = 'pureftp' ]]; then
 	notice "iNSTALLiNG Pure-FTPd"
-	packages install pure-ftpd pure-ftpd-common
+	packages install pure-ftpd
 	if_error "PureFTP failed to install"
 	
 	if [[ ! -f /etc/ssl/private/pure-ftpd.pem ]]; then  # Create SSL Certificate
@@ -318,7 +342,6 @@ if [[ ! -f /usr/local/bin/mktorrent || $buildtorrent = 'm' ]]; then
 		E_=$? ; if_error "MkTorrent Download Failed"
 		log "MkTorrent | Downloaded"
 	fi
-
 	cd mktorrent
 	make install
 
@@ -329,9 +352,9 @@ fi  # end `if $buildtorrent`
 
 cd $BASE
 ##[ Torrent Clients ]##
-if [[ $torrent = 'rtorrent' ]]; then source modules/rtorrent/install.sh
-elif [[ $torrent = 'tranny' ]]; then source modules/transmission/install.sh
-elif [[ $torrent = 'deluge' ]]; then source modules/deluge/install.sh
+if   [[ $torrent = 'rtorrent' ]]; then source modules/rtorrent/install.sh
+elif [[ $torrent = 'tranny'   ]]; then source modules/transmission/install.sh
+elif [[ $torrent = 'deluge'   ]]; then source modules/deluge/install.sh
 fi
 
 ##[ ruTorrent ]##
@@ -339,12 +362,11 @@ if [[ $webui = 'y' ]]; then source modules/rutorrent/install.sh
 fi
 
 ##[ Extras ]##
-if [[ $extras = true ]]; then
-	source modules/extras.sh
+if [[ $extras = true ]]; then source modules/extras.sh
 fi
 
-source $BASE/includes/postprocess.sh
-
+##[ PostProcess ]##
+source $BASE/includes/postprocess.sh || error "while loading postprocess.sh"
 echo -e "\n*******************************"
 echo -e   "******${bldred} SCRiPT COMPLETED! ${rst}******"
 echo -e   "****${bldred} FiNiSHED iN ${bldylw}$SECONDS ${bldred}SECONDS ${rst}**"

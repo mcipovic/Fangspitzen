@@ -23,7 +23,13 @@ if [[ $cache = 'xcache' ]]; then
 ##[ APC ]##
 elif [[ $cache = 'apc' ]]; then
 	notice "iNSTALLiNG APC"
-	packages install php-apc
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		packages install php-apc
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		# packages install TODO
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
 	if_error "PHP-APC failed to install"
 	log "APC Installation | Completed" ; debug_wait "apc.installed"
 fi
@@ -40,6 +46,8 @@ if [[ $sql = 'mysql' ]]; then
 		chkconfig --add mysql
 		/etc/init.d/mysql start
 		mysql_secure_installation
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
 	fi
 	if_error "MySQL failed to install"
 
@@ -57,7 +65,13 @@ elif [[ $sql = 'sqlite' ]]; then
 ##[ PostGreSQL ]##
 elif [[ $sql = 'postgre' ]]; then
 	notice "iNSTALLiNG PostgreSQL"
-	packages install postgresql postgresql-client-common postgresql-common
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		packages install postgresql
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		packages install postgresql postgresql-server
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
 	if_error "PostgreSQL failed to install"
 	log "PostgreSQL Installation | Completed" ; debug_wait "postgresql.installed"
 fi
@@ -65,7 +79,13 @@ fi
 ##[ Bouncers ]##
 cd $BASE
 if [[ $bnc != @(none|no|[Nn]) ]]; then
-	packages install libc-ares-dev tcl tcl-dev
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		packages install libc-ares-dev tcl tcl-dev
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		packages install libcares-devel tcl tcl-devel
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
 	if_error "Required packages failed to install"
 fi
 
@@ -155,7 +175,13 @@ fi
 cd $BASE
 if [[ $webmin = 'y' ]]; then
 	notice "iNSTALLiNG WEBMiN"
-	packages install webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		packages install webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		packages install webmin perl-Net-SSLeay
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
 	if_error "Webmin failed to install"
 	log "WebMin Installation | Completed" ; debug_wait "webmin.installed"
 fi
@@ -164,9 +190,16 @@ fi
 cd $BASE/tmp
 if [[ $vnstat = 'y' ]]; then
 	notice "iNSTALLiNG VNSTAT"
-	packages install libgd2-xpm libgd2-xpm-dev
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		packages install libgd2-xpm libgd2-xpm-dev
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		# packages install TODO
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
+	if_error "vnStat deps failed to install"
+	
 	download http://humdi.net/vnstat/vnstat-1.10.tar.gz                   # Download VnStat
-
 	git clone -q git://github.com/bjd/vnstat-php-frontend.git vnstat-web  # Checkout VnStat-Web
 	extract vnstat-1.10.tar.gz && cd vnstat-1.10                          # Unpack
 
@@ -220,13 +253,21 @@ fi
 cd $BASE/tmp
 if [[ $sabnzbd = 'y' ]]; then
 	notice "iNSTALLiNG SABnzbd"
-	packages install sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+			packages install sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		# packages install TODO
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
+	fi
 	if_error "Sabnzbd failed to install"
 
 	# Install par2cmdline 0.4 with Intel Threading Building Blocks
-	if [[ $ARCH = 'x86_64' ]]; then download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20100203-lin64.tar.gz
+	if [[ $ARCH = 'x86_64' ]]
+	then download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20100203-lin64.tar.gz
 	else download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20090203-lin32.tar.gz
-	fi ; extract par2cmdline-0.4*.tar.gz && cd par2cmdline-0.4*
+	fi
+	extract par2cmdline-0.4*.tar.gz && cd par2cmdline-0.4*
 	mv libtbb.so libtbb.so.2 par2 /usr/bin ; cd ..
 
 	#if [[ $NAME = 'lenny' ]]; then
@@ -257,10 +298,16 @@ fi
 cd $BASE/tmp
 if [[ $ipblock = 'y' ]]; then
 	notice "iNSTALLiNG iPBLOCK"
-	if [[ $NAME = 'lenny' ]]; then
-		apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1 2>> $LOG  # Install updated libraries for lenny support
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		if [[ $NAME = 'lenny' ]]; then
+			apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1 2>> $LOG  # Install updated libraries for lenny support
+		fi
+		packages install iplist
+	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+		# packages install TODO
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		# packages install TODO
 	fi
-	packages install iplist
 	if_error "iPBLOCK failed to install"
 
 	PATH_iplist=/etc/ipblock.conf

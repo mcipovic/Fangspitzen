@@ -1,30 +1,25 @@
 ##!=======================>> FUNCTiONS <<=======================!##
 base_install() {  # install dependencies
+COMMON="apache2-utils autoconf automake binutils bzip2 ca-certificates cpp curl fail2ban file gamin gcc git-core gzip htop iptables libexpat1 libtool libtorrent-rasterbar-dev libxml2 m4 make openssl patch perl pkg-config python python-gamin python-openssl python-setuptools screen subversion sudo unrar unzip zip"
+DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libncurses5 libncurses5-dev libsigc++-2.0-dev"
 
-STABLE="apt-show-versions autoconf automake autotools-dev binutils build-essential bzip2 ca-certificates cfv comerr-dev cpp curl dtach fail2ban file g++ gamin gcc git-core gzip htop iptables libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtool m4 make ncurses-base ncurses-bin ncurses-term openssl patch perl perl-modules pkg-config python python-gamin python-openssl python-setuptools ssl-cert subversion sudo unrar unzip zip"
-DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libexpat1 libncurses5 libncurses5-dev libsigc++-2.0-dev libxml2"
-if [[ $http != 'none' ]]; then
-PHP="php5 php5-cgi php5-cli php5-common php5-curl php5-gd php5-dev php5-mcrypt php5-mhash php5-mysql php5-suhosin php5-xmlrpc"
-fi
+DEBIAN="$COMMON $DYNAMIC apt-show-versions autotools-dev build-essential cfv comerr-dev dtach g++ libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl ncurses-base ncurses-bin ncurses-term perl-modules ssl-cert"
+SUSE="$COMMON libcppunit-devel libcurl4 libopenssl-devel ncurses-devel libncurses6 libsigc++2-devel"
+ARCH="base-devel yaourt"  # TODO
+
+PHP_COMMON="php5 php5-curl php5-gd php5-mcrypt php5-mysql php5-suhosin php5-xmlrpc"
+
+PHP_DEBIAN="$PHP_COMMON php5-cgi php5-cli php5-common php5-dev php5-mhash"
+PHP_SUSE="$PHP_COMMON php5-devel"
+PHP_ARCH="php"  # TODO
+
 	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
-	if [[ $DISTRO = 'Ubuntu' ]]; then
-		if [[ $NAME = @(karmic|lucid) ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar5
-		elif [[ $NAME = 'jaunty' ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar2
-		elif [[ $NAME = 'maverick' ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar6
-		fi
 
-	elif [[ $DISTRO = @([Dd]ebian|*Mint) ]]; then
-		if [[ $NAME = @(squeeze|debian) ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar5
-		elif [[ $NAME = 'lenny' ]]; then
-			packages install $STABLE $DYNAMIC libtorrent-rasterbar0
-		fi
-	elif [[ $DISTRO = 'Arch' ]]; then
-			packages install base-devel fakeroot yaourt php
-	fi
+	case "$DISTRO" in
+		Ubuntu|[Dd]ebian|*Mint) packages install $DEBIAN ;;
+		ARCH*|[Aa]rch*        ) packages install $ARCH   ;;
+		*SUSE|*[Ss]use        ) packages install $SUSE   ;;
+	esac
 
 	if_error "Required system packages failed to install"
 	log "Base Installation | Completed"
@@ -85,23 +80,22 @@ download() {  # show progress bars if debug is on
 }
 
 error() {  # call this when you know there will be an error
-	echo -e " Error:${bldred} $1 ${rst} \n"
-	exit
+	echo -e " Error:${bldred} $1 ${rst} \n" ;exit 1
 }
 
 extract() {  # find type of compression and extract accordingly
-	case $1 in
+	case "$1" in
 		*.tar.bz2) tar xjf    $1 ;;
-		*.tbz2)    tar xjf    $1 ;;
-		*.tar.gz)  tar xzf    $1 ;;
-		*.tgz)     tar xzf    $1 ;;
-		*.tar)     tar xf     $1 ;;
-		*.gz)      gunzip -q  $1 ;;
-		*.bz2)     bunzip2 -q $1 ;;
-		*.rar)     unrar x    $1 ;;
-		*.zip)     unzip      $1 ;;
-		*.Z)       uncompress $1 ;;
-		*.7z)      7z x       $1 ;;
+		*.tbz2   ) tar xjf    $1 ;;
+		*.tar.gz ) tar xzf    $1 ;;
+		*.tgz    ) tar xzf    $1 ;;
+		*.tar    ) tar xf     $1 ;;
+		*.gz     ) gunzip -q  $1 ;;
+		*.bz2    ) bunzip2 -q $1 ;;
+		*.rar    ) unrar x    $1 ;;
+		*.zip    ) unzip      $1 ;;
+		*.Z      ) uncompress $1 ;;
+		*.7z     ) 7z x       $1 ;;
 	esac
 }
 
@@ -109,8 +103,7 @@ if_error() {  # call this to catch a bad return code and log the error
 	if [[ $E_ != 0 ]]; then
 		echo -e " Error:${bldred} $1 ${rst} ($E_)"
 		log "Error: $1 ($E_)"
-		cleanup
-		exit 1
+		cleanup ;exit 1
 	fi
 }
 
@@ -120,8 +113,7 @@ log() {  # send to the logfile
 
 mkpass() {  # generate a random password of user defined length
 	newPass=$(tr -cd '[:alnum:]' < /dev/urandom | head -c ${1:-${opt}})
-	notice "$newPass"
-	exit 0
+	notice "$newPass" ;exit 0
 }
 
 mksslcert() {  # use 2048 bit certs, use sha256, and regenerate
@@ -148,9 +140,9 @@ notice() {  # echo status or general info to stdout
 	echo -en "\n${bldred} $1... ${rst}\n"
 }
 
-packages() {
+packages() {  # use appropriate package manager depending on distro
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
-		case $1 in
+		case "$1" in
 			clean  )
 					apt-get -qq autoclean
 					alias_autoclean="apt-get autoremove && apt-get autoclean";;
@@ -169,11 +161,10 @@ packages() {
 			version)
 					dpkg-query -p $2 | grep Version:   ;;
 			setvars)
-					REPO_PATH=/etc/apt/sources.list.d
-					WEB=/var/www ;;
+					REPO_PATH=/etc/apt/sources.list.d  ;;
 		esac
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		case $1 in
+		case "$1" in
 			clean  )
 					pacman --sync --clean -c --noconfirm
 					alias_autoclean="pacman -Scc" ;;
@@ -193,10 +184,10 @@ packages() {
 					pacman -Qi $2 | grep Version: ;;
 			setvars)
 					REPO_PATH=/etc/pacman.conf
-					WEB=/srv/httpd ;;
+					WEB=/srv/httpd                ;;
 		esac
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
-		case $1 in
+		case "$1" in
 			clean  )
 					zypper --quiet clean
 					alias_autoclean="zypper clean" ;;
@@ -215,27 +206,53 @@ packages() {
 			version)
 					zypper info $2 | grep Version: ;;
 			setvars)
-					REPO_PATH=/etc/zypp/repos.d
-					WEB=/var/www ;;			
+					REPO_PATH=/etc/zypp/repos.d    ;;			
 		esac
 
-	#elif [[ $DISTRO = "Fedora" ]]; then
-	#	case $1 in
-	#		install) shift; yum install $@ 2>> $LOG ; E_=$? ;;
-	#		update ) yum check-update ;;
-	#		upgrade) yum update       ;;
-	#		version) yum info         ;;
-	#		clean  ) yum clean        ;;
-	#	esac
-	
-	#elif [[ $DISTRO = "Gentoo" ]]; then
-	#	case $1 in
-	#		install) shift; emerge $@ 2>> $LOG ; E_=$? ;;
-	#		update ) layman -f               ;;
-	#		upgrade) emerge -u world         ;;
-	#		version) emerge -S or emerge -pv ;;
-	#		clean  ) emerge --depclean       ;;
-	#	esac
+	elif [[ $DISTRO = "Fedora" ]]; then
+		case "$1" in
+			clean  )
+					yum clean all -y
+					alias_autoclean="yum clean all" ;;
+			install) shift
+					yum install -y $@ 2>> $LOG; E_=$?
+					alias_install="yum install"     ;;
+			remove ) shift
+					yum remove -y $@ 2>> $LOG; E_=$?
+					alias_remove="yum remove"       ;;
+			update )
+					yum check-update -y
+					alias_update="yum check-update" ;;
+			upgrade)
+					yum upgrade -y
+					alias_upgrade="yum upgrade"     ;;
+			version)
+					yum info $2 | grep Version:     ;;
+			setvars)
+					REPO_PATH=/etc/yum/repos.d/     ;;
+		esac
+
+	elif [[ $DISTRO = "Gentoo" ]]; then
+		case "$1" in
+			clean  )
+					emerge --clean  # --depclean
+					alias_autoclean="emerge --clean" ;;
+			install) shift
+					emerge --quiet --jobs=$CORES $@ 2>> $LOG; E_=$?
+					alias_install="emerge"           ;;
+			remove ) shift
+					emerge --unmerge --quiet $@ 2>> $LOG; E=$?
+					alias_remove="emerge -C"         ;;
+			update )
+					emerge --sync
+					alias_update="emerge --sync"     ;;
+			upgrade)
+					emerge --update world --quiet  # --deep
+					alias_upgrade="emerge -u world"  ;;
+			version)
+					emerge -S or emerge -pv          ;;
+			setvars) ;;  # TODO
+		esac
 	fi
 }
 
@@ -249,12 +266,11 @@ usage() {  # help screen
 
 yes() {  # user input for yes or no
 	while read line; do
-	case $line in
+	case "$line" in
 		y|Y|Yes|YES|yes) return 0 ;;
 		n|N|No|NO|no) return 1 ;;
 		*) echo -en " Please enter ${undrln}y${rst} or ${undrln}y${rst}: " ;;
-	esac
-	done
+	esac;done
 }
 
 init() {
@@ -269,7 +285,7 @@ if [[ $OS = "Linux" ]] ; then
 		error "TODO - Gentoo"
 	fi
 	
-	packages setvars
+	packages setvars  # just sets REPO_PATH= at the moment
 	
 	if ! which lsb-release >/dev/null; then  # install lsb-release (debian stable doesnt package it)
 		packages install lsb-release
@@ -292,7 +308,7 @@ if [[ $OS = "Linux" ]] ; then
 else error "Unsupported OS"
 fi
 	packages update  # refresh our package list
-	echo -e "[${bldylw} done ${rst}]" ; sleep 1
+	echo -e "[${bldylw} done ${rst}]" ;sleep 1
 }
 
 ##[ VARiABLE iNiT ]##
@@ -300,6 +316,7 @@ CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLCERT=/usr/share/ssl-cert/ssleay.cnf
 LOG=logs/installer.log
 iFACE=eth0
+WEB=/var/www
 
 #!=====================>> COLOR CONTROL <<=====================!#
 ##[ echo -e "${txtblu}test ${rst}" ]##

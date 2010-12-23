@@ -117,7 +117,7 @@ mkpass() {  # generate a random password of user defined length
 }
 
 mksslcert() {  # use 2048 bit certs, use sha256, and regenerate
-	if [[ $1 = 'generate-default-snakeoil'
+	if [[ $1 = 'generate-default-snakeoil'  # called once after questionaire exits
 		sed -i 's:default_bits .*:default_bits = 2048:' /etc/ssl/openssl.cnf
 		sed -i 's:default_md .*:default_md = sha256:'   /etc/ssl/openssl.cnf
 		if which make-ssl-cert >/dev/null; then
@@ -127,12 +127,9 @@ mksslcert() {  # use 2048 bit certs, use sha256, and regenerate
 			echo -e "${bldylw} done${rst}"
 		fi
 	else
-		#if which make-ssl-cert >/dev/null; then
-		#	make-ssl-cert $SSLCERT $1
-		#elif which openssl >/dev/null; then
-			openssl genrsa -des3 -out $1 1024  # generate keys with arg(s)
-			[[ $2 ]] && openssl rsa -in $1 -out $2 || openssl rsa -in $1 -out $1  # you can give two args as filenames
-		#fi
+		openssl genrsa -des3 -out $1 1024  # generate single key file
+		[[ $2 ]] && openssl rsa -in $1 -out $2 || openssl rsa -in $1 -out $1  # 2nd arg creates separate .pem and .key files
+		[[ $3 ]] && openssl req -new -key $2 -days 3650 -out $3 -x509 -subj '/C=AN/ST=ON/L=YM/O=OU/CN=S/emailAddress=dev@slash.null'  # a 3rd arg creates a .crt file
 		chmod 400 $@  # Read write permission for owner only
 	fi
 }

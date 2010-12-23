@@ -9,6 +9,7 @@
 # You can, of course, change it below
 
 ##[ TODO ]##  Make useful for lighttpd and cherokee setups
+[[ ! $1 ]] echo "*OLD*FiXME*" ; exit
 
 init_variables()
 {

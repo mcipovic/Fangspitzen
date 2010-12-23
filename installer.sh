@@ -259,7 +259,7 @@ elif [[ $ftpd = 'proftp' ]]; then
 
 	if [[ ! -f /etc/proftpd/ssl/proftpd.cert.pem ]]; then  # Create SSL cert and conf
 		mkdir -p /etc/proftpd/ssl
-		mksslcert "/etc/proftpd/ssl/proftpd.cert.pem" "/etc/proftpd/ssl/proftpd.key.pem"
+		mksslcert "/etc/proftpd/ssl/proftpd.cert" "/etc/proftpd/ssl/proftpd.key"
 		log "PureFTP SSL Key created"
 		cat >> /etc/proftpd/proftpd.conf << "EOF"
 <IfModule mod_tls.c>
@@ -267,8 +267,8 @@ TLSEngine                  on
 TLSLog                     /var/log/proftpd/tls.log
 TLSProtocol                SSLv23
 TLSOptions                 NoCertRequest
-TLSRSACertificateFile      /etc/proftpd/ssl/proftpd.cert.pem
-TLSRSACertificateKeyFile   /etc/proftpd/ssl/proftpd.key.pem
+TLSRSACertificateFile      /etc/proftpd/ssl/proftpd.cert
+TLSRSACertificateKeyFile   /etc/proftpd/ssl/proftpd.key
 TLSVerifyClient            off
 TLSRequired                off
 </IfModule>

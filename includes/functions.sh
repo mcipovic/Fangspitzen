@@ -127,12 +127,13 @@ mksslcert() {  # use 2048 bit certs, use sha256, and regenerate
 			echo -e "${bldylw} done${rst}"
 		fi
 	else
-		if which make-ssl-cert >/dev/null; then
-			make-ssl-cert $SSLCERT $1
-		elif which openssl >/dev/null; then  # use openssl if ssl-cert isnt available
-			openssl req -newkey rsa:2048 -x509 -days 365 -nodes -out $1 -keyout $2
-		fi
-		chmod 600 $@  # Read write permission for owner only
+		#if which make-ssl-cert >/dev/null; then
+		#	make-ssl-cert $SSLCERT $1
+		#elif which openssl >/dev/null; then
+			openssl genrsa -des3 -out $1 1024  # generate keys with arg(s)
+			[[ $2 ]] && openssl rsa -in $1 -out $2 || openssl rsa -in $1 -out $1  # you can give two args as filenames
+		#fi
+		chmod 400 $@  # Read write permission for owner only
 	fi
 }
 

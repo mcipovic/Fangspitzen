@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-trap ctrl_c SIGINT
-#trap 'echo "ERROR ON LINE: ${LINENO}"' ERR
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +18,8 @@ trap ctrl_c SIGINT
 VERSION='0.9.9~git'                                              #
 DATE='Dec 24 2010'                                               #
 ##################################################################
+trap ctrl_c SIGINT
+trap 'echo "ERROR ON LINE: $LINENO"' ERR
 source includes/functions.sh || error "while loading functions.sh"  # Source in our functions
 
 ##[ Check command line switches ]##
@@ -43,12 +43,8 @@ checkroot
 ##[ Find Config and Load it ]##
 if [[ -f config.ini ]]; then
 	source config.ini || error "while loading config.ini"
-	if [[ $iDiDNTEDiTMYCONFiG ]]; then  # Die if it hasnt been edited
-		error "PLEASE EDiT THE CONFiG"
-	elif [[ $PWD != "$BASE" ]]; then  # Check if the user declared BASE correctly in the config
-		echo  "Wrong Directory Detected..."
-		error "Does not match $BASE"
-	fi
+	[[ $iDiDNTEDiTMYCONFiG ]] && error "PLEASE EDiT THE CONFiG" # Die if it hasnt been edited
+	[[ $PWD != "$BASE"     ]] && error "Does not match $BASE"   # Check if the user declared BASE correctly in the config
 else error "config.ini not found!"  # Cant continue without a config so produce an error and exit
 fi
 
@@ -97,16 +93,6 @@ echo -en "\n Continue? [y/n]: "
 	else log "\n*** SCRiPT STARTiNG | $(date) ***"
 	fi
 fi  # end `if ! $LOG`
-
-if [[ $DISTRO = 'Arch' ]]; then
-	source arch.installer.sh
-	exit
-fi
-
-if [[ $DISTRO = 'SUSE Linux' ]]; then
-#	source suse.installer.sh
-	exit
-fi
 
 if [[ ! -f $REPO_PATH/autoinstaller.list ]]; then
 	source $BASE/includes/repositories.sh || error "while loading repositories.sh"  # Add repositories if not already present
@@ -165,9 +151,9 @@ elif [[ $http = 'lighttp' ]]; then
 	fi
 	if_error "Lighttpd failed to install"
 
-	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create SSL Certificate
-		mksslcert "/etc/lighttpd/server.pem" "/etc/lighttpd/server.key"
-	fi
+	[[ ! -f /etc/lighttpd/server.pem ]] &&  # Create an SSL cert if one isnt found
+		mksslcert "/etc/lighttpd/server.pem" "/etc/lighttpd/server.key" &&
+		log "Lighttpd SSL Key created"
 
 	cp modules/lighttp/scgi.conf /etc/lighttpd/conf-available/20-scgi.conf        # Add mountpoint and secure it with auth
 	cat < modules/lighttp/auth.conf >> /etc/lighttpd/conf-available/05-auth.conf  # apend contents of our auth.conf into lighttp's auth.conf
@@ -203,7 +189,6 @@ elif [[ $http != @(none|no|[Nn]) ]]; then  # Edit php config
 	sed -i 's:log_errors = Off:log_errors = On:'                                       $PHPini
 	sed -i 's:;error_log .*:error_log = /var/log/php-error.log:'                       $PHPini
 fi
-
 
 ##[ vsFTP ]##
 if [[ $ftpd = 'vsftp' ]]; then
@@ -281,9 +266,8 @@ EOF
 
 	echo -n "Force SSL? [y/n]: "
 	if yes; then  # allow toggling of forcing ssl
-		sed -i 's:TLSRequired .*:TLSRequired on:'  /etc/proftpd/proftpd.conf
-	else
-		sed -i 's:TLSRequired .*:TLSRequired off:' /etc/proftpd/proftpd.conf
+		 sed -i 's:TLSRequired .*:TLSRequired on:'  /etc/proftpd/proftpd.conf
+	else sed -i 's:TLSRequired .*:TLSRequired off:' /etc/proftpd/proftpd.conf
 	fi
 	
 	/etc/init.d/proftpd restart
@@ -304,9 +288,8 @@ elif [[ $ftpd = 'pureftp' ]]; then
 
 	echo -n "Force SSL? [y/n]: "
 	if ! yes; then  # allow toggling of forcing ssl
-		echo 1 > /etc/pure-ftpd/conf/TLS  # Allow TLS+FTP
-	else
-		echo 2 > /etc/pure-ftpd/conf/TLS  # Force TLS
+		 echo 1 > /etc/pure-ftpd/conf/TLS  # Allow TLS+FTP
+	else echo 2 > /etc/pure-ftpd/conf/TLS  # Force TLS
 	fi
 
 	/etc/init.d/pure-ftpd restart
@@ -358,12 +341,10 @@ elif [[ $torrent = 'deluge'   ]]; then source modules/deluge/install.sh
 fi
 
 ##[ ruTorrent ]##
-if [[ $webui = 'y' ]]; then source modules/rutorrent/install.sh
-fi
+[[ $webui = 'y' ]] && source modules/rutorrent/install.sh
 
 ##[ Extras ]##
-if [[ $extras = true ]]; then source modules/extras.sh
-fi
+[[ $extras = 'y' ]] && source modules/extras.sh
 
 ##[ PostProcess ]##
 source $BASE/includes/postprocess.sh || error "while loading postprocess.sh"

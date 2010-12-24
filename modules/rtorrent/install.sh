@@ -49,14 +49,12 @@ cd $BASE/tmp
 	notice "COMPiLiNG... LiBTORRENT"
 #-->[ Compile libtorrent ]
 	cd ../libtorrent
-	if [[ $NAME = 'lenny' ]]; then
+	[[ $NAME = 'lenny' ]] &&
 		rm -f scripts/{libtool,lt*}.m4
-	fi
-		sh autogen.sh
-	if [[ $alloc = 'y' ]]; then
-		 sh configure --prefix=/usr --with-posix-fallocate  # Use posix_fallocate
-	else sh configure --prefix=/usr
-	fi
+	sh autogen.sh
+	[[ $alloc = 'y' ]] &&  # Use posix_fallocate
+		sh configure --prefix=/usr --with-posix-fallocate ||
+		sh configure --prefix=/usr
 	compile
 		if_error "LibTorrent Build Failed"
 		log "LibTorrent Compile | Completed in $compile_time seconds"
@@ -66,9 +64,8 @@ cd $BASE/tmp
 	notice "COMPiLiNG... rTORRENT"
 #-->[ Compile rtorrent ]
 	cd ../rtorrent
-	if [[ $NAME = 'lenny' ]]; then
+	[[ $NAME = 'lenny' ]] &&
 		rm -f scripts/{libtool,lt*}.m4
-	fi
 	sh autogen.sh
 	sh configure --prefix=/usr --with-xmlrpc-c
 	compile
@@ -105,9 +102,8 @@ if [[ $rtorrent_svn != 'y' ]]; then
 	echo "preload_type = 1"        >> $PATH_rt
 fi
 
-if [[ $alloc = 'y' ]]; then
+[[ $alloc = 'y' ]] &&
 	echo "system.file_allocate.set = yes" >> $PATH_rt  # Enable file pre-allocation
-fi
 
 if [[ -d /etc/apache2 ]]; then
 	echo 'scgi_port = localhost:5000'     >> $PATH_rt  # Create scgi port on localhost:5000

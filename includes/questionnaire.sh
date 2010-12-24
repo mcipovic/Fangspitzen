@@ -3,7 +3,7 @@ while [[ $skip_ques = 'n' ]]; do
 echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<---------------${rst}"
 
 read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: " http
-if [[ $http = 'lighttpd' ]]; then $http='lighttp' ;fi
+[[ $http = 'lighttpd' ]] && http='lighttp'
 read -p "[ FTP SERVER  ]        [vsftp|proftp|pureftp|none]: " ftpd
 read -p "[ Torrent App ]      [rtorrent|tranny|deluge|none]: " torrent
 

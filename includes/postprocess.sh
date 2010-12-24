@@ -39,24 +39,20 @@ if [[ $? != 0 ]]; then  # Check if this has already been added or not
 	sysctl -p
 fi
 
-if [[ $http = 'apache' ]]; then
-	/etc/init.d/apache2 restart
-elif [[ $http = 'lighttp' ]]; then
-	mv $WEB/index.lighttpd.html $WEB/index.html
-	/etc/init.d/lighttpd restart
-elif [[ $http = 'cherokee' ]]; then
+[[ $http = 'apache'   ]] &&
+	/etc/init.d/apache2 restart ||
+[[ $http = 'lighttp'  ]] &&
+	/etc/init.d/lighttpd restart ||
+[[ $http = 'cherokee' ]] &&
 	notice "Run sudo cherokee-admin -b to configure Cherokee."
-fi
 
-if [[ $sql = 'mysql' ]]; then
+[[ $sql = 'mysql' ]] &&
 	/etc/init.d/mysql restart
-fi
 
 if [[ $sql = 'postgre' ]]; then  # This needs to change per version
 	post_ver=8.4
-	if [[ $NAME = 'lenny' ]]; then
+	[[ $NAME = 'lenny' ]] &&
 		post_ver=8.3
-	fi
 	post_conf=/etc/postgresql/$post_ver/main/postgresql.conf
 	sed -i "s:#autovacuum .*:autovacuum = on:"     $post_conf
 	sed -i "s:#track_counts .*:track_counts = on:" $post_conf
@@ -125,9 +121,7 @@ EOF
 
 	echo -n "Restarting fail2ban..."
 	killall -q -15 fail2ban-server ; sleep 2
-	if [[ -e /var/run/fail2ban/fail2ban.sock ]]; then
-		rm /var/run/fail2ban/fail2ban.sock
-	fi
+	[[ -e /var/run/fail2ban/fail2ban.sock ]] && rm /var/run/fail2ban/fail2ban.sock
 	/etc/init.d/fail2ban start && echo " done"
 fi  # end `if $?`
 
@@ -140,10 +134,9 @@ echo ; read -p "Start rtorrent now? [y/n]: " start_rt
 		sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
 
 		TESTrt=$(pgrep -u $USER rtorrent)
-		if [[ $? = 0 ]]; then
-			echo "rTorrent has been started with dtach in ~/.dtach/rtorrent"
-		else echo "rtorrent FAILED to start!"
-		fi
+		[[ $? = 0 ]] &&
+			echo "rTorrent has been started with dtach in ~/.dtach/rtorrent" ||
+			echo "rtorrent FAILED to start!"
 	fi
 fi
 

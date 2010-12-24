@@ -39,6 +39,8 @@ while [ $# -gt 0 ]; do
 done
 
 checkroot
+[[ $DEBUG = 1 ]] && echo -e ">>> Debug Mode ON.....[${bldylw} done ${rst}]" ||
+	echo -e ">>> Debug Mode OFF....[${bldylw} done ${rst}]"
 
 ##[ Find Config and Load it ]##
 if [[ -f config.ini ]]; then

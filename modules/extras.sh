@@ -242,10 +242,10 @@ if [[ $vnstat = 'y' ]]; then
 	mv vnstat-web $WEB  # Copy VnStat-web to WebRoot
 	log "Frontend Installed | http://$iP/vnstat-web"
 
-	if [[ ! $(pgrep vnstatd) ]]; then
-		vnstat -u -i $iFACE  # Make interface database
-		vnstatd -d           # Start daemon
-	fi
+	[[ ! $(pgrep vnstatd) ]] &&
+		vnstat -u -i $iFACE &&
+		vnstatd -d  # Make database and start vnstatd
+
 	debug_wait "vnstat-web.installed"
 fi
 
@@ -263,10 +263,10 @@ if [[ $sabnzbd = 'y' ]]; then
 	if_error "Sabnzbd failed to install"
 
 	# Install par2cmdline 0.4 with Intel Threading Building Blocks
-	if [[ $ARCH = 'x86_64' ]]
-	then download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20100203-lin64.tar.gz
-	else download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20090203-lin32.tar.gz
-	fi
+	[[ $ARCH = 'x86_64' ]] &&
+		download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20100203-lin64.tar.gz ||
+		download http://chuchusoft.com/par2_tbb/par2cmdline-0.4-tbb-20090203-lin32.tar.gz
+
 	extract par2cmdline-0.4*.tar.gz && cd par2cmdline-0.4*
 	mv libtbb.so libtbb.so.2 par2 /usr/bin ; cd ..
 
@@ -284,9 +284,8 @@ if [[ $sabnzbd = 'y' ]]; then
 	/etc/init.d/sabnzbdplus start && /etc/init.d/sabnzbdplus stop  # Create config in user's home
 
 	sed -i "s:host .*:host = $iP:"  $sabnzbd_conf
-	if [[ $CORES < 2 ]]; then
-	sed -i "s:par2_multicore .*:par2_multicore = 0:" $sabnzbd_conf
-	fi
+	[[ $CORES < 2 ]] && 
+		sed -i "s:par2_multicore .*:par2_multicore = 0:" $sabnzbd_conf
 
 	/etc/init.d/sabnzbdplus start  # Start 'er up
 

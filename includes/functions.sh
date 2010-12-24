@@ -33,11 +33,8 @@ checkout() {  # increase verbosity
 }
 
 checkroot() {  # check if user is root
-	if [[ $UID = 0 ]]; then echo -e ">>> RooT USeR ChecK...[${bldylw} done ${rst}]"
-	if [[ $DEBUG = 1 ]]; then echo -e ">>> Debug Mode ON.....[${bldylw} done ${rst}]"
-	fi
-	else error "PLEASE RUN WITH SUDO"
-	fi
+	[[ $UID = 0 ]]   && echo -e ">>> RooT USeR ChecK...[${bldylw} done ${rst}]" ||
+		error "PLEASE RUN WITH SUDO"
 }
 
 cleanup() {  # remove tmp folder and restore permissions
@@ -47,7 +44,7 @@ cleanup() {  # remove tmp folder and restore permissions
 }
 
 clear_logfile() {  # clear the logfile
-	if [[ -f $LOG ]]; then rm --force $LOG ;fi
+	[[ -f $LOG ]] && rm --force $LOG
 }
 
 compile() {  # compile with num of threads as cpu cores and time it
@@ -277,17 +274,15 @@ init() {
 
 ##[ Determine OS ]##
 if [[ $OS = "Linux" ]] ; then
-	if [[ -f /etc/etc/fedora-release ]]; then
-		error "TODO - Fedora"
-	elif [[ -f /etc/gentoo-release ]]; then
-		error "TODO - Gentoo"
-	fi
+	[[ -f /etc/etc/fedora-release ]] && error "TODO - Fedora"
+	[[ -f /etc/gentoo-release     ]] && error "TODO - Gentoo"
 	
 	packages setvars  # just sets REPO_PATH= at the moment
 	
 	if ! which lsb-release >/dev/null; then  # install lsb-release (debian stable doesnt package it)
 		packages install lsb-release
 	fi
+
 	# Distributor -i > Ubuntu  > Debian  > Debian   > LinuxMint     > Arch  > SUSE LINUX  (DISTRO)
 	# Release     -r > 10.04   > 5.0.6   > testing  > 1|10          > n/a   > 11.4        (RELASE)
 	# Codename    -c > lucid   > lenny   > squeeze  > debian|julia  > n/a   > Celadon     (NAME)
@@ -298,9 +293,8 @@ if [[ $OS = "Linux" ]] ; then
 	mkdir --parents logs/
 
 	iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
-	if ! [[ $iP = *.*.* ]]; then
-		error "Unable to find ip from outside"
-	fi
+	[[ $iP != *.*.* ]] && error "Unable to find ip from outside"
+
 	readonly iP USER CORES BASE WEB HOME=/home/$USER LOG=$BASE/$LOG # make sure these variables aren't overwritten
 
 else error "Unsupported OS"

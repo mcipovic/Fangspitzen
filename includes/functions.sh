@@ -115,7 +115,7 @@ mkpass() {  # generate a random password of user defined length
 }
 
 mksslcert() {  # use 2048 bit certs, use sha256, and regenerate
-	if [[ $1 = 'generate-default-snakeoil'  # called once after questionaire exits
+	if [[ $1 = 'generate-default-snakeoil' ]]; then  # called once after questionaire exits
 		sed -i 's:default_bits .*:default_bits = 2048:' /etc/ssl/openssl.cnf
 		sed -i 's:default_md .*:default_md = sha256:'   /etc/ssl/openssl.cnf
 		if which make-ssl-cert >/dev/null; then

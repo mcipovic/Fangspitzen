@@ -47,7 +47,7 @@ if [[ $sql = 'mysql' ]]; then
 		/etc/init.d/mysql start
 		mysql_secure_installation
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		# packages install TODO
+		packages install mysql
 	fi
 	if_error "MySQL failed to install"
 

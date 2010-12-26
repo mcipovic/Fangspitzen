@@ -25,10 +25,14 @@ source includes/functions.sh || error "while loading functions.sh"  # Source in 
 ##[ Check command line switches ]##
 while [ $# -gt 0 ]; do
   	case "$1" in
+  		-d|--dry)  # TODO
+  			checkroot && init
+  			packages update ; base_install
+  			exit ;;
 		-p|--pass)  # Generate strong random 'user defined length' passwords
-			if [[ $2 ]]; then opt=$2
-			else error "Specify Length --pass x ";fi
-			mkpass ;;
+			[[ $2 ]] && 
+				passwdlength=$2 && mkpass ||
+				error "Specify Length --pass x " ;;
 		-v|--version)  # Output version and date
 			echo -e "\n v$VERSION  $DATE \n"
 			exit ;;
@@ -49,7 +53,6 @@ if [[ -f config.ini ]]; then
 	[[ $PWD != "$BASE"     ]] && error "Does not match $BASE"   # Check if the user declared BASE correctly in the config
 else error "config.ini not found!"  # Cant continue without a config so produce an error and exit
 fi
-
 init
 
 #!=======================>> DiSCLAiMER <<=======================!#
@@ -96,8 +99,8 @@ echo -en "\n Continue? [y/n]: "
 	fi
 fi  # end `if ! $LOG`
 
-if [[ ! -f $REPO_PATH/autoinstaller.list ]]; then
-	source $BASE/includes/repositories.sh || error "while loading repositories.sh"  # Add repositories if not already present
+if [[ ! -f $REPO_PATH/.autoinstalled ]]; then  # Add repositories if not already present
+	source $BASE/includes/repositories.sh || error "while loading repositories.sh"
 else log "Repositories Already Present, skipping"
 fi
 
@@ -121,24 +124,41 @@ if [[ $http = 'apache' ]]; then
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
 		packages install $PHP_SUSE apache2 apache2-mod_php5 apache2-mod_scgi apache2-prefork suphp
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		# packages install TODO
+		packages install $PHP_ARCH apache php-apache
 	fi
 	if_error "Apache2 failed to install"
-
-	cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
 
 	a2enmod auth_digest ssl php5 scgi expires deflate mem_cache  # Enable modules
 	a2dismod cgi
 	a2ensite default-ssl
 
-	sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s:AllowOverride .*:AllowOverride All:' /etc/apache2/sites-available/default*
-	sed -i 's:ServerSignature On:ServerSignature Off:' /etc/apache2/apache2.conf
-	sed -i 's:Timeout 300:Timeout 30:'                 /etc/apache2/apache2.conf
-	sed -i 's:KeepAliveTimeout 15:KeepAliveTimeout 5:' /etc/apache2/apache2.conf
-	sed -i 's:ServerTokens Full:ServerTokens Prod:'    /etc/apache2/apache2.conf
-	echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then  # TODO OpenSUSE
+		cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
+		sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s:AllowOverride .*:AllowOverride All:' /etc/apache2/sites-available/default*
+		sed -i 's:ServerSignature On:ServerSignature Off:' /etc/apache2/apache2.conf
+		sed -i 's:Timeout 300:Timeout 30:'                 /etc/apache2/apache2.conf
+		sed -i 's:KeepAliveTimeout 15:KeepAliveTimeout 5:' /etc/apache2/apache2.conf
+		sed -i 's:ServerTokens Full:ServerTokens Prod:'    /etc/apache2/apache2.conf
+		echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
+		PHPini=/etc/php5/apache/php.ini
+	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		useradd -d $WEB -r -s /bin/false -U www-data
+		#echo -e "LoadModule php5_module modules/libphp5.so"  >> /etc/httpd/conf/httpd.conf
+		#echo -e "LoadModule scgi_module modules/mod_scgi.so" >> /etc/httpd/conf/httpd.conf
+		#echo -e "Include conf/extra/php5_module.conf"        >> /etc/httpd/conf/httpd.conf
+		echo -e "SCGIMount /rutorrent/master 127.0.0.1:5000" >> /etc/httpd/conf/httpd.conf  # Add mountpoint
 
-	PHPini=/etc/php5/apache/php.ini
+		sed -i "s:User http:User www-data:"                          /etc/httpd/conf/httpd.conf
+		sed -i "s:Group http:Group www-data:"                        /etc/httpd/conf/httpd.conf
+		sed -i "s:DocumentRoot \"/srv/http\":DocumentRoot \"$WEB\":" /etc/httpd/conf/httpd.conf
+		sed -i "s:<Directory \"/srv/http\":<Directory \"$WEB\">:"    /etc/httpd/conf/httpd.conf
+		
+		PHPini=/etc/php/php.ini
+		sed -i "s:;extension=sockets.so:extension=sockets.so:" $PHPini
+		sed -i "s:;extension=xmlrpc.so:extension=xmlrpc.so:"   $PHPini
+		sed -i "s|open_basedir = .*|open_basedir = $WEB/:/home/:/tmp/:/usr/share/pear/|" $PHPini
+		/etc/rc.d/httpd restart
+	fi
 	log "Apache Installation | Completed" ; debug_wait "apache.installed"
 
 ##[ LiGHTTPd ]##
@@ -149,7 +169,7 @@ elif [[ $http = 'lighttp' ]]; then
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
 		packages install $PHP_SUSE lighttpd
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		# packages install TODO
+		packages install $PHP_ARCH lighttpd fcgi
 	fi
 	if_error "Lighttpd failed to install"
 
@@ -159,7 +179,6 @@ elif [[ $http = 'lighttp' ]]; then
 
 	cp modules/lighttp/scgi.conf /etc/lighttpd/conf-available/20-scgi.conf        # Add mountpoint and secure it with auth
 	cat < modules/lighttp/auth.conf >> /etc/lighttpd/conf-available/05-auth.conf  # apend contents of our auth.conf into lighttp's auth.conf
-
 	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable modules
 
 	PHPini=/etc/php5/cgi/php.ini
@@ -170,7 +189,7 @@ elif [[ $http = 'cherokee' ]]; then
 	notice "iNSTALLiNG CHEROKEE"
 	#if [[ $NAME = 'lenny' ]]; then
 	#	packages install cherokee spawn-fcgi
-	#else
+	#fi
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install $PHP_DEBIAN cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
@@ -179,7 +198,7 @@ elif [[ $http = 'cherokee' ]]; then
 		# packages install TODO
 	fi
 	if_error "Cherokee failed to install"
-	#fi
+
 	PHPini=/etc/php5/cgi/php.ini
 	log "Cherokee Installation | Completed" ; debug_wait "cherokee.installed"
 
@@ -190,6 +209,7 @@ elif [[ $http != @(none|no|[Nn]) ]]; then  # Edit php config
 	sed -i 's:display_errors = On:display_errors = Off:'                               $PHPini
 	sed -i 's:log_errors = Off:log_errors = On:'                                       $PHPini
 	sed -i 's:;error_log .*:error_log = /var/log/php-error.log:'                       $PHPini
+	[[ $infophp = 'y' ]] && echo "<?php phpinfo(); ?>" > $WEB/info.php
 fi
 
 ##[ vsFTP ]##
@@ -228,7 +248,6 @@ if [[ $ftpd = 'vsftp' ]]; then
 		sed -i 's:force_local_logins_ssl.*:force_local_logins_ssl=NO:'  /etc/vsftpd.conf
 		sed -i 's:force_local_data_ssl.*:cforce_local_data_ssl=NO:'     /etc/vsftpd.conf
 	fi
-	
 	/etc/init.d/vsftpd restart
 	log "vsFTP Installation | Completed" ; debug_wait "vsftpd.installed"
 
@@ -271,7 +290,6 @@ EOF
 		 sed -i 's:TLSRequired .*:TLSRequired on:'  /etc/proftpd/proftpd.conf
 	else sed -i 's:TLSRequired .*:TLSRequired off:' /etc/proftpd/proftpd.conf
 	fi
-	
 	/etc/init.d/proftpd restart
 	log "ProFTP Installation | Completed" ; debug_wait "proftpd.installed"
 
@@ -293,7 +311,6 @@ elif [[ $ftpd = 'pureftp' ]]; then
 		 echo 1 > /etc/pure-ftpd/conf/TLS  # Allow TLS+FTP
 	else echo 2 > /etc/pure-ftpd/conf/TLS  # Force TLS
 	fi
-
 	/etc/init.d/pure-ftpd restart
 	log "PureFTP Installation | Completed" ; debug_wait "pureftp.installed"
 fi

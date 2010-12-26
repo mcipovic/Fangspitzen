@@ -11,7 +11,7 @@ PHP_COMMON="php5 php5-curl php5-gd php5-mcrypt php5-mysql php5-suhosin php5-xmlr
 
 PHP_DEBIAN="$PHP_COMMON php5-cgi php5-cli php5-common php5-dev php5-mhash"
 PHP_SUSE="$PHP_COMMON php5-devel"
-PHP_ARCH="php"  # TODO
+PHP_ARCH="php php-cgi"  # TODO
 
 	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 
@@ -33,7 +33,8 @@ checkout() {  # increase verbosity
 }
 
 checkroot() {  # check if user is root
-	[[ $UID = 0 ]]   && echo -e ">>> RooT USeR ChecK...[${bldylw} done ${rst}]" ||
+	[[ $UID = 0 ]] &&
+		echo -e ">>> RooT USeR ChecK...[${bldylw} done ${rst}]" ||
 		error "PLEASE RUN WITH SUDO"
 }
 
@@ -109,7 +110,7 @@ log() {  # send to the logfile
 }
 
 mkpass() {  # generate a random password of user defined length
-	newPass=$(tr -cd '[:alnum:]' < /dev/urandom | head -c ${1:-${opt}})
+	newPass=$(tr -cd '[:alnum:]' < /dev/urandom | head -c ${1:-${passwdlength}})
 	notice "$newPass" ;exit 0
 }
 
@@ -178,8 +179,7 @@ packages() {  # use appropriate package manager depending on distro
 			version)
 					pacman -Qi $2 | grep Version: ;;
 			setvars)
-					REPO_PATH=/etc/pacman.conf
-					WEB=/srv/httpd                ;;
+					REPO_PATH=/etc/pacman.conf    ;;
 		esac
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
 		case "$1" in
@@ -272,7 +272,7 @@ init() {
 	clear ; echo -n ">>> iNiTiALiZiNG......"
 	OS=$(uname -s)
 
-##[ Determine OS ]##
+	##[ Determine OS ]##
 if [[ $OS = "Linux" ]] ; then
 	[[ -f /etc/etc/fedora-release ]] && error "TODO - Fedora"
 	[[ -f /etc/gentoo-release     ]] && error "TODO - Gentoo"
@@ -297,9 +297,8 @@ if [[ $OS = "Linux" ]] ; then
 
 	readonly iP USER CORES BASE WEB HOME=/home/$USER LOG=$BASE/$LOG # make sure these variables aren't overwritten
 
-else error "Unsupported OS"
+	else error "Unsupported OS"
 fi
-	packages update  # refresh our package list
 	echo -e "[${bldylw} done ${rst}]" ;sleep 1
 }
 

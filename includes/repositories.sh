@@ -49,6 +49,7 @@ elif [[ $DISTRO = 'Arch' ]]; then
 else
 	error "Failed to add repositories to unknown distro... exiting ($DISTRO)"
 fi
+echo "" > $REPO_PATH/.autoinstalled
 
 ##!=====================>> PUBLiC KEYS <<========================!##
 if [[ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]]; then
@@ -62,7 +63,7 @@ if [[ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]]; then
 	wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | apt-key add -
 	wget -q http://www.webmin.com/jcameron-key.asc -O- | apt-key add -
 fi
-	packages update
+	packages update	 # refresh our package list
 	log "Repositories Added and Updated"
 	debug_wait "repos.added"
 clear

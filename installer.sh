@@ -124,7 +124,7 @@ if [[ $http = 'apache' ]]; then
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
 		packages install $PHP_SUSE apache2 apache2-mod_php5 apache2-mod_scgi apache2-prefork suphp
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		packages install $PHP_ARCH apache php-apache
+		packages install $PHP_ARCHLINUX apache php-apache
 	fi
 	if_error "Apache2 failed to install"
 
@@ -169,7 +169,7 @@ elif [[ $http = 'lighttp' ]]; then
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
 		packages install $PHP_SUSE lighttpd
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		packages install $PHP_ARCH lighttpd fcgi
+		packages install $PHP_ARCHLINUX lighttpd fcgi
 	fi
 	if_error "Lighttpd failed to install"
 
@@ -195,6 +195,7 @@ elif [[ $http = 'cherokee' ]]; then
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
 		# packages install $PHP_SUSE TODO
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		echo
 		# packages install TODO
 	fi
 	if_error "Cherokee failed to install"
@@ -259,6 +260,7 @@ elif [[ $ftpd = 'proftp' ]]; then
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
 		packages install proftpd
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		echo
 		# packages install TODO
 	fi
 	if_error "ProFTPd failed to install"

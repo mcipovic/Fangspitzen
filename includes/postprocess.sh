@@ -17,34 +17,35 @@ fi
 
 cat /etc/sysctl.conf | grep '# added by autoscript' >/dev/null
 if [[ $? != 0 ]]; then  # Check if this has already been added or not
-	echo "# added by autoscript" >> /etc/sysctl.conf
-	echo "kernel.exec-shield=1"          >> /etc/sysctl.conf  # Turn on execshield
-	echo "kernel.randomize_va_space=1"   >> /etc/sysctl.conf
-	echo "net.ipv4.conf.all.rp_filter=1" >> /etc/sysctl.conf  # Enable IP spoofing protection
-	echo "net.ipv4.conf.all.accept_source_route=0" >> /etc/sysctl.conf  # Disable IP source routing
-	echo "net.ipv4.icmp_echo_ignore_broadcasts=1"  >> /etc/sysctl.conf  # Ignoring broadcasts request
-	echo "net.ipv4.icmp_ignore_bogus_error_messages=1" >> /etc/sysctl.conf
-	echo "net.ipv4.conf.all.log_martians=1"       >> /etc/sysctl.conf  # Make sure spoofed packets get logged
-	echo "net.ipv4.tcp_syncookies=1"              >> /etc/sysctl.conf  # Prevent against the common 'syn flood attack'
-	echo "vm.dirty_background_ratio=20"           >> /etc/sysctl.conf  # Less frequent writeback flushes
-	echo "vm.swappiness=5"                        >> /etc/sysctl.conf  # Very low use of swapfile
-	echo 'net.core.wmem_max=12582912'             >> /etc/sysctl.conf  # Set the max send buffer (wmem) and receive buffer (rmem) size to 12 MB for queues on all protocols
-	echo 'net.core.rmem_max=12582912'             >> /etc/sysctl.conf
-	echo 'net.ipv4.tcp_rmem=10240 87380 12582912' >> /etc/sysctl.conf  # Set minimum size, initial size, and maximum size in bytes
-	echo 'net.ipv4.tcp_wmem=10240 87380 12582912' >> /etc/sysctl.conf
-	echo 'net.ipv4.tcp_window_scaling=1'          >> /etc/sysctl.conf  # Enlarge the transfer window
-	echo 'net.ipv4.tcp_timestamps=1'              >> /etc/sysctl.conf  # Enable timestamps
-	echo 'net.ipv4.tcp_sack=1'                    >> /etc/sysctl.conf  # Enable select acknowledgments
-	echo 'net.core.netdev_max_backlog=5000'       >> /etc/sysctl.conf  # Maximum number of packets, queued on INPUT
+	echo '# added by autoscript' >> /etc/sysctl.conf
+	echo 'kernel.exec-shield=1'                    >> /etc/sysctl.conf  # Turn on execshield
+	echo 'kernel.randomize_va_space=1'             >> /etc/sysctl.conf
+	echo 'net.ipv4.conf.all.rp_filter=1'           >> /etc/sysctl.conf  # Enable IP spoofing protection
+	echo 'net.ipv4.conf.all.accept_source_route=0' >> /etc/sysctl.conf  # Disable IP source routing
+	echo 'net.ipv4.icmp_echo_ignore_broadcasts=1'  >> /etc/sysctl.conf  # Ignoring broadcasts request
+	echo 'net.ipv4.icmp_ignore_bogus_error_messages=1' >> /etc/sysctl.conf
+	echo 'net.ipv4.conf.all.log_martians=1'        >> /etc/sysctl.conf  # Make sure spoofed packets get logged
+	echo 'net.ipv4.tcp_syncookies=1'               >> /etc/sysctl.conf  # Prevent against the common 'syn flood attack'
+	echo 'vm.dirty_background_ratio=20'            >> /etc/sysctl.conf  # Less frequent writeback flushes
+	echo 'vm.swappiness=5'                         >> /etc/sysctl.conf  # Very low use of swapfile
+	echo 'net.core.wmem_max=12582912'              >> /etc/sysctl.conf  # Set the max send buffer (wmem) and receive buffer (rmem) size to 12 MB for queues on all protocols
+	echo 'net.core.rmem_max=12582912'              >> /etc/sysctl.conf
+	echo 'net.ipv4.tcp_rmem=10240 87380 12582912'  >> /etc/sysctl.conf  # Set minimum size, initial size, and maximum size in bytes
+	echo 'net.ipv4.tcp_wmem=10240 87380 12582912'  >> /etc/sysctl.conf
+	echo 'net.ipv4.tcp_window_scaling=1'           >> /etc/sysctl.conf  # Enlarge the transfer window
+	echo 'net.ipv4.tcp_timestamps=1'               >> /etc/sysctl.conf  # Enable timestamps
+	echo 'net.ipv4.tcp_sack=1'                     >> /etc/sysctl.conf  # Enable select acknowledgments
+	echo 'net.core.netdev_max_backlog=5000'        >> /etc/sysctl.conf  # Maximum number of packets, queued on INPUT
 	sysctl -p
 fi
 
-[[ $http = 'apache'   ]] &&
-	/etc/init.d/apache2 restart ||
-[[ $http = 'lighttp'  ]] &&
-	/etc/init.d/lighttpd restart ||
-[[ $http = 'cherokee' ]] &&
+if [[ $http = 'apache'   ]]; then
+	/etc/init.d/apache2 restart
+elif [[ $http = 'lighttp'  ]]; then
+	/etc/init.d/lighttpd restart
+elif [[ $http = 'cherokee' ]]; then
 	notice "Run sudo cherokee-admin -b to configure Cherokee."
+fi
 
 [[ $sql = 'mysql' ]] &&
 	/etc/init.d/mysql restart
@@ -121,8 +122,10 @@ EOF
 
 	echo -n "Restarting fail2ban..."
 	killall -q -15 fail2ban-server ; sleep 2
-	[[ -e /var/run/fail2ban/fail2ban.sock ]] && rm /var/run/fail2ban/fail2ban.sock
-	/etc/init.d/fail2ban start && echo " done"
+	if [[ -e /var/run/fail2ban/fail2ban.sock ]]; then
+		rm /var/run/fail2ban/fail2ban.sock
+		/etc/init.d/fail2ban start
+	fi ; echo " done"
 fi  # end `if $?`
 
 if [[ $torrent = 'rtorrent' ]]; then

@@ -30,9 +30,10 @@ while [ $# -gt 0 ]; do
   			packages update ; base_install
   			exit ;;
 		-p|--pass)  # Generate strong random 'user defined length' passwords
-			[[ $2 ]] && 
-				passwdlength=$2 && mkpass ||
-				error "Specify Length --pass x " ;;
+			if $2
+				then passwdlength=$2 && mkpass
+				else error "Specify Length --pass x "
+			fi ;;
 		-v|--version)  # Output version and date
 			echo -e "\n v$VERSION  $DATE \n"
 			exit ;;
@@ -193,11 +194,9 @@ elif [[ $http = 'cherokee' ]]; then
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install $PHP_DEBIAN cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
-		echo
-		# packages install $PHP_SUSE TODO
+		echo # packages install $PHP_SUSE TODO
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		echo
-		# packages install TODO
+		echo # packages install TODO
 	fi
 	if_error "Cherokee failed to install"
 
@@ -211,7 +210,7 @@ elif [[ $http != @(none|no|[Nn]) ]]; then  # Edit php config
 	sed -i 's:display_errors = On:display_errors = Off:'                               $PHPini
 	sed -i 's:log_errors = Off:log_errors = On:'                                       $PHPini
 	sed -i 's:;error_log .*:error_log = /var/log/php-error.log:'                       $PHPini
-	[[ $infophp = 'y' ]] && echo "<?php phpinfo(); ?>" > $WEB/info.php
+	[[ $infophp = 'y' ]] && echo "<?php phpinfo(); ?>" > $WEB/info.php  # Create a phpinfo file
 fi
 
 ##[ vsFTP ]##
@@ -238,8 +237,7 @@ if [[ $ftpd = 'vsftp' ]]; then
 		echo "ssl_tlsv1=YES"  >> /etc/vsftpd.conf
 		echo "ssl_sslv2=NO"   >> /etc/vsftpd.conf
 		echo "ssl_sslv3=YES"  >> /etc/vsftpd.conf
-	else
-		log "vsftpd config already edited, skipping"
+	else log "vsftpd config already edited, skipping"
 	fi
 
 	echo -n "Force SSL? [y/n]: "
@@ -261,8 +259,7 @@ elif [[ $ftpd = 'proftp' ]]; then
 	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
 		packages install proftpd
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		echo
-		# packages install TODO
+		echo # packages install TODO
 	fi
 	if_error "ProFTPd failed to install"
 

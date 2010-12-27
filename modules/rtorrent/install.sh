@@ -49,8 +49,7 @@ cd $BASE/tmp
 	notice "COMPiLiNG... LiBTORRENT"
 #-->[ Compile libtorrent ]
 	cd ../libtorrent
-	[[ $NAME = 'lenny' ]] &&
-		rm -f scripts/{libtool,lt*}.m4
+	[[ $NAME = 'lenny' ]] && rm -f scripts/{libtool,lt*}.m4
 	sh autogen.sh
 	[[ $alloc = 'y' ]] &&  # Use posix_fallocate
 		sh configure --prefix=/usr --with-posix-fallocate ||
@@ -64,8 +63,7 @@ cd $BASE/tmp
 	notice "COMPiLiNG... rTORRENT"
 #-->[ Compile rtorrent ]
 	cd ../rtorrent
-	[[ $NAME = 'lenny' ]] &&
-		rm -f scripts/{libtool,lt*}.m4
+	[[ $NAME = 'lenny' ]] && rm -f scripts/{libtool,lt*}.m4
 	sh autogen.sh
 	sh configure --prefix=/usr --with-xmlrpc-c
 	compile
@@ -110,8 +108,7 @@ if [[ -d /etc/apache2 ]]; then
 elif [[ -d /etc/lighttpd || -d /etc/cherokee ]]; then
 	echo "scgi_local = /tmp/rpc.socket"                             >> $PATH_rt  # Create sgci socket
 	echo 'schedule = chmod,0,0,"execute=chmod,777,/tmp/rpc.socket"' >> $PATH_rt  # Make socket readable
-else
-	debug_wait "No httpd found: Make sure to add sgci mounts to .rtorrent.rc"
+else debug_wait "No httpd found: Make sure to add sgci mounts to .rtorrent.rc"
 fi
 log "rTorrent Config | Created" ; log "rTorrent listening on port: $NUMBER"
 
@@ -126,8 +123,7 @@ if [[ ! -f /etc/init.d/rtorrent ]]; then  # Copy init script
 	sed -i "s:logfile=:logfile=$HOME/.rtorrent.init.log:" $HOME/.rtorrent.init.conf
 
 	chmod a+x /etc/init.d/rtorrent && update-rc.d rtorrent defaults  # Start at boot
-	log "rTorrent Config | Installed \nrTorrent Init Script | Created"
-else
-	log "Previous rTorrent Init Script Found, skipping..."
+	 log "rTorrent Config | Installed \nrTorrent Init Script | Created"
+else log "Previous rTorrent Init Script Found, skipping..."
 fi
 debug_wait "rtorrent.installed"

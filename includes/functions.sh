@@ -274,18 +274,20 @@ init() {
 
 	##[ Determine OS ]##
 if [[ $OS = "Linux" ]] ; then
-	[[ -f /etc/etc/fedora-release ]] && error "TODO - Fedora"
-	[[ -f /etc/gentoo-release     ]] && error "TODO - Gentoo"
-	
-	packages setvars  # just sets REPO_PATH= at the moment
-	
-	if ! which lsb-release >/dev/null; then  # install lsb-release (debian stable doesnt package it)
-		packages install lsb-release
+	[[ -f /etc/fedora-release ]] && error "TODO - Fedora"
+	[[ -f /etc/gentoo-release ]] && error "TODO - Gentoo"
+
+	if [[ -f /etc/SuSE-release ]]; then
+		if ! which lsb_release >/dev/null; then  # install lsb_release (distros dont like to keep things simple)
+			packages install lsb_release ;fi
+	else
+		if ! which lsb-release >/dev/null; then  # install lsb-release (debian stable doesnt package it)
+			packages install lsb-release lsb_release ;fi
 	fi
 
 	# Distributor -i > Ubuntu  > Debian  > Debian   > LinuxMint     > Arch  > SUSE LINUX  (DISTRO)
-	# Release     -r > 10.04   > 5.0.6   > testing  > 1|10          > n/a   > 11.4        (RELASE)
-	# Codename    -c > lucid   > lenny   > squeeze  > debian|julia  > n/a   > Celadon     (NAME)
+	# Release     -r > 10.04   > 5.0.6   > testing  > 1|10          > n/a   > 11.3        (RELASE)
+	# Codename    -c > lucid   > lenny   > squeeze  > debian|julia  > n/a   > n/a         (NAME)
 	readonly DISTRO=$(lsb_release -is) RELEASE=$(lsb_release -rs) NAME=$(lsb_release -cs) ARCH=$(uname -m) KERNEL=$(uname -r)
 
 	##[ Create folders if not already created ]##
@@ -296,7 +298,7 @@ if [[ $OS = "Linux" ]] ; then
 	[[ $iP != *.*.* ]] && error "Unable to find ip from outside"
 
 	readonly iP USER CORES BASE WEB HOME=/home/$USER LOG=$BASE/$LOG # make sure these variables aren't overwritten
-
+	packages setvars  # just sets REPO_PATH= at the moment
 	else error "Unsupported OS"
 fi
 	echo -e "[${bldylw} done ${rst}]" ;sleep 1

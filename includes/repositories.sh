@@ -43,9 +43,17 @@ elif [[ $DISTRO = @(Debian|LinuxMint) ]]; then
 	echo "deb http://download.webmin.com/download/repository sarge contrib"       >> $REPO_PATH/autoinstaller.list  # Webmin
 	log "Repositories ADD | Success"
 
-elif [[ $DISTRO = 'Arch' ]]; then
+elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 	echo '[archlinuxfr]'                           >> $REPO_PATH
 	echo 'Server = http://repo.archlinux.fr/$arch' >> $REPO_PATH
+	
+elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	zypper addrepo http://download.opensuse.org/repositories/openSUSE:/11.3:/Contrib/standard/ Contrib
+	zypper addrepo http://ftp.uni-erlangen.de/pub/mirrors/packman/suse/11.3/ Packman
+	zypper addrepo http://download.opensuse.org/repositories/Apache/openSUSE_11.3/ Apache
+	zypper addrepo http://download.opensuse.org/repositories/Apache:/Modules/Apache_openSUSE_11.3/ Apache-Modules
+	zypper addrepo http://download.opensuse.org/repositories/server:/php/server_apache_openSUSE_11.3/ Apache-PHP
+	zypper addrepo http://download.opensuse.org/repositories/filesharing/openSUSE_11.3/ Transmission
 else
 	error "Failed to add repositories to unknown distro... exiting ($DISTRO)"
 fi

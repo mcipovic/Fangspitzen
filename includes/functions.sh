@@ -139,9 +139,11 @@ notice() {  # echo status or general info to stdout
 packages() {  # use appropriate package manager depending on distro
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		case "$1" in
+			addkey )
+					apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $2 ;;
 			clean  )
 					apt-get -qq autoclean
-					alias_autoclean="apt-get autoremove && apt-get autoclean";;
+					alias_autoclean="apt-get autoremove && apt-get autoclean"   ;;
 			install) shift  # forget $1
 					apt-get install --yes -qq $@ 2>> $LOG; E_=$?
 					alias_install="apt-get install"    ;;
@@ -164,7 +166,7 @@ packages() {  # use appropriate package manager depending on distro
 			clean  )
 					pacman --sync --clean -c --noconfirm
 					alias_autoclean="pacman -Scc" ;;
-			install) shift  # forget $1
+			install) shift
 					pacman --sync --noconfirm $@ 2>> $LOG; E_=$?
 					alias_install="pacman -S"     ;;
 			remove ) shift
@@ -183,12 +185,12 @@ packages() {  # use appropriate package manager depending on distro
 		esac
 	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		case "$1" in
-			addrepo)
-					zypper --non-interactive addrepo --refresh $@ 2>> $LOG ;;
+			addrepo) shift
+					zypper --no-gpg-checks --gpg-auto-import-keys addrepo --refresh $@ 2>> $LOG ;;
 			clean  )
 					zypper --quiet clean
 					alias_autoclean="zypper clean" ;;
-			install) shift  # forget $1
+			install) shift
 					zypper --quiet --non-interactive install $@ 2>> $LOG; E_=$?
 					alias_install="zypper install" ;;
 			remove ) shift

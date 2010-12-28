@@ -84,13 +84,13 @@ echo -e "
   programs by simply running this script with the --dry option.
 
     Supported:                InProgress:
-      Ubuntu 9.04 -> 10.10      OpenSUSE 11.x
+      Ubuntu 9.04 -> 10.10      OpenSUSE 11.3
       Debian 5.0  ->  6.0       ArchLinux
 
   If your OS is not listed, this script will most likey explode. \n"
 
 echo -e " ${undred}_______________________${rst}"
-echo -e " Distro:${bldylw} $DISTRO $RELEASE/$NAME ${rst}"
+echo -e " Distro:${bldylw} $DISTRO $RELEASE ${rst}"
 echo -e " Kernel:${bldylw} $KERNEL${rst}-${bldylw}$ARCH ${rst}"
 
 echo -en "\n Continue? [y/n]: "

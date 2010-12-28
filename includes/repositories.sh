@@ -60,14 +60,13 @@ fi
 echo "" > $REPO_PATH/.autoinstalled
 
 ##!=====================>> PUBLiC KEYS <<========================!##
-if [[ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]]; then
-	addkey='apt-key adv --keyserver keyserver.ubuntu.com --recv-keys'  # Add signing keys
-	$addkey EBA7BD49
-	$addkey 5A43ED73
-	$addkey 249AD24C
-	$addkey 365C5CA1
-	$addkey 108B243F
-	$addkey 4BB9F05F
+if [[ $DISTRO = @(Ubuntu|Debian|LinuxMint) ]]; then  # Add signing keys
+	packages addkey EBA7BD49
+	packages addkey 5A43ED73
+	packages addkey 249AD24C
+	packages addkey 365C5CA1
+	packages addkey 108B243F
+	packages addkey 4BB9F05F
 	wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | apt-key add -
 	wget -q http://www.webmin.com/jcameron-key.asc -O- | apt-key add -
 fi

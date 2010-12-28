@@ -47,7 +47,7 @@ elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 	echo '[archlinuxfr]'                           >> $REPO_PATH
 	echo 'Server = http://repo.archlinux.fr/$arch' >> $REPO_PATH
 	
-elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 	zypper addrepo http://download.opensuse.org/repositories/openSUSE:/11.3:/Contrib/standard/ Contrib
 	zypper addrepo http://ftp.uni-erlangen.de/pub/mirrors/packman/suse/11.3/ Packman
 	zypper addrepo http://download.opensuse.org/repositories/Apache/openSUSE_11.3/ Apache

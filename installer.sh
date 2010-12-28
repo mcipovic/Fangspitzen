@@ -122,7 +122,7 @@ if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install $PHP_DEBIAN apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		packages install $PHP_SUSE apache2 apache2-mod_php5 apache2-mod_scgi apache2-prefork suphp
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		packages install $PHP_ARCHLINUX apache php-apache
@@ -167,7 +167,7 @@ elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install $PHP_DEBIAN lighttpd
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		packages install $PHP_SUSE lighttpd
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		packages install $PHP_ARCHLINUX lighttpd fcgi
@@ -193,7 +193,7 @@ elif [[ $http = 'cherokee' ]]; then
 	#fi
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install $PHP_DEBIAN cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		echo # packages install $PHP_SUSE TODO
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		echo # packages install TODO
@@ -256,7 +256,7 @@ elif [[ $ftpd = 'proftp' ]]; then
 	notice "iNSTALLiNG proFTPd"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install proftpd-basic
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		packages install proftpd
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		echo # packages install TODO

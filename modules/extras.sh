@@ -25,7 +25,7 @@ elif [[ $cache = 'apc' ]]; then
 	notice "iNSTALLiNG APC"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install php-apc
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		# packages install TODO
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		# packages install TODO
@@ -41,7 +41,7 @@ if [[ $sql = 'mysql' ]]; then
 		packages install libmysqlclient16-dev mysql-client mysql-server mytop
 	elif [[ $DISTRO = [Dd]ebian || $NAME = 'hardy' ]]; then
 		packages install libmysqlclient15-dev mysql-client mysql-server mytop
-	elif [[ $DISTRO = *@(SUSE|[Ss]use); then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)*; then
 		packages install libmysqlclient-devel mysql-community-server mytop
 		chkconfig --add mysql
 		/etc/init.d/mysql start
@@ -67,7 +67,7 @@ elif [[ $sql = 'postgre' ]]; then
 	notice "iNSTALLiNG PostgreSQL"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install postgresql
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		packages install postgresql postgresql-server
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		# packages install TODO
@@ -81,7 +81,7 @@ cd $BASE
 if [[ $bnc != @(none|no|[Nn]) ]]; then
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install libc-ares-dev tcl tcl-dev
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		packages install libcares-devel tcl tcl-devel
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		# packages install TODO
@@ -177,7 +177,7 @@ if [[ $webmin = 'y' ]]; then
 	notice "iNSTALLiNG WEBMiN"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install webmin libauthen-pam-perl libio-pty-perl libnet-ssleay-perl libpam-runtime
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		packages install webmin perl-Net-SSLeay
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		# packages install TODO
@@ -192,7 +192,7 @@ if [[ $vnstat = 'y' ]]; then
 	notice "iNSTALLiNG VNSTAT"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 		packages install libgd2-xpm libgd2-xpm-dev
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		# packages install TODO
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		# packages install TODO
@@ -255,7 +255,7 @@ if [[ $sabnzbd = 'y' ]]; then
 	notice "iNSTALLiNG SABnzbd"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
 			packages install sabnzbdplus par2 python-cheetah python-dbus python-yenc sabnzbdplus-theme-classic sabnzbdplus-theme-plush sabnzbdplus-theme-smpl
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		# packages install TODO
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		# packages install TODO
@@ -302,7 +302,7 @@ if [[ $ipblock = 'y' ]]; then
 			apt-get -t squeeze install libpcre3 libnfnetlink0 libnetfilter-queue1 2>> $LOG  # Install updated libraries for lenny support
 		fi
 		packages install iplist
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		# packages install TODO
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		# packages install TODO

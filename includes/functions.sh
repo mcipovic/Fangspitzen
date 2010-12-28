@@ -181,7 +181,7 @@ packages() {  # use appropriate package manager depending on distro
 			setvars)
 					REPO_PATH=/etc/pacman.conf    ;;
 		esac
-	elif [[ $DISTRO = *@(SUSE|[Ss]use) ]]; then
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		case "$1" in
 			clean  )
 					zypper --quiet clean

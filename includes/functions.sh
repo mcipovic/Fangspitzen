@@ -40,7 +40,7 @@ checkroot() {  # check if user is root
 
 cleanup() {  # remove tmp folder and restore permissions
 	cd $BASE && rm --recursive --force tmp
-	chown -R $USER:$USER $BASE
+	chown -R $USER $BASE
 	log "Removed tmp/ folder"
 }
 
@@ -183,6 +183,8 @@ packages() {  # use appropriate package manager depending on distro
 		esac
 	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		case "$1" in
+			addrepo)
+					zypper --non-interactive addrepo --refresh $@ 2>> $LOG ;;
 			clean  )
 					zypper --quiet clean
 					alias_autoclean="zypper clean" ;;

@@ -4,7 +4,7 @@ echo -e "\n ${txtred}-------------->>${bldred} CONFiGURATiON ${txtred}<<--------
 
 read -p "[ HTTP SERVER ]     [apache|lighttp|cherokee|none]: " http
 [[ $http = 'lighttpd' ]] && http='lighttp'
-if [[ $http != 'none' && $DEBUG = 1 ]]; then
+if [[ $http != @(none|[Nn]) && $DEBUG = 1 ]]; then
 read -p "[ Create info.php? ]                         [y|n]: " infophp ;fi
 read -p "[ FTP SERVER  ]        [vsftp|proftp|pureftp|none]: " ftpd
 read -p "[ Torrent App ]      [rtorrent|tranny|deluge|none]: " torrent

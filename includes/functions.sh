@@ -18,7 +18,7 @@ PHP_ARCHLINUX="php php-cgi"  # TODO
 	case "$DISTRO" in
 		Ubuntu|[Dd]ebian|*Mint) packages install $DEBIAN    ;;
 		ARCH*|[Aa]rch*        ) packages install $ARCHLINUX ;;
-		*SUSE|*[Ss]use        ) packages install $SUSE      ;;
+		SUSE*|[Ss]use*        ) packages install $SUSE      ;;
 	esac
 
 	if_error "Required system packages failed to install"

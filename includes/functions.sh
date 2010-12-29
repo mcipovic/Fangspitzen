@@ -138,7 +138,7 @@ notice() {  # echo status or general info to stdout
 
 packages() {  # use appropriate package manager depending on distro
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
-	   [[ $DEBUG = 1 ]] && quiet='-qq' || quiet=
+	   [[ $DEBUG != 1 ]] && quiet='-qq'
 		case "$1" in
 			addkey )
 					apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $2 ;;
@@ -163,7 +163,7 @@ packages() {  # use appropriate package manager depending on distro
 					REPO_PATH=/etc/apt/sources.list.d  ;;
 		esac
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		 [[ $DEBUG = 1 ]] && quiet='--noconfirm' || quiet=
+		 [[ $DEBUG != 1 ]] && quiet='--noconfirm'
 		case "$1" in
 			clean  )
 					pacman --sync --clean -c $quiet
@@ -186,7 +186,7 @@ packages() {  # use appropriate package manager depending on distro
 					REPO_PATH=/etc/pacman.conf    ;;
 		esac
 	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
-		 [[ $DEBUG = 1 ]] && quiet='--quiet' || quiet=
+		 [[ $DEBUG != 1 ]] && quiet='--quiet'
 		case "$1" in
 			addrepo) shift
 					zypper --no-gpg-checks --gpg-auto-import-keys addrepo --refresh $@ 2>> $LOG ;;
@@ -212,6 +212,7 @@ packages() {  # use appropriate package manager depending on distro
 		esac
 
 	elif [[ $DISTRO = "Fedora" ]]; then
+		 [[ $DEBUG != 1 ]] && quiet=''
 		case "$1" in
 			clean  )
 					yum clean all -y
@@ -235,7 +236,7 @@ packages() {  # use appropriate package manager depending on distro
 		esac
 
 	elif [[ $DISTRO = "Gentoo" ]]; then
-		 [[ $DEBUG = 1 ]] && quiet='--quiet' || quiet=
+		 [[ $DEBUG != 1 ]] && quiet='--quiet'
 		case "$1" in
 			clean  )
 					emerge --clean  # --depclean

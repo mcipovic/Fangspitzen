@@ -59,6 +59,6 @@ cd $BASE/tmp
 
 	cp -R rutorrent "$WEB"  # Move rutorrent to webroot
 	chmod -R 755 $WEB
-	chown -R www-data:www-data $WEB
+	chown -R $WEBUSER:$WEBGROUP $WEB
 	log "ruTorrent Installation | Completed" ; debug_wait "rutorrent.installed"
 fi

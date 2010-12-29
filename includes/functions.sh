@@ -183,7 +183,8 @@ packages() {  # use appropriate package manager depending on distro
 			version)
 					pacman -Qi $2 | grep Version: ;;
 			setvars)
-					REPO_PATH=/etc/pacman.conf    ;;
+					REPO_PATH=/etc/pacman.conf
+					WEB=/srv/http WEBUSER='http' WEBGROUP='http' ;;
 		esac
 	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		 [[ $DEBUG != 1 ]] && quiet='--quiet'
@@ -208,7 +209,8 @@ packages() {  # use appropriate package manager depending on distro
 			version)
 					zypper info $2 | grep Version: ;;
 			setvars)
-					REPO_PATH=/etc/zypp/repos.d    ;;			
+					REPO_PATH=/etc/zypp/repos.d
+					WEB=/srv/www/htdocs WEBUSER='wwwrun' WEBGROUP='www' ;;
 		esac
 
 	elif [[ $DISTRO = "Fedora" ]]; then
@@ -318,6 +320,8 @@ CORES=$(grep -c ^processor /proc/cpuinfo)
 SSLCERT=/usr/share/ssl-cert/ssleay.cnf
 LOG=logs/installer.log
 iFACE=eth0
+WEBUSER='www-data'
+WEBGROUP='www-data'
 WEB=/var/www
 
 #!=====================>> COLOR CONTROL <<=====================!#

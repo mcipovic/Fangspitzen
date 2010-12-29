@@ -43,21 +43,10 @@ echo -e "LoadModule scgi_module modules/mod_scgi.so" >> /etc/httpd/conf/httpd.co
 echo -e "Include conf/extra/php5_module.conf"        >> /etc/httpd/conf/httpd.conf
 echo -e "SCGIMount /rutorrent/master 127.0.0.1:5000" >> /etc/httpd/conf/httpd.conf
 
-sed -i 's/User http/User www-data/'                                /etc/httpd/conf/httpd.conf
-sed -i 's/Group http/Group www-data/'                              /etc/httpd/conf/httpd.conf
-sed -i 's/DocumentRoot \"\/srv\/httpd"/DocumentRoot "\/var\/www"/' /etc/httpd/conf/httpd.conf
-sed -i 's/<Directory \"\/srv\/httpd"/<Directory \"\/var\/www">/'   /etc/httpd/conf/httpd.conf
-
 #configure php
 sed -i 's/;extension=sockets.so/extension=sockets.so/' /etc/php/php.ini
 sed -i 's/;extension=xmlrpc.so/extension=xmlrpc.so/'   /etc/php/php.ini
 sed -i 's/open_basedir = \/srv\/http\/:\/home\/:\/tmp\/:\/usr\/share\/pear\//open_basedir = \/srv\/http\/:\/home\/:\/tmp\/:\/usr\/share\/pear\/:\/var\/www\//' /etc/php/php.ini
-
-#remove http and add www-data as apache user
-mkdir /var/www
-useradd --home-dir /var/www --system --shell /bin/false www-data
-chown -R www-data:www-data /var/www
-userdel http
 
 #start apcahe
 /etc/rc.d/httpd start

@@ -131,34 +131,33 @@ if [[ $http = 'apache' ]]; then
 
 	a2enmod auth_digest ssl php5 scgi expires deflate mem_cache  # Enable modules
 	a2dismod cgi
-	a2ensite default-ssl
 
-	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then  # TODO OpenSUSE
+	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+		a2ensite default-ssl
 		cp modules/apache/scgi.conf /etc/apache2/mods-available/scgi.conf  # Add mountpoint
-		sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s:AllowOverride .*:AllowOverride All:' /etc/apache2/sites-available/default*
-		sed -i 's:ServerSignature On:ServerSignature Off:' /etc/apache2/apache2.conf
-		sed -i 's:Timeout 300:Timeout 30:'                 /etc/apache2/apache2.conf
-		sed -i 's:KeepAliveTimeout 15:KeepAliveTimeout 5:' /etc/apache2/apache2.conf
-		sed -i 's:ServerTokens Full:ServerTokens Prod:'    /etc/apache2/apache2.conf
+		sed -i "/<Directory \/var\/www\/>/,/<\/Directory>/ s:AllowOverride .*:AllowOverride All:" /etc/apache2/sites-available/default*
+		sed -i "s:ServerSignature On:ServerSignature Off:" /etc/apache2/apache2.conf
+		sed -i "s:Timeout 300:Timeout 30:"                 /etc/apache2/apache2.conf
+		sed -i "s:KeepAliveTimeout 15:KeepAliveTimeout 5:" /etc/apache2/apache2.conf
+		sed -i "s:ServerTokens Full:ServerTokens Prod:"    /etc/apache2/apache2.conf
 		echo   "ServerName $HOSTNAME" >>                   /etc/apache2/apache2.conf
 		PHPini=/etc/php5/apache/php.ini
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		useradd -d $WEB -r -s /bin/false -U www-data
 		#echo -e "LoadModule php5_module modules/libphp5.so"  >> /etc/httpd/conf/httpd.conf
 		#echo -e "LoadModule scgi_module modules/mod_scgi.so" >> /etc/httpd/conf/httpd.conf
 		#echo -e "Include conf/extra/php5_module.conf"        >> /etc/httpd/conf/httpd.conf
 		echo -e "SCGIMount /rutorrent/master 127.0.0.1:5000" >> /etc/httpd/conf/httpd.conf  # Add mountpoint
-
-		sed -i "s:User http:User www-data:"                          /etc/httpd/conf/httpd.conf
-		sed -i "s:Group http:Group www-data:"                        /etc/httpd/conf/httpd.conf
-		sed -i "s:DocumentRoot \"/srv/http\":DocumentRoot \"$WEB\":" /etc/httpd/conf/httpd.conf
-		sed -i "s:<Directory \"/srv/http\":<Directory \"$WEB\">:"    /etc/httpd/conf/httpd.conf
-		
 		PHPini=/etc/php/php.ini
 		sed -i "s:;extension=sockets.so:extension=sockets.so:" $PHPini
 		sed -i "s:;extension=xmlrpc.so:extension=xmlrpc.so:"   $PHPini
-		sed -i "s|open_basedir = .*|open_basedir = $WEB/:/home/:/tmp/:/usr/share/pear/|" $PHPini
 		/etc/rc.d/httpd restart
+	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
+		a2enflag SSL
+		sed -i "/<Directory \"\/srv\/www\/htdocs\">/,/<\/Directory>/ s:AllowOverride .*:AllowOverride All:" /etc/apache2/default-server.conf
+		sed -i "s:APACHE_SERVERSIGNATURE=\"on\":APACHE_SERVERSIGNATURE=\"off\":" /etc/sysconfig/apache2
+		sed -i "s:APACHE_SERVERTOKENS=.*:APACHE_SERVERTOKENS="ProductOnly":"     /etc/sysconfig/apache2
+		sed -i "s:KeepAliveTimeout 15:KeepAliveTimeout 5:"                       /etc/apache2/server-tuning.conf
+		PHPini=/etc/php5/apache/php.ini
 	fi
 	log "Apache Installation | Completed" ; debug_wait "apache.installed"
 
@@ -183,6 +182,7 @@ elif [[ $http = 'lighttp' ]]; then
 	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable modules
 
 	PHPini=/etc/php5/cgi/php.ini
+	#PHPini=/etc/php5/fastcgi/php.ini  # opensuse
 	log "Lighttp Installation | Completed" ; debug_wait "lighttpd.installed"
 
 ##[ Cherokee ]##

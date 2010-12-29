@@ -60,7 +60,7 @@ init
 if [[ ! -f $LOG ]]; then  # only show for first run
 echo -e "
                       ______
-                   .-"      "-.
+                   .-\"      \"-.
                   /            \\
                  |              |
                  |,  .-.  .-.  ,|

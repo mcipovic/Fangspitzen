@@ -1,10 +1,10 @@
 ##!=======================>> FUNCTiONS <<=======================!##
 base_install() {  # install dependencies
-COMMON="apache2-utils autoconf automake binutils bzip2 ca-certificates cpp curl fail2ban file gamin gcc git-core gzip htop iptables libexpat1 libtool libtorrent-rasterbar-dev libxml2 m4 make openssl patch perl pkg-config python python-gamin python-openssl python-setuptools screen subversion sudo unrar unzip zip"
+COMMON="apache2-utils autoconf automake binutils bzip2 ca-certificates cpp curl fail2ban file gamin gcc git-core gzip htop iptables libexpat1 libtool libxml2 m4 make openssl patch perl pkg-config python python-gamin python-openssl python-setuptools screen subversion sudo unrar unzip zip"
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libncurses5 libncurses5-dev libsigc++-2.0-dev"
 
-DEBIAN="$COMMON $DYNAMIC apt-show-versions autotools-dev build-essential cfv comerr-dev dtach g++ libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl ncurses-base ncurses-bin ncurses-term perl-modules ssl-cert"
-SUSE="$COMMON libcppunit-devel libcurl4 libopenssl-devel ncurses-devel libncurses6 libsigc++2-devel"
+DEBIAN="$COMMON $DYNAMIC apt-show-versions autotools-dev build-essential cfv comerr-dev dtach g++ libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtorrent-rasterbar-dev ncurses-base ncurses-bin ncurses-term perl-modules ssl-cert"
+SUSE="$COMMON libcppunit-devel libcurl4 libopenssl-devel libtorrent-rasterbar-devel ncurses-devel libncurses6 libsigc++2-devel"
 ARCHLINUX="base-devel yaourt"  # TODO
 
 PHP_COMMON="php5 php5-curl php5-gd php5-mcrypt php5-mysql php5-suhosin php5-xmlrpc"
@@ -138,6 +138,7 @@ notice() {  # echo status or general info to stdout
 
 packages() {  # use appropriate package manager depending on distro
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
+	   [[ $DEBUG = 1 ]] && quiet='-qq' || quiet=
 		case "$1" in
 			addkey )
 					apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $2 ;;
@@ -145,16 +146,16 @@ packages() {  # use appropriate package manager depending on distro
 					apt-get -qq autoclean
 					alias_autoclean="apt-get autoremove && apt-get autoclean"   ;;
 			install) shift  # forget $1
-					apt-get install --yes -qq $@ 2>> $LOG; E_=$?
+					apt-get install --yes $quiet $@ 2>> $LOG; E_=$?
 					alias_install="apt-get install"    ;;
 			remove ) shift
-					apt-get autoremove --yes -qq $@ 2>> $LOG; E_=$?
+					apt-get autoremove --yes $quiet $@ 2>> $LOG; E_=$?
 					alias_remove="apt-get autoremove"  ;;
 			update )
-					apt-get update -qq
+					apt-get update $quiet
 					alias_update="apt-get update"      ;;
 			upgrade) 
-					apt-get upgrade --yes -qq
+					apt-get upgrade --yes $quiet
 					alias_upgrade="apt-get upgrade"    ;;
 			version)
 					dpkg-query -p $2 | grep Version:   ;;
@@ -162,21 +163,22 @@ packages() {  # use appropriate package manager depending on distro
 					REPO_PATH=/etc/apt/sources.list.d  ;;
 		esac
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
+		 [[ $DEBUG = 1 ]] && quiet='--noconfirm' || quiet=
 		case "$1" in
 			clean  )
-					pacman --sync --clean -c --noconfirm
+					pacman --sync --clean -c $quiet
 					alias_autoclean="pacman -Scc" ;;
 			install) shift
-					pacman --sync --noconfirm $@ 2>> $LOG; E_=$?
+					pacman --sync $quiet $@ 2>> $LOG; E_=$?
 					alias_install="pacman -S"     ;;
 			remove ) shift
 					pacman --remove $@ 2>> $LOG; E_=$?
 					alias_remove="pacman -R"      ;;
 			update )
-					pacman --sync --refresh --noconfirm
+					pacman --sync --refresh $quiet
 					alias_update="pacman -Sy"     ;;
 			upgrade)
-					pacman --sync --refresh --sysupgrade --noconfirm
+					pacman --sync --refresh --sysupgrade $quiet
 					alias_upgrade="pacman -Syu"   ;;
 			version)
 					pacman -Qi $2 | grep Version: ;;
@@ -184,23 +186,24 @@ packages() {  # use appropriate package manager depending on distro
 					REPO_PATH=/etc/pacman.conf    ;;
 		esac
 	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
+		 [[ $DEBUG = 1 ]] && quiet='--quiet' || quiet=
 		case "$1" in
 			addrepo) shift
 					zypper --no-gpg-checks --gpg-auto-import-keys addrepo --refresh $@ 2>> $LOG ;;
 			clean  )
-					zypper --quiet clean
+					zypper $quiet clean
 					alias_autoclean="zypper clean" ;;
 			install) shift
-					zypper --quiet --non-interactive install $@ 2>> $LOG; E_=$?
+					zypper $quiet --non-interactive install $@ 2>> $LOG; E_=$?
 					alias_install="zypper install" ;;
 			remove ) shift
-					zypper --quiet remove $@ 2>> $LOG; E_=$?
+					zypper $quiet remove $@ 2>> $LOG; E_=$?
 					alias_remove="zypper remove"   ;;
 			update )
-					zypper --quiet refresh
+					zypper $quiet refresh
 					alias_update="zypper refresh"  ;;
 			upgrade)
-					zypper --quiet --non-interactive update --auto-agree-with-licenses
+					zypper $quiet --non-interactive update --auto-agree-with-licenses
 					alias_upgrade="zypper update"  ;;
 			version)
 					zypper info $2 | grep Version: ;;
@@ -232,21 +235,22 @@ packages() {  # use appropriate package manager depending on distro
 		esac
 
 	elif [[ $DISTRO = "Gentoo" ]]; then
+		 [[ $DEBUG = 1 ]] && quiet='--quiet' || quiet=
 		case "$1" in
 			clean  )
 					emerge --clean  # --depclean
 					alias_autoclean="emerge --clean" ;;
 			install) shift
-					emerge --quiet --jobs=$CORES $@ 2>> $LOG; E_=$?
+					emerge $quiet --jobs=$CORES $@ 2>> $LOG; E_=$?
 					alias_install="emerge"           ;;
 			remove ) shift
-					emerge --unmerge --quiet $@ 2>> $LOG; E=$?
+					emerge --unmerge $quiet $@ 2>> $LOG; E=$?
 					alias_remove="emerge -C"         ;;
 			update )
 					emerge --sync
 					alias_update="emerge --sync"     ;;
 			upgrade)
-					emerge --update world --quiet  # --deep
+					emerge --update world $quiet  # --deep
 					alias_upgrade="emerge -u world"  ;;
 			version)
 					emerge -S or emerge -pv          ;;

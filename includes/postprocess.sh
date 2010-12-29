@@ -4,15 +4,16 @@ echo -e   "******${bldred} POST PROCESSiNG ${rst}********"
 echo -e   "*******************************\n"
 
 if [[ -f /etc/ssh/sshd_config ]]; then
-	sed -i 's:Protocol .*:Protocol 2:'                      /etc/ssh/sshd_config
-	sed -i 's:IgnoreRhosts no:IgnoreRhosts yes:'            /etc/ssh/sshd_config
-	sed -i 's:PermitRootLogin yes:PermitRootLogin no:'      /etc/ssh/sshd_config
-	sed -i 's:LoginGraceTime 120:LoginGraceTime 30:'        /etc/ssh/sshd_config
-	sed -i 's:StrictModes no:StrictModes yes:'              /etc/ssh/sshd_config
-	sed -i 's:ServerKeyBits .*:ServerKeyBits 1024:'         /etc/ssh/sshd_config
-	sed -i 's:AllowTcpForwarding yes:AllowTcpForwarding no:'/etc/ssh/sshd_config
-	sed -i 's:X11Forwarding yes:X11Forwarding no:'          /etc/ssh/sshd_config
-	/etc/init.d/ssh restart
+	sed -i 's:Protocol .*:Protocol 2:'                       /etc/ssh/sshd_config
+	sed -i 's:IgnoreRhosts no:IgnoreRhosts yes:'             /etc/ssh/sshd_config
+	sed -i 's:PermitRootLogin yes:PermitRootLogin no:'       /etc/ssh/sshd_config
+	sed -i 's:LoginGraceTime 120:LoginGraceTime 30:'         /etc/ssh/sshd_config
+	sed -i 's:StrictModes no:StrictModes yes:'               /etc/ssh/sshd_config
+	sed -i 's:ServerKeyBits .*:ServerKeyBits 1024:'          /etc/ssh/sshd_config
+	sed -i 's:AllowTcpForwarding yes:AllowTcpForwarding no:' /etc/ssh/sshd_config
+	sed -i 's:X11Forwarding yes:X11Forwarding no:'           /etc/ssh/sshd_config
+	[[ -f /etc/init.d/ssh ]] && /etc/init.d/ssh restart ||
+	[[ -f /etc/init.d/sshd ]] && /etc/init.d/sshd restart
 fi
 
 cat /etc/sysctl.conf | grep '# added by autoscript' >/dev/null
@@ -23,7 +24,6 @@ if [[ $? != 0 ]]; then  # Check if this has already been added or not
 	echo 'net.ipv4.conf.all.rp_filter=1'           >> /etc/sysctl.conf  # Enable IP spoofing protection
 	echo 'net.ipv4.conf.all.accept_source_route=0' >> /etc/sysctl.conf  # Disable IP source routing
 	echo 'net.ipv4.icmp_echo_ignore_broadcasts=1'  >> /etc/sysctl.conf  # Ignoring broadcasts request
-	echo 'net.ipv4.icmp_ignore_bogus_error_messages=1' >> /etc/sysctl.conf
 	echo 'net.ipv4.conf.all.log_martians=1'        >> /etc/sysctl.conf  # Make sure spoofed packets get logged
 	echo 'net.ipv4.tcp_syncookies=1'               >> /etc/sysctl.conf  # Prevent against the common 'syn flood attack'
 	echo 'vm.dirty_background_ratio=20'            >> /etc/sysctl.conf  # Less frequent writeback flushes

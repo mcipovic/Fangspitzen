@@ -125,9 +125,9 @@ mksslcert() {  # use 2048 bit certs, use sha256, and regenerate
 			echo -e "${bldylw} done${rst}"
 		fi
 	else
-		openssl genrsa -des3 -out $1 1024  # generate single key file
-		[[ $2 ]] && openssl rsa -in $1 -out $2 || openssl rsa -in $1 -out $1  # 2nd arg creates separate .pem and .key files
-		[[ $3 ]] && openssl req -new -key $2 -days 3650 -out $3 -x509 -subj '/C=AN/ST=ON/L=YM/O=OU/CN=S/emailAddress=dev@slash.null'  # a 3rd arg creates a .crt file
+		[[ $# = 1 ]] && openssl genrsa -des3 -out $1 1024  # generate single key file
+		[[ $# = 2 ]] && openssl rsa -in $1 -out $2 || openssl rsa -in $1 -out $1  # 2nd arg creates separate .pem and .key files
+		[[ $# = 3 ]] && openssl req -new -key $2 -days 3650 -out $3 -x509 -subj '/C=AN/ST=ON/L=YM/O=OU/CN=S/emailAddress=dev@slash.null'  # a 3rd arg creates a .crt file
 		chmod 400 $@  # Read write permission for owner only
 	fi
 }

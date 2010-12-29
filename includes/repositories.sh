@@ -48,12 +48,12 @@ elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 	echo 'Server = http://repo.archlinux.fr/$arch' >> $REPO_PATH
 	
 elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
-	packages addrepo http://download.opensuse.org/repositories/openSUSE:/11.3:/Contrib/standard/ "Contrib"
-	packages addrepo http://ftp.uni-erlangen.de/pub/mirrors/packman/suse/11.3/ "Packman"
-	packages addrepo http://download.opensuse.org/repositories/Apache/openSUSE_11.3/ "Apache"
+	packages addrepo http://download.opensuse.org/repositories/openSUSE:/11.3:/Contrib/standard/     "Contrib"
+	packages addrepo http://ftp.uni-erlangen.de/pub/mirrors/packman/suse/11.3/                       "Packman"
+	packages addrepo http://download.opensuse.org/repositories/Apache/openSUSE_11.3/                 "Apache"
 	packages addrepo http://download.opensuse.org/repositories/Apache:/Modules/Apache_openSUSE_11.3/ "Apache-Modules"
-	packages addrepo http://download.opensuse.org/repositories/server:/php/server_apache_openSUSE_11.3/ "Apache-PHP"
-	packages addrepo http://download.opensuse.org/repositories/filesharing/openSUSE_11.3/ "Transmission"
+	packages addrepo http://download.opensuse.org/repositories/server:/php/openSUSE_11.3/            "Apache-PHP"
+	#packages addrepo http://download.opensuse.org/repositories/filesharing/openSUSE_11.3/            "Transmission"
 else
 	error "Failed to add repositories to unknown distro... exiting ($DISTRO)"
 fi

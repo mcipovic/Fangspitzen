@@ -4,7 +4,7 @@ COMMON="apache2-utils autoconf automake binutils bzip2 ca-certificates cpp curl 
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libncurses5 libncurses5-dev libsigc++-2.0-dev"
 
 DEBIAN="$COMMON $DYNAMIC apt-show-versions autotools-dev build-essential cfv comerr-dev dtach g++ libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtorrent-rasterbar-dev ncurses-base ncurses-bin ncurses-term perl-modules ssl-cert"
-SUSE="$COMMON libcppunit-devel libcurl4 libopenssl-devel libtorrent-rasterbar-devel ncurses-devel libncurses6 libsigc++2-devel"
+SUSE="$COMMON libcppunit-devel libcurl-devel libopenssl-devel libtorrent-rasterbar-devel gcc-c++ ncurses-devel libncurses6 libsigc++2-devel"
 ARCHLINUX="base-devel yaourt"  # TODO
 
 PHP_COMMON="php5 php5-curl php5-gd php5-mcrypt php5-mysql php5-suhosin php5-xmlrpc"
@@ -13,7 +13,7 @@ PHP_DEBIAN="$PHP_COMMON php5-cgi php5-cli php5-common php5-dev php5-mhash"
 PHP_SUSE="$PHP_COMMON php5-devel"
 PHP_ARCHLINUX="php php-cgi"  # TODO
 
-	echo -en "${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
+	echo -en "\n${bldred} iNSTALLiNG BASE PACKAGES, this may take a while...${rst}"
 
 	case "$DISTRO" in
 		Ubuntu|[Dd]ebian|*Mint) packages install $DEBIAN    ;;

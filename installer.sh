@@ -116,6 +116,13 @@ echo -e   "********************************\n"
 mksslcert generate-default-snakeoil
 base_install
 
+if [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
+	cd $BASE/tmp
+	download http://sourceforge.net/projects/dtach/files/dtach/0.8/dtach-0.8.tar.gz && extract dtach-0.8.tar.gz
+	cd dtach-0.8
+	sh configure && make && cp dtach /usr/bin
+fi
+
 cd $BASE
 ##[ APACHE ]##
 if [[ $http = 'apache' ]]; then
@@ -228,9 +235,12 @@ if [[ $ftpd = 'vsftp' ]]; then
 
 	cat /etc/vsftpd.conf | grep '# added by autoscript' >/dev/null
 	if [[ $? != 0 ]]; then  # Check if this has already been added or not
+		if [[ -f /etc/vsftpd/vsftpd.pem ]]; then
+			openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout /etc/vsftpd/vsftpd.pem -out /etc/vsftpd/vsftpd.pem -subj '/C=AN/ST=ON/L=YM/O=OU/CN=S/emailAddress=slash@dev.null' ;fi
 		echo "# added by autoscript"     >> /etc/vsftpd.conf
 		echo "force_local_logins_ssl=NO" >> /etc/vsftpd.conf
 		echo "force_local_data_ssl=NO"   >> /etc/vsftpd.conf
+		echo "rsa_cert_file=/etc/vsftpd/vsftpd.pem" >> /etc/vsftpd.conf
 		echo "ssl_enable=YES" >> /etc/vsftpd.conf
 		echo "ssl_tlsv1=YES"  >> /etc/vsftpd.conf
 		echo "ssl_sslv2=NO"   >> /etc/vsftpd.conf
@@ -240,10 +250,6 @@ if [[ $ftpd = 'vsftp' ]]; then
 
 	echo -n "Force SSL? [y/n]: "
 	if yes; then  # allow toggling of forcing ssl
-		if [[ -f /etc/vsftpd/vsftpd.pem ]]; then
-			openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout /etc/vsftpd/vsftpd.pem -out /etc/vsftpd/vsftpd.pem -subj '/C=AN/ST=ON/L=YM/O=OU/CN=S/emailAddress=slash@dev.null'
-			echo "rsa_cert_file=/etc/vsftpd/vsftpd.pem" >> /etc/vsftpd.conf
-		fi
 		sed -i 's:force_local_logins_ssl.*:force_local_logins_ssl=YES:' /etc/vsftpd.conf
 		sed -i 's:force_local_data_ssl.*:force_local_data_ssl=YES:'     /etc/vsftpd.conf
 	else
@@ -267,7 +273,7 @@ elif [[ $ftpd = 'proftp' ]]; then
 
 	if [[ ! -f /etc/proftpd/ssl/proftpd.cert.pem ]]; then  # Create SSL cert and conf
 		mkdir -p /etc/proftpd/ssl
-		mksslcert "/etc/proftpd/ssl/proftpd.cert" "/etc/proftpd/ssl/proftpd.key"
+		mksslcert "/etc/proftpd/ssl/proftpd.cert" "/etc/proftpd/ssl/proftpd.key" &&
 		log "PureFTP SSL Key created"
 		cat >> /etc/proftpd/proftpd.conf << "EOF"
 <IfModule mod_tls.c>
@@ -303,10 +309,10 @@ elif [[ $ftpd = 'pureftp' ]]; then
 	
 	if [[ ! -f /etc/ssl/private/pure-ftpd.pem ]]; then  # Create SSL Certificate
 		mkdir -p /etc/ssl/private
-		mksslcert "/etc/ssl/private/pure-ftpd.pem"
+		mksslcert "/etc/ssl/private/pure-ftpd.pem" &&
 		log "PureFTP SSL Key created"
 	fi
-	sed -i 's:STANDALONE_OR_INETD=.*:STANDALONE_OR_INETD=standalone:' /etc/default/pure-ftpd-common
+	[[ -f /etc/default/pure-ftpd-common ]] && sed -i 's:STANDALONE_OR_INETD=.*:STANDALONE_OR_INETD=standalone:' /etc/default/pure-ftpd-common
 
 	echo -n "Force SSL? [y/n]: "
 	if ! yes; then  # allow toggling of forcing ssl

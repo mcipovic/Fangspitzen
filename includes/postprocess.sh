@@ -133,7 +133,7 @@ echo ; read -p "Start rtorrent now? [y/n]: " start_rt
 	if [[ $start_rt = 'y' ]]; then
 		mkdir -p $HOME/.dtach ; rm -f $HOME/.dtach/rtorrent
 		chmod -R 755 $HOME/.dtach
-		chown -R $USER:$USER $HOME/.dtach
+		chown -R $USER $HOME/.dtach
 		sudo -u $USER dtach -n /home/$USER/.dtach/rtorrent rtorrent
 
 		TESTrt=$(pgrep -u $USER rtorrent)
@@ -146,7 +146,7 @@ fi
 ldconfig
 log "Linking Shared Libaries | Completed"
 
-echo -en "\n${bldred} Cleaning up...${rst}"
+echo -en "\n${bldred} Cleaning up... ${rst}"
 packages clean  # remove uneeded and cached packages
 cleanup
 echo -e "${bldylw} done${rst}"

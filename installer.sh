@@ -228,9 +228,7 @@ if [[ $ftpd = 'vsftp' ]]; then
 
 	cat /etc/vsftpd.conf | grep '# added by autoscript' >/dev/null
 	if [[ $? != 0 ]]; then  # Check if this has already been added or not
-		echo "# added by autoscript"                                       >> /etc/vsftpd.conf
-		echo "rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem"          >> /etc/vsftpd.conf
-		echo "rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key" >> /etc/vsftpd.conf
+		echo "# added by autoscript"     >> /etc/vsftpd.conf
 		echo "force_local_logins_ssl=NO" >> /etc/vsftpd.conf
 		echo "force_local_data_ssl=NO"   >> /etc/vsftpd.conf
 		echo "ssl_enable=YES" >> /etc/vsftpd.conf
@@ -242,11 +240,15 @@ if [[ $ftpd = 'vsftp' ]]; then
 
 	echo -n "Force SSL? [y/n]: "
 	if yes; then  # allow toggling of forcing ssl
+		if [[ -f /etc/vsftpd/vsftpd.pem ]]; then
+			openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout /etc/vsftpd/vsftpd.pem -out /etc/vsftpd/vsftpd.pem -subj '/C=AN/ST=ON/L=YM/O=OU/CN=S/emailAddress=slash@dev.null'
+			echo "rsa_cert_file=/etc/vsftpd/vsftpd.pem" >> /etc/vsftpd.conf
+		fi
 		sed -i 's:force_local_logins_ssl.*:force_local_logins_ssl=YES:' /etc/vsftpd.conf
-		sed -i 's:force_local_data_ssl.*:cforce_local_data_ssl=YES:'    /etc/vsftpd.conf
+		sed -i 's:force_local_data_ssl.*:force_local_data_ssl=YES:'     /etc/vsftpd.conf
 	else
 		sed -i 's:force_local_logins_ssl.*:force_local_logins_ssl=NO:'  /etc/vsftpd.conf
-		sed -i 's:force_local_data_ssl.*:cforce_local_data_ssl=NO:'     /etc/vsftpd.conf
+		sed -i 's:force_local_data_ssl.*:force_local_data_ssl=NO:'      /etc/vsftpd.conf
 	fi
 	/etc/init.d/vsftpd restart
 	log "vsFTP Installation | Completed" ; debug_wait "vsftpd.installed"

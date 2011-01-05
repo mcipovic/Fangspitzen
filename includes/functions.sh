@@ -126,7 +126,7 @@ mksslcert() {  # use 2048 bit certs, use sha256, and regenerate
 		fi
 	else
 		[[ $# = 1 ]] && openssl genrsa -des3 -out $1 1024  # generate single key file
-		[[ $# = 2 ]] && openssl rsa -in $1 -out $2 || openssl rsa -in $1 -out $1  # 2nd arg creates separate .pem and .key files
+		[[ $# = 2 ]] && openssl rsa -in $1 -out $2  # 2nd arg creates separate .pem and .key files
 		[[ $# = 3 ]] && openssl req -new -key $2 -days 3650 -out $3 -x509 -subj '/C=AN/ST=ON/L=YM/O=OU/CN=S/emailAddress=dev@slash.null'  # a 3rd arg creates a .crt file
 		chmod 400 $@  # Read write permission for owner only
 	fi
@@ -138,7 +138,7 @@ notice() {  # echo status or general info to stdout
 
 packages() {  # use appropriate package manager depending on distro
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
-	   [[ $DEBUG != 1 ]] && quiet='-qq'
+		[[ $DEBUG != 1 ]] && quiet='-qq'
 		case "$1" in
 			addkey )
 					apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $2 ;;
@@ -163,7 +163,7 @@ packages() {  # use appropriate package manager depending on distro
 					REPO_PATH=/etc/apt/sources.list.d  ;;
 		esac
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
-		 [[ $DEBUG != 1 ]] && quiet='--noconfirm'
+		[[ $DEBUG != 1 ]] && quiet='--noconfirm'
 		case "$1" in
 			clean  )
 					pacman --sync --clean -c $quiet
@@ -187,7 +187,7 @@ packages() {  # use appropriate package manager depending on distro
 					WEB=/srv/http WEBUSER='http' WEBGROUP='http' ;;
 		esac
 	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
-		 [[ $DEBUG != 1 ]] && quiet='--quiet'
+		[[ $DEBUG != 1 ]] && quiet='--quiet'
 		case "$1" in
 			addrepo) shift
 					zypper --no-gpg-checks --gpg-auto-import-keys addrepo --refresh $@ 2>> $LOG ;;
@@ -214,7 +214,7 @@ packages() {  # use appropriate package manager depending on distro
 		esac
 
 	elif [[ $DISTRO = "Fedora" ]]; then
-		 [[ $DEBUG != 1 ]] && quiet=''
+		[[ $DEBUG != 1 ]] && quiet=''
 		case "$1" in
 			clean  )
 					yum clean all -y
@@ -238,7 +238,7 @@ packages() {  # use appropriate package manager depending on distro
 		esac
 
 	elif [[ $DISTRO = "Gentoo" ]]; then
-		 [[ $DEBUG != 1 ]] && quiet='--quiet'
+		[[ $DEBUG != 1 ]] && quiet='--quiet'
 		case "$1" in
 			clean  )
 					emerge --clean  # --depclean
@@ -308,8 +308,8 @@ if [[ $OS = "Linux" ]] ; then
 	iP=$(wget --quiet --timeout=30 www.whatismyip.com/automation/n09230945.asp -O - 2)
 	[[ $iP != *.*.* ]] && error "Unable to find ip from outside"
 
-	readonly iP USER CORES BASE WEB HOME=/home/$USER LOG=$BASE/$LOG # make sure these variables aren't overwritten
 	packages setvars  # just sets REPO_PATH= at the moment
+	readonly iP USER CORES BASE WEB HOME=/home/$USER LOG=$BASE/$LOG # make sure these variables aren't overwritten
 	else error "Unsupported OS"
 fi
 	echo -e "[${bldylw} done ${rst}]" ;sleep 1

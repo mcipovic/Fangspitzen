@@ -3,7 +3,7 @@ base_install() {  # install dependencies
 COMMON="apache2-utils autoconf automake binutils bzip2 ca-certificates cpp curl fail2ban file gamin gcc git-core gzip htop iptables libexpat1 libtool libxml2 m4 make openssl patch perl pkg-config python python-gamin python-openssl python-setuptools screen subversion sudo unrar unzip zip"
 DYNAMIC="libcurl3 libcurl3-gnutls libcurl4-openssl-dev libncurses5 libncurses5-dev libsigc++-2.0-dev"
 
-DEBIAN="$COMMON $DYNAMIC apt-show-versions autotools-dev build-essential cfv comerr-dev dtach g++ libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtorrent-rasterbar-dev ncurses-base ncurses-bin ncurses-term perl-modules ssl-cert"
+DEBIAN="$COMMON $DYNAMIC aptitude autotools-dev build-essential cfv comerr-dev dtach g++ libcppunit-dev libperl-dev libssl-dev libterm-readline-gnu-perl libtorrent-rasterbar-dev ncurses-base ncurses-bin ncurses-term perl-modules ssl-cert"
 SUSE="$COMMON libcppunit-devel libcurl-devel libopenssl-devel libtorrent-rasterbar-devel gcc-c++ ncurses-devel libncurses6 libsigc++2-devel"
 ARCHLINUX="base-devel yaourt"  # TODO
 
@@ -158,7 +158,7 @@ packages() {  # use appropriate package manager depending on distro
 					apt-get upgrade --yes $quiet
 					alias_upgrade="apt-get upgrade"    ;;
 			version)
-					dpkg-query -p $2 | grep Version:   ;;
+					aptitude show $2 | grep Version:   ;;
 			setvars)
 					REPO_PATH=/etc/apt/sources.list.d  ;;
 		esac
@@ -260,6 +260,30 @@ packages() {  # use appropriate package manager depending on distro
 			setvars) ;;  # TODO
 		esac
 	fi
+}
+
+spanner() {
+	SP_COUNT=0
+	while [[ -d /proc/$1 ]]; do
+		while [[ "$SP_COUNT" -lt 10 ]]; do
+			echo -en "${bldpur}\b+ " ;sleep 0.1
+			((SP_COUNT++))
+		done
+		until [[ "$SP_COUNT" -eq 0 ]]; do
+			echo -en "\b\b $rst" ;sleep 0.1
+			((SP_COUNT -= 1))
+		done
+	done
+}
+
+spinner() {
+	SP_WIDTH=0.1
+	SP_STRING=".o0Oo"
+	while [[ -d /proc/$1 ]]; do
+		printf "${bldpur}\e7  %${SP_WIDTH}s  \e8${rst}" "$SP_STRING"
+		sleep 0.2
+		SP_STRING=${SP_STRING#"${SP_STRING%?}"}${SP_STRING%?}
+	done
 }
 
 usage() {  # help screen

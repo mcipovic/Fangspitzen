@@ -179,7 +179,7 @@ elif [[ $http = 'lighttp' ]]; then
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		packages install $PHP_ARCHLINUX lighttpd fcgi
 	fi
-	if_error "Lighttpd failed to install"
+	#if_error "Lighttpd failed to install"  # I wonder when fam and gamin api will be compatible
 
 	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create an SSL cert if one isnt found
 		mksslcert "/etc/lighttpd/server.pem"

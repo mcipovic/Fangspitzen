@@ -128,9 +128,9 @@ cd $BASE
 if [[ $http = 'apache' ]]; then
 	notice "iNSTALLiNG APACHE"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
-		packages install $PHP_DEBIAN apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp suphp-common apachetop
+		packages install $PHP_DEBIAN apache2 apache2-mpm-prefork libapache2-mod-php5 libapache2-mod-python libapache2-mod-scgi libapache2-mod-suphp php5 suphp-common apachetop
 	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
-		packages install $PHP_SUSE apache2 apache2-mod_php5 apache2-mod_scgi apache2-prefork suphp
+		packages install $PHP_SUSE apache2 apache2-mod_php5 apache2-mod_scgi apache2-prefork php5 suphp
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
 		packages install $PHP_ARCHLINUX apache php-apache
 	fi
@@ -172,7 +172,8 @@ if [[ $http = 'apache' ]]; then
 elif [[ $http = 'lighttp' ]]; then
 	notice "iNSTALLiNG LiGHTTP"
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
-		packages install $PHP_DEBIAN lighttpd
+		packages install lighttpd php5-cgi
+		packages install $PHP_DEBIAN
 	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		packages install $PHP_SUSE lighttpd
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
@@ -180,12 +181,13 @@ elif [[ $http = 'lighttp' ]]; then
 	fi
 	if_error "Lighttpd failed to install"
 
-	[[ ! -f /etc/lighttpd/server.pem ]] &&  # Create an SSL cert if one isnt found
-		mksslcert "/etc/lighttpd/server.pem" "/etc/lighttpd/server.key" &&
+	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create an SSL cert if one isnt found
+		mksslcert "/etc/lighttpd/server.pem" "/etc/lighttpd/server.key"
 		log "Lighttpd SSL Key created"
+	fi
 
 	cp modules/lighttp/scgi.conf /etc/lighttpd/conf-available/20-scgi.conf        # Add mountpoint and secure it with auth
-	cat < modules/lighttp/auth.conf >> /etc/lighttpd/conf-available/05-auth.conf  # apend contents of our auth.conf into lighttp's auth.conf
+	cat < modules/lighttp/auth.conf >> /etc/lighttpd/conf-available/05-auth.conf  # Apend contents of our auth.conf into lighttp's auth.conf
 	lighty-enable-mod scgi fastcgi fastcgi-php auth access accesslog compress ssl # Enable modules
 
 	PHPini=/etc/php5/cgi/php.ini

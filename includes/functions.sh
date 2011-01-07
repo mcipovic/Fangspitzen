@@ -7,7 +7,7 @@ DEBIAN="$COMMON $DYNAMIC aptitude autotools-dev build-essential cfv comerr-dev d
 SUSE="$COMMON libcppunit-devel libcurl-devel libopenssl-devel libtorrent-rasterbar-devel gcc-c++ ncurses-devel libncurses6 libsigc++2-devel"
 ARCHLINUX="base-devel yaourt"  # TODO
 
-PHP_COMMON="php5 php5-curl php5-gd php5-mcrypt php5-mysql php5-suhosin php5-xmlrpc"
+PHP_COMMON="php5-curl php5-gd php5-mcrypt php5-mysql php5-suhosin php5-xmlrpc"
 
 PHP_DEBIAN="$PHP_COMMON php5-cgi php5-cli php5-common php5-dev php5-mhash"
 PHP_SUSE="$PHP_COMMON php5-devel"

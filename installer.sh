@@ -182,7 +182,7 @@ elif [[ $http = 'lighttp' ]]; then
 	if_error "Lighttpd failed to install"
 
 	if [[ ! -f /etc/lighttpd/server.pem ]]; then  # Create an SSL cert if one isnt found
-		mksslcert "/etc/lighttpd/server.pem" "/etc/lighttpd/server.key"
+		mksslcert "/etc/lighttpd/server.pem"
 		log "Lighttpd SSL Key created"
 	fi
 

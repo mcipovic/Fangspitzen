@@ -9,7 +9,7 @@ if [[ $DISTRO = 'Ubuntu' ]]; then
 	echo "deb http://archive.ubuntu.com/ubuntu/ $NAME-updates multiverse"       >> $REPO_PATH/multiverse.list  # non-free
 	echo "deb-src http://archive.ubuntu.com/ubuntu/ $NAME-updates multiverse"   >> $REPO_PATH/multiverse.list  # non-free
 
-	echo "deb http://ppa.launchpad.net/cherokee-webserver/ppa/ubuntu $NAME main" > $REPO_PATH/autoinstaller.list  # Cherokee
+	echo "deb http://ppa.launchpad.net/cherokee-webserver/i-tse/ubuntu $NAME main" > $REPO_PATH/autoinstaller.list  # Cherokee
 	echo "deb http://ppa.launchpad.net/stbuehler/ppa/ubuntu $NAME main"         >> $REPO_PATH/autoinstaller.list  # Lighttp
 	echo "deb http://ppa.launchpad.net/deluge-team/ppa/ubuntu $NAME main"       >> $REPO_PATH/autoinstaller.list  # Deluge
 	echo "deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu $NAME main"    >> $REPO_PATH/autoinstaller.list  # Transmission

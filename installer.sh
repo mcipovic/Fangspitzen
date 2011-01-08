@@ -201,7 +201,8 @@ elif [[ $http = 'cherokee' ]]; then
 	#	packages install cherokee spawn-fcgi
 	#fi
 	if [[ $DISTRO = @(Ubuntu|[dD]ebian|*Mint) ]]; then
-		packages install $PHP_DEBIAN cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi
+		packages install cherokee libcherokee-mod-libssl libcherokee-mod-rrd libcherokee-mod-admin spawn-fcgi
+		packages install $PHP_DEBIAN 
 	elif [[ $DISTRO = @(SUSE|[Ss]use)* ]]; then
 		echo # packages install $PHP_SUSE TODO
 	elif [[ $DISTRO = @(ARCH|[Aa]rch)* ]]; then
